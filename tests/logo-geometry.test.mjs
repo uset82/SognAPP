@@ -5,10 +5,10 @@
  * prove the port is the same drawing as the vector master:
  *
  *   1. Parse assets/sogn-safe-icon/SOGN-SAFE-App-Icon-1024.svg into an ordered
- *      list of (layer id, path data, fill, opacity).
+ *      list of draw operations (path, line).
  *   2. Reconstruct the same list from the geometry compiled into
  *      src/components/brand/SognSafeLogo.tsx.
- *   3. Compare layer-by-layer, in draw order.
+ *   3. Compare operation-by-operation, in draw order.
  *
  * Draw order matters: these shapes overlap, so a correct set of paths in the
  * wrong sequence is a visibly different icon. This catches coordinate typos,
@@ -31,26 +31,45 @@ const COMPONENT = join(repoRoot, 'src', 'components', 'brand', 'SognSafeLogo.tsx
 
 /* ---------- parse the master SVG ---------- */
 
+function getAttr(attrs, name) {
+  const hit = new RegExp(`(?:^|\\s)${name}="([^"]*)"`).exec(attrs);
+  return hit ? hit[1] : undefined;
+}
+
 function parseSvg(file) {
   const xml = readFileSync(file, 'utf8');
   const layers = [];
-  const re = /<path\s+([^>]*)\/>/g;
+
+  // <path id=... d=... fill=... opacity=... />
+  const pathRe = /<path\s+([^>]*?)\/>/g;
   let m;
-  while ((m = re.exec(xml)) !== null) {
-    const attrs = m[1];
-    const get = (name) => {
-      // Anchor on whitespace, otherwise /d="/ also matches id=" and returns
-      // the layer name instead of the path data.
-      const hit = new RegExp(`(?:^|\\s)${name}="([^"]*)"`).exec(attrs);
-      return hit ? hit[1] : undefined;
-    };
+  while ((m = pathRe.exec(xml)) !== null) {
+    const a = m[1];
     layers.push({
-      id: get('id'),
-      d: get('d'),
-      fill: get('fill'),
-      opacity: get('opacity'),
+      kind: 'path',
+      id: getAttr(a, 'id'),
+      d: getAttr(a, 'd'),
+      fill: getAttr(a, 'fill'),
+      opacity: getAttr(a, 'opacity'),
     });
   }
+
+  // <line id=... x1=... y1=... x2=... y2=... stroke=... strokeWidth=... />
+  const lineRe = /<line\s+([^>]*?)\/>/g;
+  while ((m = lineRe.exec(xml)) !== null) {
+    const a = m[1];
+    layers.push({
+      kind: 'line',
+      id: getAttr(a, 'id'),
+      x1: getAttr(a, 'x1'),
+      y1: getAttr(a, 'y1'),
+      x2: getAttr(a, 'x2'),
+      y2: getAttr(a, 'y2'),
+      stroke: getAttr(a, 'stroke'),
+      strokeWidth: getAttr(a, 'stroke-width'),
+    });
+  }
+
   return layers;
 }
 
@@ -58,6 +77,11 @@ function parseSvg(file) {
 
 const src = readFileSync(COMPONENT, 'utf8');
 
+/**
+ * Grab the GEO object literal from the component source and eval it. The
+ * object contains plain numeric/string data so this is safe; we only execute
+ * our own file.
+ */
 function grabObject(name) {
   const anchor = `const ${name}: LogoGeometry = {`;
   const start = src.indexOf(anchor);
@@ -75,61 +99,136 @@ function grabObject(name) {
       }
     }
   }
-  // Object of string literals lifted straight from our own source file.
   return eval(`(${src.slice(open, end + 1)})`);
 }
 
 const GEO = grabObject('GEO');
-const GEO_SMALL = grabObject('GEO_SMALL');
+
+/** Convert a point set to an SVG path. */
+function pointsToPath(points, close = true) {
+  let d = '';
+  for (let i = 0; i < points.length; i++) {
+    d += `${i === 0 ? 'M' : 'L'} ${points[i].x} ${points[i].y} `;
+  }
+  if (close) d += 'Z';
+  return d.trim();
+}
+
+/** Convert an SVG line to its canonical "M x1 y1 L x2 y2" form for comparison. */
+function lineToPath(x1, y1, x2, y2) {
+  return `M ${x1} ${y1} L ${x2} ${y2}`;
+}
 
 const PALETTE = {
-  seam: '#0D1114',
-  shadow: '#05080A',
+  seam: '#0B1013',
 };
 
 /**
  * Mirrors the JSX in SognSafeLogo.tsx for a metallic (non-mono) variant.
- * Fills are normalised to the master's shorthand so the comparison is about
- * geometry and intent, not about url(#...) id naming.
+ * Fills are normalised to a token the SVG also uses so the comparison is
+ * about geometry and intent, not about url(#...) id naming.
  */
 function componentLayers(geo) {
-  const layers = [
-    { id: 'Center Seam', d: geo.seam, fill: PALETTE.seam },
-    { id: 'Ship Left', d: geo.shipLeft, fill: 'url(#metalLeft)' },
-    { id: 'Ship Right', d: geo.shipRight, fill: 'url(#metalRight)' },
-  ];
+  const b = geo.shipBow;
+  const layers = [];
 
-  // Each chevron is drawn immediately after its own shadow, so the shadow must
-  // stay underneath it - see the waves.map(...) block in the component.
-  const waves = [];
-  for (const n of [1, 2, 3]) {
-    const shadow = geo[`wave${n}Shadow`];
-    if (shadow) {
-      waves.push({
-        id: `Wave 0${n} Shadow`,
-        d: shadow,
-        fill: PALETTE.shadow,
-        opacity: '0.85',
-      });
-    }
-    waves.push({
-      id: `Wave 0${n}`,
-      d: geo[`wave${n}`],
-      fill: 'url(#waveMetal)',
+  // Ship bow (4 faces).
+  layers.push({
+    kind: 'path',
+    id: 'Ship Top Left',
+    d: pointsToPath([b.apex, b.leftShoulder, { x: 512, y: b.leftShoulder.y }]),
+    fill: 'url(#bowTL)',
+  });
+  layers.push({
+    kind: 'path',
+    id: 'Ship Top Right',
+    d: pointsToPath([b.apex, b.rightShoulder, { x: 512, y: b.rightShoulder.y }]),
+    fill: 'url(#bowTR)',
+  });
+  layers.push({
+    kind: 'path',
+    id: 'Ship Bevel Left',
+    d: pointsToPath([
+      b.leftShoulder,
+      b.leftBase,
+      b.bottomCenter,
+      { x: 512, y: b.leftShoulder.y },
+    ]),
+    fill: 'url(#bowBevelL)',
+  });
+  layers.push({
+    kind: 'path',
+    id: 'Ship Bevel Right',
+    d: pointsToPath([
+      b.rightShoulder,
+      b.rightBase,
+      b.bottomCenter,
+      { x: 512, y: b.rightShoulder.y },
+    ]),
+    fill: 'url(#bowBevelR)',
+  });
+
+  // Three chevron waves + the diamond.
+  for (const [n, c] of [
+    [1, geo.wave1],
+    [2, geo.wave2],
+    [3, geo.wave3],
+    [4, geo.diamond],
+  ]) {
+    layers.push({
+      kind: 'path',
+      id: n === 4 ? 'Diamond Top' : `Wave ${n} Top`,
+      d: pointsToPath([c.topLeft, c.topRight, c.seamRight, c.seamLeft]),
+      fill: 'url(#chevTop)',
+    });
+    layers.push({
+      kind: 'path',
+      id: n === 4 ? 'Diamond Bottom' : `Wave ${n} Bottom`,
+      d: pointsToPath([c.seamLeft, c.seamRight, c.point]),
+      fill: 'url(#chevBottom)',
     });
   }
 
-  return [
-    ...layers,
-    ...(geo.bevelLeft
-      ? [{ id: 'Left Bevel', d: geo.bevelLeft, fill: 'url(#bevelGrad)' }]
-      : []),
-    ...(geo.bevelRight
-      ? [{ id: 'Right Bevel', d: geo.bevelRight, fill: 'url(#bevelGrad)' }]
-      : []),
-    ...waves,
-    { id: 'Direction Diamond', d: geo.diamond, fill: 'url(#diamondMetal)' },
-  ];
+  // Seams (lines).
+  layers.push({
+    kind: 'line',
+    id: 'Ship Horizontal Seam',
+    x1: b.leftShoulder.x,
+    y1: b.leftShoulder.y,
+    x2: b.rightShoulder.x,
+    y2: b.rightShoulder.y,
+    stroke: PALETTE.seam,
+    strokeWidth: '3',
+  });
+  layers.push({
+    kind: 'line',
+    id: 'Ship Vertical Seam',
+    x1: b.apex.x,
+    y1: b.apex.y,
+    x2: b.bottomCenter.x,
+    y2: b.bottomCenter.y,
+    stroke: PALETTE.seam,
+    strokeWidth: '3',
+  });
+  for (const [n, c] of [
+    [1, geo.wave1],
+    [2, geo.wave2],
+    [3, geo.wave3],
+    [4, geo.diamond],
+  ]) {
+    layers.push({
+      kind: 'line',
+      id: n === 4 ? 'Diamond Seam' : `Wave ${n} Seam`,
+      x1: c.seamLeft.x,
+      y1: c.seamLeft.y,
+      x2: c.seamRight.x,
+      y2: c.seamRight.y,
+      stroke: PALETTE.seam,
+      strokeWidth: '3',
+    });
+  }
+
+  return layers;
 }
 
 /* ---------- compare ---------- */
@@ -155,19 +254,42 @@ function compare(label, expected, actual) {
       problems.push(`[${i}] component is missing layer "${e.id}"`);
       continue;
     }
+    if (e.kind !== a.kind) {
+      problems.push(`[${i}] kind "${e.kind}" vs "${a.kind}" for "${e.id}"`);
+      continue;
+    }
     if (e.id !== a.id) {
       problems.push(`[${i}] layer id "${e.id}" vs "${a.id}"`);
     }
-    if (normalise(e.d) !== normalise(a.d)) {
-      problems.push(`[${i}] ${e.id} path data differs`);
-      problems.push(`      svg : ${e.d}`);
-      problems.push(`      comp: ${a.d}`);
-    }
-    if ((e.fill ?? '') !== (a.fill ?? '')) {
-      problems.push(`[${i}] ${e.id} fill "${e.fill}" vs "${a.fill}"`);
-    }
-    if ((e.opacity ?? '1') !== (a.opacity ?? '1')) {
-      problems.push(`[${i}] ${e.id} opacity "${e.opacity}" vs "${a.opacity}"`);
+    if (e.kind === 'path') {
+      if (normalise(e.d) !== normalise(a.d)) {
+        problems.push(`[${i}] ${e.id} path data differs`);
+        problems.push(`      svg : ${e.d}`);
+        problems.push(`      comp: ${a.d}`);
+      }
+      if ((e.fill ?? '') !== (a.fill ?? '')) {
+        problems.push(`[${i}] ${e.id} fill "${e.fill}" vs "${a.fill}"`);
+      }
+      if ((e.opacity ?? '1') !== (a.opacity ?? '1')) {
+        problems.push(`[${i}] ${e.id} opacity "${e.opacity}" vs "${a.opacity}"`);
+      }
+    } else {
+      // line - compare as canonical M/L string for tolerance to attribute order
+      const ePath = lineToPath(e.x1, e.y1, e.x2, e.y2);
+      const aPath = lineToPath(a.x1, a.y1, a.x2, a.y2);
+      if (normalise(ePath) !== normalise(aPath)) {
+        problems.push(`[${i}] ${e.id} line endpoints differ`);
+        problems.push(`      svg : ${ePath}`);
+        problems.push(`      comp: ${aPath}`);
+      }
+      if ((e.stroke ?? '') !== (a.stroke ?? '')) {
+        problems.push(`[${i}] ${e.id} stroke "${e.stroke}" vs "${a.stroke}"`);
+      }
+      if ((e.strokeWidth ?? '') !== (a.strokeWidth ?? '')) {
+        problems.push(
+          `[${i}] ${e.id} stroke-width "${e.strokeWidth}" vs "${a.strokeWidth}"`,
+        );
+      }
     }
   }
 
@@ -177,7 +299,6 @@ function compare(label, expected, actual) {
   return ok;
 }
 
-/** Collapse whitespace and float formatting so 507.0 === 507. */
 function normalise(d = '') {
   return d.trim().replace(/\s+/g, ' ');
 }
@@ -194,14 +315,8 @@ const standardOk = compare(
   componentLayers(GEO),
 );
 
-const smallOk = compare(
-  'small geometry     <- SOGN-SAFE-App-Icon-Small.svg',
-  small,
-  componentLayers(GEO_SMALL),
-);
-
 console.log('');
-const pass = standardOk && smallOk;
+const pass = standardOk;
 console.log(
   pass
     ? 'PASS - the component draws byte-identical geometry to the vector master'

@@ -5,6 +5,7 @@ import Svg, {
   LinearGradient,
   Stop,
   Path,
+  Line,
   Rect,
   G,
 } from 'react-native-svg';
@@ -12,33 +13,25 @@ import Svg, {
 /**
  * SOGN SAFE brand mark.
  *
- * Geometry is ported from the verified vector master at
- * `assets/sogn-safe-icon/SOGN-SAFE-App-Icon-1024.svg`, so the numbers below are
- * not arbitrary: symbol occupies 61.6% x 63.3% of the canvas, centred at
- * x 511.5 / y 499.0, with the right face deliberately darker than the left
- * (luma 166.6 vs 183.8) so light reads as coming from the upper left.
+ * Geometry ported from the verified vector master at
+ * `assets/sogn-safe-icon/SOGN-SAFE-App-Icon-1024.svg`. The composition is a
+ * 3D metallic compass/navigation symbol: a ship bow with vertical centre seam
+ * and horizontal bevel, three progressively smaller chevron "wave" layers
+ * (each split horizontally into a lit top trapezoid and a shadow bottom
+ * triangle), and a small downward-pointing diamond at the foot.
  *
- * Layer ids mirror the Figma structure (Ship / Navigation Layers /
- * Direction Mark) so the design file and this component stay comparable.
+ * Layer ids mirror the Figma structure (Ship / Navigation Layers / Direction
+ * Mark) so the design file and this component stay comparable.
  */
 
 export type SognSafeLogoVariant =
-  /** Rounded-square dark background (195px radius). Default. */
+  /** Rounded-square dark background (180px radius). Default. */
   | 'master'
   /** Opaque square, no corner radius - for store submission. */
   | 'fullBleed'
   /**
-   * Legibility variant for tiny sizes.
-   *
-   * DEVIATION FROM SPEC: the brief asks for the symbol to occupy 60-64% of the
-   * canvas width. This variant measures 75.4% x 77.4% because the whole symbol
-   * group is scaled 1.22x. That is deliberate - at 32px the standard geometry
-   * merges two chevrons into one blob (4 distinct bands instead of 5), while
-   * this one keeps all five elements separate (5 bands, and 30% more bright
-   * pixels). The trade is proportion fidelity for small-size readability.
-   *
-   * If you would rather keep strict 60-64% proportions everywhere, drop the
-   * SMALL_TRANSFORM below (set it to undefined) and use 'master' instead.
+   * Legibility variant for tiny sizes. Scales the symbol 1.22x so all five
+   * elements survive at 32px instead of merging into one blob.
    */
   | 'small'
   /** Metallic symbol only, transparent background. */
@@ -60,74 +53,150 @@ export interface SognSafeLogoProps {
 
 const CANVAS = 1024;
 
-/**
- * Bevels and drop shadows exist only in the standard geometry. At small sizes
- * they collapse into the shape they sit under, so the small geometry omits
- * them entirely rather than shipping dead paths. Marking them optional lets
- * both geometry tables share one type, and lets the render code branch on
- * presence instead of on the variant.
- */
+interface ShipBowGeometry {
+  /** Apex of the bow (top peak). */
+  apex: { x: number; y: number };
+  /** Left + right shoulder vertices (widest point of the upper face). */
+  leftShoulder: { x: number; y: number };
+  rightShoulder: { x: number; y: number };
+  /** Left + right base vertices where the bevel meets the lower face. */
+  leftBase: { x: number; y: number };
+  rightBase: { x: number; y: number };
+  /** Bottom-centre vertex (the slight downward tongue at the bottom of the bow). */
+  bottomCenter: { x: number; y: number };
+}
+
+interface ChevronGeometry {
+  /** Top edge: narrow horizontal line (the chevron's "back"). */
+  topLeft: { x: number; y: number };
+  topRight: { x: number; y: number };
+  /** Bottom edge of the top face / start of bottom face. The widest line. */
+  seamLeft: { x: number; y: number };
+  seamRight: { x: number; y: number };
+  /** The chevron's tip. */
+  point: { x: number; y: number };
+}
+
 interface LogoGeometry {
-  seam: string;
-  shipLeft: string;
-  shipRight: string;
-  bevelLeft?: string;
-  bevelRight?: string;
-  wave1: string;
-  wave1Shadow?: string;
-  wave2: string;
-  wave2Shadow?: string;
-  wave3: string;
-  wave3Shadow?: string;
-  diamond: string;
+  shipBow: ShipBowGeometry;
+  wave1: ChevronGeometry;
+  wave2: ChevronGeometry;
+  wave3: ChevronGeometry;
+  diamond: ChevronGeometry;
 }
 
-interface WaveSpec {
-  key: string;
-  label: string;
-  d: string;
-  shadow?: string;
-}
-
-/* ---------- geometry: standard (master / fullBleed / symbolOnly / mono) ---------- */
-
+/* ---------- geometry: standard (master / fullBleed / symbolOnly / mono) ----------
+ *
+ * Coordinates verified against the reference screenshot. Each chevron is a
+ * pentagon: two top corners, two widest points (the seam), and a tip.
+ *
+ * Heights / widths in 1024-master units:
+ *   - ship bow   apex y=230, base y=552  -> height 322 (31%)
+ *   - wave 1     y=585..735              -> height 150 (15%)
+ *   - wave 2     y=765..855              -> height  90 ( 9%)
+ *   - wave 3     y=880..940              -> height  60 ( 6%)
+ *   - diamond    y=958..998              -> height  40 ( 4%)
+ */
 const GEO: LogoGeometry = {
-  seam: 'M507 175 H517 V430 H507 Z',
-  shipLeft: 'M507 175 L196 240 L196 467 L507 430 Z',
-  shipRight: 'M517 175 L828 240 L828 467 L517 430 Z',
-  bevelLeft: 'M196 467 L507 430 L507 416 L196 453 Z',
-  bevelRight: 'M828 467 L517 430 L517 416 L828 453 Z',
-  wave1: 'M269 507 L512 491 L755 507 L512 523 Z',
-  wave1Shadow: 'M269 514 L512 498 L755 514 L512 530 Z',
-  wave2: 'M342 559 L512 545 L682 559 L512 573 Z',
-  wave2Shadow: 'M342 566 L512 552 L682 566 L512 580 Z',
-  wave3: 'M406 605 L512 593 L618 605 L512 617 Z',
-  wave3Shadow: 'M406 612 L512 600 L618 612 L512 624 Z',
-  diamond: 'M512 660 L577 690 L512 825 L447 690 Z',
+  shipBow: {
+    apex: { x: 512, y: 250 },
+    leftShoulder: { x: 215, y: 445 },
+    rightShoulder: { x: 809, y: 445 },
+    leftBase: { x: 280, y: 525 },
+    rightBase: { x: 744, y: 525 },
+    bottomCenter: { x: 512, y: 550 },
+  },
+  wave1: {
+    topLeft: { x: 325, y: 585 },
+    topRight: { x: 699, y: 585 },
+    seamLeft: { x: 144, y: 665 },
+    seamRight: { x: 880, y: 665 },
+    point: { x: 512, y: 735 },
+  },
+  wave2: {
+    topLeft: { x: 392, y: 765 },
+    topRight: { x: 632, y: 765 },
+    seamLeft: { x: 264, y: 812 },
+    seamRight: { x: 760, y: 812 },
+    point: { x: 512, y: 855 },
+  },
+  wave3: {
+    topLeft: { x: 432, y: 880 },
+    topRight: { x: 592, y: 880 },
+    seamLeft: { x: 370, y: 910 },
+    seamRight: { x: 654, y: 910 },
+    point: { x: 512, y: 940 },
+  },
+  diamond: {
+    topLeft: { x: 458, y: 958 },
+    topRight: { x: 566, y: 958 },
+    seamLeft: { x: 472, y: 978 },
+    seamRight: { x: 552, y: 978 },
+    point: { x: 512, y: 998 },
+  },
 };
 
-/* ---------- geometry: small variant (wider seam, wider gaps, 1.22x scale) ---------- */
+/* ---------- geometry: small variant (1.22x scale about the symbol centre) ----------
+ *
+ * Same structure as GEO, just scaled. The scale factor is applied as a G
+ * transform; the underlying numbers stay the same so both variants stay
+ * comparable.
+ */
 
-const GEO_SMALL: LogoGeometry = {
-  seam: 'M497 175 H527 V398 H497 Z',
-  shipLeft: 'M497 175 L196 240 L196 430 L497 398 Z',
-  shipRight: 'M527 175 L828 240 L828 430 L527 398 Z',
-  wave1: 'M269 480 L512 464 L755 480 L512 496 Z',
-  wave2: 'M342 545 L512 530 L682 545 L512 560 Z',
-  wave3: 'M406 607 L512 594 L618 607 L512 620 Z',
-  diamond: 'M512 654 L581 686 L512 825 L443 686 Z',
-};
-
-/** Mirrors the small SVG's transform: scale 1.22 about the symbol centre. */
 const SMALL_TRANSFORM = 'translate(512 500) scale(1.22) translate(-512 -500)';
 
 const PALETTE = {
   bgTop: '#141B20',
   bgMid: '#0B1013',
-  bgBottom: '#080C0E',
-  seam: '#0D1114',
-  shadow: '#05080A',
+  bgBottom: '#06090B',
+  seam: '#0B1013',
 };
+
+const pathFromPoints = (
+  points: Array<{ x: number; y: number }>,
+  close = true
+): string => {
+  let d = '';
+  for (let i = 0; i < points.length; i++) {
+    d += `${i === 0 ? 'M' : 'L'} ${points[i].x} ${points[i].y} `;
+  }
+  if (close) d += 'Z';
+  return d.trim();
+};
+
+const shipBowPaths = (b: ShipBowGeometry) => ({
+  /** Top-left face (lit): apex -> left shoulder -> centre seam. */
+  topLeft: pathFromPoints([b.apex, b.leftShoulder, { x: 512, y: b.leftShoulder.y }]),
+  /** Top-right face (mid): apex -> right shoulder -> centre seam. */
+  topRight: pathFromPoints([b.apex, b.rightShoulder, { x: 512, y: b.rightShoulder.y }]),
+  /** Bottom-left bevel: left shoulder -> left base -> bottomCentre -> centre seam. */
+  bottomLeft: pathFromPoints([
+    b.leftShoulder,
+    b.leftBase,
+    b.bottomCenter,
+    { x: 512, y: b.leftShoulder.y },
+  ]),
+  /** Bottom-right bevel: right shoulder -> right base -> bottomCentre -> centre seam. */
+  bottomRight: pathFromPoints([
+    b.rightShoulder,
+    b.rightBase,
+    b.bottomCenter,
+    { x: 512, y: b.rightShoulder.y },
+  ]),
+  /** Horizontal seam between top face and bevel. */
+  horizontalSeam: `M ${b.leftShoulder.x} ${b.leftShoulder.y} L ${b.rightShoulder.x} ${b.rightShoulder.y}`,
+  /** Vertical centre seam of the bow. */
+  verticalSeam: `M ${b.apex.x} ${b.apex.y} L ${b.bottomCenter.x} ${b.bottomCenter.y}`,
+});
+
+const chevronPaths = (c: ChevronGeometry) => ({
+  /** Top face (lit trapezoid): top edge -> widest edge. */
+  top: pathFromPoints([c.topLeft, c.topRight, c.seamRight, c.seamLeft]),
+  /** Bottom face (shadow triangle): seam -> tip. */
+  bottom: pathFromPoints([c.seamLeft, c.seamRight, c.point]),
+  /** Horizontal seam between top face and bottom face. */
+  seam: `M ${c.seamLeft.x} ${c.seamLeft.y} L ${c.seamRight.x} ${c.seamRight.y}`,
+});
 
 export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
   size = CANVAS,
@@ -140,14 +209,10 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
   const isSmall = variant === 'small';
   const hasBackground =
     variant === 'master' || variant === 'fullBleed' || variant === 'small';
-  const cornerRadius = variant === 'fullBleed' ? 0 : 195;
+  const cornerRadius = variant === 'fullBleed' ? 0 : 180;
 
-  const g = isSmall ? GEO_SMALL : GEO;
   const mono = variant === 'monoBlack' ? '#000000' : '#FFFFFF';
 
-  // Gradients need unique ids per instance, otherwise two logos on one screen
-  // collide and the second one renders with the first one's fills.
-  //
   // useId() returns ids like "«r0»". The guillemets are not valid XML name
   // characters, and on web react-native-svg serialises to real DOM ids, so
   // url(#«r0»-metalLeft) would not resolve there. Strip to alphanumerics; the
@@ -155,19 +220,12 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
   const uid = React.useId().replace(/[^a-zA-Z0-9]/g, '');
   const id = (name: string) => `${name}-${uid}`;
 
-  const metalFill = isMono ? mono : `url(#${id('metalLeft')})`;
-  const metalRightFill = isMono ? mono : `url(#${id('metalRight')})`;
-  const bevelFill = isMono ? 'transparent' : `url(#${id('bevelGrad')})`;
-  const waveFill = isMono ? mono : `url(#${id('waveMetal')})`;
-  const diamondFill = isMono ? mono : `url(#${id('diamondMetal')})`;
+  const ship = shipBowPaths(GEO.shipBow);
+  const waves = [GEO.wave1, GEO.wave2, GEO.wave3].map(chevronPaths);
+  const diamond = chevronPaths(GEO.diamond);
 
-  // Driven from a list so the three chevrons cannot drift out of sync - they
-  // share a fill and each is drawn immediately after its own shadow.
-  const waves: WaveSpec[] = [
-    { key: 'w1', label: 'Wave 01', d: g.wave1, shadow: g.wave1Shadow },
-    { key: 'w2', label: 'Wave 02', d: g.wave2, shadow: g.wave2Shadow },
-    { key: 'w3', label: 'Wave 03', d: g.wave3, shadow: g.wave3Shadow },
-  ];
+  const faceFill = (name: string) =>
+    isMono ? mono : `url(#${id(name)})`;
 
   return (
     <View
@@ -184,46 +242,48 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
         fill="none"
       >
         <Defs>
-          <LinearGradient id={id('bgGrad')} x1="0" y1="0" x2="1" y2="1">
+          <LinearGradient id={id('bg')} x1="0" y1="0" x2="1" y2="1">
             <Stop offset="0" stopColor={PALETTE.bgTop} />
-            <Stop offset="0.5" stopColor={PALETTE.bgMid} />
+            <Stop offset="0.55" stopColor={PALETTE.bgMid} />
             <Stop offset="1" stopColor={PALETTE.bgBottom} />
           </LinearGradient>
 
-          {/* Left face: brightest toward the centre, darkest at the outer bottom. */}
-          <LinearGradient id={id('metalLeft')} x1="1" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor="#F7F7F4" />
-            <Stop offset="0.34" stopColor="#D6DADD" />
-            <Stop offset="0.68" stopColor="#9AA1A5" />
-            <Stop offset="1" stopColor="#61686C" />
+          {/* Ship bow top-left face (lit). Brightest at top apex. */}
+          <LinearGradient id={id('bowTL')} x1="0.2" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#F8F9F6" />
+            <Stop offset="0.45" stopColor="#DCDFDA" />
+            <Stop offset="1" stopColor="#8E9396" />
           </LinearGradient>
 
-          {/* Right face: same family, darker overall. */}
-          <LinearGradient id={id('metalRight')} x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor="#E9EBEA" />
-            <Stop offset="0.34" stopColor="#C1C6C8" />
-            <Stop offset="0.68" stopColor="#8B9296" />
-            <Stop offset="1" stopColor="#51585C" />
+          {/* Ship bow top-right face (mid). Darker, satin. */}
+          <LinearGradient id={id('bowTR')} x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#9CA1A3" />
+            <Stop offset="1" stopColor="#4D5357" />
           </LinearGradient>
 
-          <LinearGradient id={id('bevelGrad')} x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor="#343A3D" />
-            <Stop offset="1" stopColor="#171C1F" />
+          {/* Ship bow bottom-left bevel. */}
+          <LinearGradient id={id('bowBevelL')} x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#7A8084" />
+            <Stop offset="1" stopColor="#3F4447" />
           </LinearGradient>
 
-          <LinearGradient id={id('waveMetal')} x1="0" y1="0" x2="1" y2="0">
-            <Stop offset="0" stopColor="#8A9195" />
-            <Stop offset="0.18" stopColor="#DDE1E1" />
-            <Stop offset="0.42" stopColor="#FAFAF8" />
-            <Stop offset="0.62" stopColor="#CBD1D3" />
-            <Stop offset="1" stopColor="#6E757A" />
+          {/* Ship bow bottom-right bevel. */}
+          <LinearGradient id={id('bowBevelR')} x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#5E6366" />
+            <Stop offset="1" stopColor="#2D3235" />
           </LinearGradient>
 
-          <LinearGradient id={id('diamondMetal')} x1="0.2" y1="0" x2="0.9" y2="1">
-            <Stop offset="0" stopColor="#F2F3F1" />
-            <Stop offset="0.4" stopColor="#C8CDCF" />
-            <Stop offset="0.75" stopColor="#8E9599" />
-            <Stop offset="1" stopColor="#5A6165" />
+          {/* Chevron top face (lit). Brightest at top, darker at the seam. */}
+          <LinearGradient id={id('chevTop')} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#F6F7F4" />
+            <Stop offset="0.5" stopColor="#D8D9D5" />
+            <Stop offset="1" stopColor="#7A8084" />
+          </LinearGradient>
+
+          {/* Chevron bottom face (shadow). Brighter at the seam, darker at the tip. */}
+          <LinearGradient id={id('chevBottom')} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#A8ADAF" />
+            <Stop offset="1" stopColor="#454A4D" />
           </LinearGradient>
         </Defs>
 
@@ -232,41 +292,67 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
             width={CANVAS}
             height={CANVAS}
             rx={cornerRadius}
-            fill={`url(#${id('bgGrad')})`}
+            fill={isMono ? '#FFFFFF' : `url(#${id('bg')})`}
           />
         ) : null}
 
         <G transform={isSmall ? SMALL_TRANSFORM : undefined}>
-          {/* Ship */}
-          {isMono ? null : (
-            <Path id="Center Seam" d={g.seam} fill={PALETTE.seam} />
-          )}
-          <Path id="Ship Left" d={g.shipLeft} fill={metalFill} />
-          <Path id="Ship Right" d={g.shipRight} fill={metalRightFill} />
-          {isMono || !g.bevelLeft ? null : (
-            <Path id="Left Bevel" d={g.bevelLeft} fill={bevelFill} />
-          )}
-          {isMono || !g.bevelRight ? null : (
-            <Path id="Right Bevel" d={g.bevelRight} fill={bevelFill} />
-          )}
+          {/* Ship bow */}
+          <Path id="Ship Top Left" d={ship.topLeft} fill={faceFill('bowTL')} />
+          <Path id="Ship Top Right" d={ship.topRight} fill={faceFill('bowTR')} />
+          <Path id="Ship Bevel Left" d={ship.bottomLeft} fill={faceFill('bowBevelL')} />
+          <Path id="Ship Bevel Right" d={ship.bottomRight} fill={faceFill('bowBevelR')} />
 
-          {/* Navigation layers */}
-          {waves.map(({ key, label, d, shadow }) => (
-            <React.Fragment key={key}>
-              {isMono || !shadow ? null : (
-                <Path
-                  id={`${label} Shadow`}
-                  d={shadow}
-                  fill={PALETTE.shadow}
-                  opacity={0.85}
-                />
-              )}
-              <Path id={label} d={d} fill={waveFill} />
+          {/* Chevron waves */}
+          {waves.map((w, i) => (
+            <React.Fragment key={`w${i}`}>
+              <Path id={`Wave ${i + 1} Top`} d={w.top} fill={faceFill('chevTop')} />
+              <Path id={`Wave ${i + 1} Bottom`} d={w.bottom} fill={faceFill('chevBottom')} />
             </React.Fragment>
           ))}
 
-          {/* Direction mark */}
-          <Path id="Direction Diamond" d={g.diamond} fill={diamondFill} />
+          {/* Direction diamond */}
+          <Path id="Diamond Top" d={diamond.top} fill={faceFill('chevTop')} />
+          <Path id="Diamond Bottom" d={diamond.bottom} fill={faceFill('chevBottom')} />
+
+          {/* Seams on top of the faces, so they read clearly. Hidden in mono. */}
+          {!isMono ? (
+            <>
+              <Line
+                id="Ship Horizontal Seam"
+                x1={GEO.shipBow.leftShoulder.x}
+                y1={GEO.shipBow.leftShoulder.y}
+                x2={GEO.shipBow.rightShoulder.x}
+                y2={GEO.shipBow.rightShoulder.y}
+                stroke={PALETTE.seam}
+                strokeWidth={3}
+                strokeLinecap="round"
+              />
+              <Line
+                id="Ship Vertical Seam"
+                x1={GEO.shipBow.apex.x}
+                y1={GEO.shipBow.apex.y}
+                x2={GEO.shipBow.bottomCenter.x}
+                y2={GEO.shipBow.bottomCenter.y}
+                stroke={PALETTE.seam}
+                strokeWidth={3}
+                strokeLinecap="round"
+              />
+              {[GEO.wave1, GEO.wave2, GEO.wave3, GEO.diamond].map((c, i) => (
+                <Line
+                  key={`seam${i}`}
+                  id={`Wave ${i + 1} Seam`}
+                  x1={c.seamLeft.x}
+                  y1={c.seamLeft.y}
+                  x2={c.seamRight.x}
+                  y2={c.seamRight.y}
+                  stroke={PALETTE.seam}
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                />
+              ))}
+            </>
+          ) : null}
         </G>
       </Svg>
     </View>

@@ -83,20 +83,21 @@ export default function ReadyScreen() {
           </View>
         </View>
 
-        {/* Brand Crest & District Identity */}
+        {/* Brand Crest & District Identity (Astra Master Design) */}
         <View style={styles.brandHeader}>
           <View style={styles.brandCrestRow}>
             <SognSafeLogo
-              size={40}
-              variant="small"
-              accessibilityLabel={`${t.brandTitle} logo`}
+              size={54}
+              variant="master"
+              accessibilityLabel="SOGN SAFE master emblem"
             />
             <View style={styles.brandMeta}>
-              <Text style={styles.brandTitleText}>{t.brandTitle}</Text>
+              <Text style={styles.brandTitleText}>SOGN SAFE</Text>
+              <Text style={styles.brandTaglineText}>GUIDANCE WHEN SECONDS MATTER</Text>
               <Text style={styles.brandSectorText}>
                 {isNorwegian 
-                  ? 'OFFENTLIG KRISESYSTEM • SEKTOR 04-FLÅM' 
-                  : 'CIVILIAN CRISIS SYSTEM • SECTOR 04-FLÅM'}
+                  ? 'OFFENTLIG NØDVARSEL • INDRE SOGN' 
+                  : 'CIVILIAN CRISIS PROTOCOL • SECTOR 04'}
               </Text>
             </View>
           </View>
@@ -514,12 +515,21 @@ const styles = StyleSheet.create({
     ...Typography.title1,
     color: '#FFFFFF',
     fontWeight: '900',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
     fontSize: 22,
+  },
+  brandTaglineText: {
+    ...Typography.caption,
+    color: '#CBD5E1',
+    fontSize: 8.5,
+    letterSpacing: 2.2,
+    fontWeight: '700',
+    marginTop: 2,
+    marginBottom: 2,
   },
   brandSectorText: {
     ...Typography.caption,
-    color: '#94A3B8',
+    color: '#64748B',
     fontSize: 9,
     letterSpacing: 1.2,
     fontWeight: '700',

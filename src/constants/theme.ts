@@ -9,21 +9,29 @@
  */
 
 export const Colors = {
-  // Neutral Canvas & Surfaces (Nightglass Precision Tokens)
-  canvas: '#090B0E',
-  surface: '#12161D',
-  surfaceRaised: '#181D26',
-  surfaceSubtle: '#202733',
-  border: 'rgba(255, 255, 255, 0.08)',
-  borderLight: 'rgba(255, 255, 255, 0.14)',
+  // Neutral Canvas & Surfaces (Nightglass & Astra Metallic Tokens)
+  canvas: '#080B0F',
+  surface: '#0F151E',
+  surfaceRaised: '#151C28',
+  surfaceSubtle: '#1C2534',
+  carbonPlate: '#0B0F15',
+  border: 'rgba(255, 255, 255, 0.09)',
+  borderLight: 'rgba(255, 255, 255, 0.16)',
   borderSubtle: 'rgba(255, 255, 255, 0.04)',
-  specularTop: 'rgba(255, 255, 255, 0.15)',
+  specularTop: 'rgba(255, 255, 255, 0.20)',
+
+  // Astra Metallic Steel Palette
+  metalHighlight: '#F8FAFC',
+  metalPrimary: '#E2E8F0',
+  metalSecondary: '#94A3B8',
+  metalShadow: '#475569',
+  metalEdge: 'rgba(203, 213, 225, 0.25)',
 
   // Text Hierarchy
-  textPrimary: '#F4F7FB',
-  textSecondary: '#C6CDD7',
-  textMuted: '#8A95A5',
-  textFaint: '#505A68',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#CBD5E1',
+  textMuted: '#7E8B9B',
+  textFaint: '#475569',
   textOnColor: '#FFFFFF',
 
   // Semantic Emergency Palette
