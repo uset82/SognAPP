@@ -11,6 +11,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "no.hvl.sognsafe",
       "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
         "NSLocationWhenInUseUsageDescription": "SOGN SAFE uses your location to calculate distance to the nearest safe shelter and to guide your evacuation path during active incidents.",
         "UIBackgroundModes": [
           "remote-notification"
