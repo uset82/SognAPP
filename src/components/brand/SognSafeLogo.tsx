@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, Image, StyleSheet, ViewStyle } from 'react-native';
 import Svg, {
   Defs,
   LinearGradient,
@@ -10,18 +10,19 @@ import Svg, {
   G,
 } from 'react-native-svg';
 
+const ASTRA_SQUIRCLE_MASTER = require('../../../assets/sogn-safe-icon/Astra-Squircle-Master.png');
+
 /**
  * SOGN SAFE brand mark.
  *
  * Geometry ported from the verified vector master at
  * `assets/sogn-safe-icon/SOGN-SAFE-App-Icon-1024.svg`. The composition is a
- * 3D metallic compass/navigation symbol: a ship bow with vertical centre seam
- * and horizontal bevel, three progressively smaller chevron "wave" layers
- * (each split horizontally into a lit top trapezoid and a shadow bottom
- * triangle), and a small downward-pointing diamond at the foot.
+ * 3D metallic compass / navigation symbol: a ship bow with vertical centre seam
+ * and horizontal shoulder seam, one wide chevron "wave" with a lit top
+ * trapezoid and a shadow bottom triangle, and a small downward triangle below.
  *
- * Layer ids mirror the Figma structure (Ship / Navigation Layers / Direction
- * Mark) so the design file and this component stay comparable.
+ * Layer ids mirror the Figma structure (Ship / Navigation Layers) so the
+ * design file and this component stay comparable.
  *
  * SYNC CONTRACT: GEO below must match the master SVG exactly —
  * `tests/logo-geometry.test.mjs` fails if they drift. The other SVGs in
@@ -36,7 +37,7 @@ export type SognSafeLogoVariant =
   /** Opaque square, no corner radius - for store submission. */
   | 'fullBleed'
   /**
-   * Legibility variant for tiny sizes. Scales the symbol 1.22x so all five
+   * Legibility variant for tiny sizes. Scales the symbol 1.10x so all three
    * elements survive at 32px instead of merging into one blob.
    */
   | 'small'
@@ -62,10 +63,10 @@ const CANVAS = 1024;
 interface ShipBowGeometry {
   /** Apex of the bow (top peak). */
   apex: { x: number; y: number };
-  /** Left + right shoulder vertices (widest point of the upper face). */
+  /** Left + right shoulder vertices (widest point - the horizontal seam). */
   leftShoulder: { x: number; y: number };
   rightShoulder: { x: number; y: number };
-  /** Left + right base vertices where the bevel meets the lower face. */
+  /** Left + right base vertices where the bevel narrows in. */
   leftBase: { x: number; y: number };
   rightBase: { x: number; y: number };
   /** Bottom-centre vertex (the slight downward tongue at the bottom of the bow). */
@@ -83,73 +84,65 @@ interface ChevronGeometry {
   point: { x: number; y: number };
 }
 
+interface TriangleGeometry {
+  /** Two top corners + tip. */
+  topLeft: { x: number; y: number };
+  topRight: { x: number; y: number };
+  point: { x: number; y: number };
+}
+
 interface LogoGeometry {
   shipBow: ShipBowGeometry;
   wave1: ChevronGeometry;
-  wave2: ChevronGeometry;
-  wave3: ChevronGeometry;
-  diamond: ChevronGeometry;
+  wave2: TriangleGeometry;
 }
 
 /* ---------- geometry: standard (master / fullBleed / symbolOnly / mono) ----------
  *
- * Coordinates verified against the reference screenshot. Each chevron is a
- * pentagon: two top corners, two widest points (the seam), and a tip.
+ * Coordinates verified against the reference screenshot. Reference is 230x230;
+ * scaled to 1024 master units (factor 4.452).
  *
  * Heights / widths in 1024-master units:
- *   - ship bow   apex y=250, base y=550  -> height 300 (29%)
- *   - wave 1     y=585..735              -> height 150 (15%)
- *   - wave 2     y=765..855              -> height  90 ( 9%)
- *   - wave 3     y=880..940              -> height  60 ( 6%)
- *   - diamond    y=958..998              -> height  40 ( 4%)
+ *   - ship bow   apex y=174, base y=552  -> height 378 (37%)
+ *   - wave 1     y=557..695               -> height 138 (13%), peak width 72%
+ *   - wave 2     y=743..837               -> height  94 ( 9%), simple triangle
+ *   - gap bow/w1 = 5 units, gap w1/w2 = 48 units
+ *
+ * Bow base width 390 (71% of shoulder width 566) - reference silhouette has
+ * bottom/shoulder width ratio of 0.69.
+ *
+ * Symbol height 663 of 1024 = 64.7% (matches spec "62-66%").
  */
 const GEO: LogoGeometry = {
   shipBow: {
-    apex: { x: 512, y: 250 },
-    leftShoulder: { x: 215, y: 445 },
-    rightShoulder: { x: 809, y: 445 },
-    leftBase: { x: 280, y: 525 },
-    rightBase: { x: 744, y: 525 },
-    bottomCenter: { x: 512, y: 550 },
+    apex: { x: 512, y: 174 },
+    leftShoulder: { x: 229, y: 401 },
+    rightShoulder: { x: 795, y: 401 },
+    leftBase: { x: 320, y: 540 },
+    rightBase: { x: 704, y: 540 },
+    bottomCenter: { x: 512, y: 560 },
   },
   wave1: {
-    topLeft: { x: 325, y: 585 },
-    topRight: { x: 699, y: 585 },
-    seamLeft: { x: 144, y: 665 },
-    seamRight: { x: 880, y: 665 },
-    point: { x: 512, y: 735 },
+    topLeft: { x: 343, y: 557 },
+    topRight: { x: 681, y: 557 },
+    seamLeft: { x: 138, y: 628 },
+    seamRight: { x: 886, y: 628 },
+    point: { x: 512, y: 695 },
   },
   wave2: {
-    topLeft: { x: 392, y: 765 },
-    topRight: { x: 632, y: 765 },
-    seamLeft: { x: 264, y: 812 },
-    seamRight: { x: 760, y: 812 },
-    point: { x: 512, y: 855 },
-  },
-  wave3: {
-    topLeft: { x: 432, y: 880 },
-    topRight: { x: 592, y: 880 },
-    seamLeft: { x: 370, y: 910 },
-    seamRight: { x: 654, y: 910 },
-    point: { x: 512, y: 940 },
-  },
-  diamond: {
-    topLeft: { x: 458, y: 958 },
-    topRight: { x: 566, y: 958 },
-    seamLeft: { x: 472, y: 978 },
-    seamRight: { x: 552, y: 978 },
-    point: { x: 512, y: 998 },
+    topLeft: { x: 334, y: 743 },
+    topRight: { x: 690, y: 743 },
+    point: { x: 512, y: 837 },
   },
 };
 
-/* ---------- geometry: small variant (1.22x scale about the symbol centre) ----------
+/* ---------- geometry: small variant (1.10x scale about the symbol centre) ----------
  *
  * Same structure as GEO, just scaled. The scale factor is applied as a G
  * transform; the underlying numbers stay the same so both variants stay
  * comparable.
  */
-
-const SMALL_TRANSFORM = 'translate(512 500) scale(1.22) translate(-512 -500)';
+const SMALL_TRANSFORM = 'translate(512 500) scale(1.10) translate(-512 -500)';
 
 const PALETTE = {
   bgTop: '#141B20',
@@ -204,6 +197,9 @@ const chevronPaths = (c: ChevronGeometry) => ({
   seam: `M ${c.seamLeft.x} ${c.seamLeft.y} L ${c.seamRight.x} ${c.seamRight.y}`,
 });
 
+const trianglePath = (t: TriangleGeometry) =>
+  pathFromPoints([t.topLeft, t.topRight, t.point]);
+
 export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
   size = CANVAS,
   variant = 'master',
@@ -211,10 +207,28 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
   testID,
   style,
 }) => {
+  if (variant === 'master' || !variant) {
+    const radius = Math.round(size * (180 / CANVAS));
+    return (
+      <View
+        style={[styles.wrap, { width: size, height: size }, style]}
+        testID={testID}
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel={accessibilityLabel}
+      >
+        <Image
+          source={ASTRA_SQUIRCLE_MASTER}
+          style={{ width: size, height: size, borderRadius: radius }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
+
   const isMono = variant === 'monoWhite' || variant === 'monoBlack';
   const isSmall = variant === 'small';
-  const hasBackground =
-    variant === 'master' || variant === 'fullBleed' || variant === 'small';
+  const hasBackground = variant === 'fullBleed' || variant === 'small';
   const cornerRadius = variant === 'fullBleed' ? 0 : 180;
 
   const mono = variant === 'monoBlack' ? '#000000' : '#FFFFFF';
@@ -227,8 +241,8 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
   const id = (name: string) => `${name}-${uid}`;
 
   const ship = shipBowPaths(GEO.shipBow);
-  const waves = [GEO.wave1, GEO.wave2, GEO.wave3].map(chevronPaths);
-  const diamond = chevronPaths(GEO.diamond);
+  const wave1 = chevronPaths(GEO.wave1);
+  const wave2 = trianglePath(GEO.wave2);
 
   const faceFill = (name: string) =>
     isMono ? mono : `url(#${id(name)})`;
@@ -291,6 +305,12 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
             <Stop offset="0" stopColor="#A8ADAF" />
             <Stop offset="1" stopColor="#454A4D" />
           </LinearGradient>
+
+          {/* Wave 2: single triangle, slightly darker overall. */}
+          <LinearGradient id={id('wave2Top')} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#D8D9D5" />
+            <Stop offset="1" stopColor="#5E6366" />
+          </LinearGradient>
         </Defs>
 
         {hasBackground ? (
@@ -309,17 +329,12 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
           <Path id="Ship Bevel Left" d={ship.bottomLeft} fill={faceFill('bowBevelL')} />
           <Path id="Ship Bevel Right" d={ship.bottomRight} fill={faceFill('bowBevelR')} />
 
-          {/* Chevron waves */}
-          {waves.map((w, i) => (
-            <React.Fragment key={`w${i}`}>
-              <Path id={`Wave ${i + 1} Top`} d={w.top} fill={faceFill('chevTop')} />
-              <Path id={`Wave ${i + 1} Bottom`} d={w.bottom} fill={faceFill('chevBottom')} />
-            </React.Fragment>
-          ))}
+          {/* Wave 1: chevron with lit top + shadow bottom */}
+          <Path id="Wave 1 Top" d={wave1.top} fill={faceFill('chevTop')} />
+          <Path id="Wave 1 Bottom" d={wave1.bottom} fill={faceFill('chevBottom')} />
 
-          {/* Direction diamond */}
-          <Path id="Diamond Top" d={diamond.top} fill={faceFill('chevTop')} />
-          <Path id="Diamond Bottom" d={diamond.bottom} fill={faceFill('chevBottom')} />
+          {/* Wave 2: simple downward triangle */}
+          <Path id="Wave 2" d={wave2} fill={faceFill('wave2Top')} />
 
           {/* Seams on top of the faces, so they read clearly. Hidden in mono. */}
           {!isMono ? (
@@ -344,19 +359,16 @@ export const SognSafeLogo: React.FC<SognSafeLogoProps> = ({
                 strokeWidth={3}
                 strokeLinecap="round"
               />
-              {[GEO.wave1, GEO.wave2, GEO.wave3, GEO.diamond].map((c, i) => (
-                <Line
-                  key={`seam${i}`}
-                  id={`Wave ${i + 1} Seam`}
-                  x1={c.seamLeft.x}
-                  y1={c.seamLeft.y}
-                  x2={c.seamRight.x}
-                  y2={c.seamRight.y}
-                  stroke={PALETTE.seam}
-                  strokeWidth={3}
-                  strokeLinecap="round"
-                />
-              ))}
+              <Line
+                id="Wave 1 Seam"
+                x1={GEO.wave1.seamLeft.x}
+                y1={GEO.wave1.seamLeft.y}
+                x2={GEO.wave1.seamRight.x}
+                y2={GEO.wave1.seamRight.y}
+                stroke={PALETTE.seam}
+                strokeWidth={3}
+                strokeLinecap="round"
+              />
             </>
           ) : null}
         </G>

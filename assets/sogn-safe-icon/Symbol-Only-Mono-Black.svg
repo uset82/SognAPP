@@ -2,5 +2,5 @@
   <title>SOGN SAFE</title>
   <desc>Single-colour black symbol on transparent background.</desc>
 
-  <path id="Symbol" d="Ship Top Left Ship Top Right Ship Bevel Left Ship Bevel Right Wave 1 Top Wave 1 Bottom Wave 2 Top Wave 2 Bottom Wave 3 Top Wave 3 Bottom Diamond Top Diamond Bottom" fill="#000000" />
+  <path id="Symbol" d="Ship Top Left Ship Top Right Ship Bevel Left Ship Bevel Right Wave 1 Top Wave 1 Bottom Wave 2" fill="#000000" />
 </svg>
