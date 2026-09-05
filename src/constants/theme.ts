@@ -9,42 +9,46 @@
  */
 
 export const Colors = {
-  // Neutral Canvas & Surfaces
-  canvas: '#0D0F12',
-  surface: '#16191E',
-  surfaceRaised: '#1E232A',
-  surfaceSubtle: '#252B33',
-  border: '#2C333D',
-  borderLight: '#3D4653',
+  // Neutral Canvas & Surfaces (Nightglass Precision Tokens)
+  canvas: '#090B0E',
+  surface: '#12161D',
+  surfaceRaised: '#181D26',
+  surfaceSubtle: '#202733',
+  border: 'rgba(255, 255, 255, 0.08)',
+  borderLight: 'rgba(255, 255, 255, 0.14)',
+  borderSubtle: 'rgba(255, 255, 255, 0.04)',
+  specularTop: 'rgba(255, 255, 255, 0.15)',
 
-  // Text
-  textPrimary: '#FFFFFF',
-  textSecondary: '#A0AAB8',
-  textMuted: '#6D7886',
+  // Text Hierarchy
+  textPrimary: '#F4F7FB',
+  textSecondary: '#C6CDD7',
+  textMuted: '#8A95A5',
+  textFaint: '#505A68',
   textOnColor: '#FFFFFF',
 
   // Semantic Emergency Palette
-  emergencyRed: '#D93829',
-  emergencyRedDark: '#3A1412',
-  emergencyRedBorder: '#E65142',
-  emergencyRedText: '#FFA197',
+  emergencyRed: '#EF4444',
+  emergencyRedDark: '#2B1113',
+  emergencyRedBorder: '#F87171',
+  emergencyRedText: '#FCA5A5',
 
-  // Safety / Normal State
-  safetyGreen: '#1E874B',
-  safetyGreenDark: '#122E1F',
-  safetyGreenBorder: '#27A860',
-  safetyGreenText: '#87E2A9',
+  // Safety / Normal State (High-grade Emerald)
+  safetyGreen: '#10B981',
+  safetyGreenDark: '#0B2418',
+  safetyGreenBorder: '#059669',
+  safetyGreenText: '#6EE7B7',
 
   // Warning / Degraded Connectivity
-  warningAmber: '#D97706',
-  warningAmberDark: '#33200B',
-  warningAmberBorder: '#F59E0B',
-  warningAmberText: '#FCD34D',
+  warningAmber: '#F59E0B',
+  warningAmberDark: '#2B1B09',
+  warningAmberBorder: '#D97706',
+  warningAmberText: '#FDE68A',
 
   // Accent / Map & Navigation
-  fjordTeal: '#2A5A66',
-  fjordTealLight: '#4B8898',
+  fjordTeal: '#0284C7',
+  fjordTealLight: '#38BDF8',
   routeBlue: '#38BDF8',
+  routeBlueDark: '#082F49',
 };
 
 export const Spacing = {

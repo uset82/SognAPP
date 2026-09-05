@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
 import { Colors, Spacing, Typography, BorderRadius } from '../constants/theme';
 import { EmergencyButton } from '../components/ui';
+import { AlertTriangleIcon } from '../components/ui/CivicIcons';
 
 export default function AlertScreen() {
   const router = useRouter();
@@ -65,7 +66,7 @@ export default function AlertScreen() {
         <View style={styles.affectedAreaCard}>
           <View style={styles.affectedHeaderRow}>
             <View style={styles.affectedIconBadge}>
-              <Text style={styles.affectedIcon}>!</Text>
+              <AlertTriangleIcon size={18} color="#FFFFFF" />
             </View>
             <View style={styles.affectedTextCol}>
               <Text style={styles.affectedHeading}>

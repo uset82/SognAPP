@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" fill="none">
+  <title>SOGN SAFE / App Icon / Small-size variant (optimised for 32-64px)</title>
+
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#141B20"/>
+      <stop offset="0.5" stop-color="#0B1013"/>
+      <stop offset="1" stop-color="#080C0E"/>
+    </linearGradient>
+    <linearGradient id="metalLeft" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F7F7F4"/>
+      <stop offset="0.34" stop-color="#D6DADD"/>
+      <stop offset="0.68" stop-color="#9AA1A5"/>
+      <stop offset="1" stop-color="#61686C"/>
+    </linearGradient>
+    <linearGradient id="metalRight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E9EBEA"/>
+      <stop offset="0.34" stop-color="#C1C6C8"/>
+      <stop offset="0.68" stop-color="#8B9296"/>
+      <stop offset="1" stop-color="#51585C"/>
+    </linearGradient>
+    <linearGradient id="waveMetal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8A9195"/>
+      <stop offset="0.42" stop-color="#FAFAF8"/>
+      <stop offset="1" stop-color="#6E757A"/>
+    </linearGradient>
+    <linearGradient id="diamondMetal" x1="0.2" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#F2F3F1"/>
+      <stop offset="0.5" stop-color="#C8CDCF"/>
+      <stop offset="1" stop-color="#5A6165"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" rx="195" fill="url(#bgGrad)"/>
+
+  <!-- Same silhouette as the master, re-spaced for tiny sizes.
+       Rule: a gap must be >= 32 units at this scale to survive one pixel at
+       32px render (1024/32 = 32). Master gaps were ~14 => 0.44px => invisible.
+       Seam widened 10 -> 30 for the same reason. -->
+  <g id="Symbol" transform="translate(512 500) scale(1.22) translate(-512 -500)">
+    <path id="Center Seam" d="M497 175 H527 V398 H497 Z" fill="#0D1114"/>
+    <path id="Ship Left" d="M497 175 L196 240 L196 430 L497 398 Z" fill="url(#metalLeft)"/>
+    <path id="Ship Right" d="M527 175 L828 240 L828 430 L527 398 Z" fill="url(#metalRight)"/>
+
+    <path id="Wave 01" d="M269 480 L512 464 L755 480 L512 496 Z" fill="url(#waveMetal)"/>
+    <path id="Wave 02" d="M342 545 L512 530 L682 545 L512 560 Z" fill="url(#waveMetal)"/>
+    <path id="Wave 03" d="M406 607 L512 594 L618 607 L512 620 Z" fill="url(#waveMetal)"/>
+
+    <path id="Direction Diamond" d="M512 654 L581 686 L512 825 L443 686 Z" fill="url(#diamondMetal)"/>
+  </g>
+</svg>

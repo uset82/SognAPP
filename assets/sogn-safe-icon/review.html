@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOGN SAFE — App Icon Review</title>
+<style>
+  :root {
+    --bg: #0D0F12;
+    --surface: #16191E;
+    --raised: #1E232A;
+    --border: #2C333D;
+    --text: #FFFFFF;
+    --muted: #A0AAB8;
+    --green: #27A860;
+    --amber: #F59E0B;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 40px 32px 64px;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.3px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 36px; }
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin: 40px 0 16px; font-weight: 600;
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px;
+  }
+  .sizes { display: flex; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+  .size { text-align: center; }
+  .size img { display: block; border-radius: 6px; }
+  .size .lbl { font-size: 12px; color: var(--muted); margin-top: 10px; font-variant-numeric: tabular-nums; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+  .cmp { text-align: center; }
+  .cmp img { border-radius: 8px; display: block; margin: 0 auto; }
+  .cmp .lbl { font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .cmp .good { color: var(--green); }
+  .cmp .warn { color: var(--amber); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .ok { color: var(--green); font-weight: 600; }
+  .note {
+    background: var(--raised); border-left: 3px solid var(--amber);
+    padding: 14px 18px; border-radius: 0 8px 8px 0; font-size: 13px; color: var(--muted);
+    margin-top: 20px;
+  }
+  .note strong { color: var(--text); }
+  .swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+  .sw { width: 84px; }
+  .sw .chip { height: 44px; border-radius: 8px; border: 1px solid var(--border); }
+  .sw .name { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .sw .hex { font-size: 10px; color: #6D7886; font-family: ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>SOGN SAFE — App Icon Review</h1>
+  <p class="sub">Vector reconstruction · 1024 master + preview sizes · now also a React Native component</p>
+
+  <div class="note" style="border-left-color:var(--amber); margin:0 0 8px;">
+    <strong>One deviation is open.</strong> The <code>small</code> variant measures
+    <strong>75.4% wide</strong> against the spec's 60–64%. That is the 1.22&times; scale that
+    keeps all five elements separate at 32px. It affects tiny renders and the 38px in-app badge
+    only — <em>not</em> the shipped app icon, which uses the standard geometry at 61.7%.
+    Decide keep or revert; see the tradeoff table below.
+  </div>
+
+  <h2>Preview sizes</h2>
+  <div class="card">
+    <div class="sizes">
+      <div class="size"><img src="png/SOGN-SAFE-App-Icon-1024.png" width="240" height="240" alt="1024"><div class="lbl">1024</div></div>
+      <div class="size"><img src="png/SOGN-SAFE-App-Icon-512.png" width="128" height="128" alt="512"><div class="lbl">512</div></div>
+      <div class="size"><img src="png/SOGN-SAFE-App-Icon-256.png" width="72" height="72" alt="256"><div class="lbl">256</div></div>
+      <div class="size"><img src="png/SOGN-SAFE-App-Icon-128.png" width="44" height="44" alt="128"><div class="lbl">128</div></div>
+      <div class="size"><img src="png/SOGN-SAFE-App-Icon-64.png" width="32" height="32" alt="64"><div class="lbl">64</div></div>
+      <div class="size"><img src="png/SOGN-SAFE-App-Icon-32.png" width="24" height="24" alt="32"><div class="lbl">32</div></div>
+    </div>
+  </div>
+
+  <h2>Small-size: master vs optimised variant</h2>
+  <div class="card">
+    <div class="grid2">
+      <div class="cmp">
+        <img src="png/SOGN-SAFE-App-Icon-32.png" width="96" height="96" alt="master 32">
+        <div class="lbl">Master @ 32px &nbsp;·&nbsp; <span class="warn">4 bands</span></div>
+      </div>
+      <div class="cmp">
+        <img src="png-small/SOGN-SAFE-App-Icon-Small-32.png" width="96" height="96" alt="small 32">
+        <div class="lbl">Variant @ 32px &nbsp;·&nbsp; <span class="good">5 bands</span></div>
+      </div>
+      <div class="cmp">
+        <img src="png/SOGN-SAFE-App-Icon-64.png" width="96" height="96" alt="master 64">
+        <div class="lbl">Master @ 64px &nbsp;·&nbsp; <span class="good">5 bands</span></div>
+      </div>
+      <div class="cmp">
+        <img src="png-small/SOGN-SAFE-App-Icon-Small-64.png" width="96" height="96" alt="small 64">
+        <div class="lbl">Variant @ 64px &nbsp;·&nbsp; <span class="good">5 bands</span></div>
+      </div>
+    </div>
+    <div class="note">
+      <strong>Why there are two.</strong> At 32px the master's three wave layers merge into
+      visual mud: the gaps between them are ~14 units at master scale, which is
+      <em>0.44px</em> when rendered at 32 — sub-pixel, so they vanish. The variant scales the
+      symbol up 1.22&times; and widens the gaps to ~32 units, which restores all five
+      separate elements. Both are shipped; pick whichever looks right to you.
+    </div>
+  </div>
+
+  <h2>Symbol variants</h2>
+  <div class="card">
+    <div class="grid2">
+      <div class="cmp">
+        <img src="png/SOGN-SAFE-App-Icon-512.png" width="110" height="110" alt="metallic">
+        <div class="lbl">Metallic (on dark)</div>
+      </div>
+      <div class="cmp" style="background:#F6F5F2; border-radius:8px; padding:12px;">
+        <img src="Symbol-Only-Mono-Black.svg" width="86" height="88" alt="mono black">
+        <div class="lbl" style="color:#5a5a5a;">Mono Black (on light)</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Numeric verification</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Check</th><th>Measured</th><th>Spec</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Symbol width</td><td class="num">61.6%</td><td class="num">60–64%</td><td class="ok">PASS</td></tr>
+        <tr><td>Symbol height</td><td class="num">63.3%</td><td class="num">62–66%</td><td class="ok">PASS</td></tr>
+        <tr><td>Horizontal centre</td><td class="num">x 511.5</td><td class="num">x 512</td><td class="ok">PASS</td></tr>
+        <tr><td>Vertical centre</td><td class="num">y 499.0</td><td class="num">slightly above centre</td><td class="ok">PASS</td></tr>
+        <tr><td>Left face luma</td><td class="num">183.8</td><td class="num">brighter</td><td class="ok">PASS</td></tr>
+        <tr><td>Right face luma</td><td class="num">166.6</td><td class="num">darker</td><td class="ok">PASS</td></tr>
+        <tr><td>Background</td><td class="num">rgb(19,26,30)</td><td class="num">deep blue-black</td><td class="ok">PASS</td></tr>
+        <tr><td>Corner radius</td><td class="num">195px</td><td class="num">180–210px</td><td class="ok">PASS</td></tr>
+        <tr><td>Shape count</td><td class="num">13</td><td class="num">&lt; 30</td><td class="ok">PASS</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="border-left-color:var(--green);">
+      <strong>Still needs your eyes.</strong> Everything above was verified by sampling
+      actual pixels, but three things from the brief can't be measured: whether the metal
+      reads as <em>satin</em> rather than chrome, whether it's <em>silver</em> rather than
+      white, and above all the side-by-side against your reference screenshot. Compare
+      the 1024 render against the original before signing off.
+    </div>
+  </div>
+
+  <h2>Palette vs project tokens</h2>
+  <div class="card">
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#0B1013"></div><div class="name">Icon base</div><div class="hex">#0B1013</div></div>
+      <div class="sw"><div class="chip" style="background:#0D0F12"></div><div class="name">canvas</div><div class="hex">#0D0F12</div></div>
+      <div class="sw"><div class="chip" style="background:#141B20"></div><div class="name">Icon top</div><div class="hex">#141B20</div></div>
+      <div class="sw"><div class="chip" style="background:#16191E"></div><div class="name">surface</div><div class="hex">#16191E</div></div>
+      <div class="sw"><div class="chip" style="background:#080C0E"></div><div class="name">Icon bottom</div><div class="hex">#080C0E</div></div>
+      <div class="sw"><div class="chip" style="background:#D6DADD"></div><div class="name">Metal mid</div><div class="hex">#D6DADD</div></div>
+    </div>
+    <div class="note" style="border-left-color:var(--green);">
+      Icon background sits within the SOGN SAFE dark-neutral family — largest channel
+      delta against the project tokens is <strong>5</strong>, which is imperceptible.
+      No palette conflict.
+    </div>
+  </div>
+
+  <h2>Files</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>File</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>SOGN-SAFE-App-Icon-1024.svg</code></td><td>Master — rounded square, editable vector</td></tr>
+        <tr><td><code>SOGN-SAFE-App-Icon-FullBleed.svg</code></td><td>Opaque square, no radius — App Store submission</td></tr>
+        <tr><td><code>SOGN-SAFE-App-Icon-Small.svg</code></td><td>Optimised for 32–64px</td></tr>
+        <tr><td><code>Symbol-Only-Metallic.svg</code></td><td>Symbol without background</td></tr>
+        <tr><td><code>Symbol-Only-Mono-White.svg</code> / <code>-Black.svg</code></td><td>Single-colour marks</td></tr>
+        <tr><td><code>png/</code> <code>png-small/</code> <code>png-fullbleed/</code></td><td>Renders at 1024·512·256·128·64·32</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

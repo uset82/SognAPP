@@ -20,9 +20,9 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/sogn-safe-icon/png-symbol/Symbol-Only-Metallic-1024.png",
+        "foregroundImage": "./assets/sogn-safe-icon/png-symbol-square/Symbol-Only-Square-Metallic-1024.png",
         "backgroundColor": "#0B1013",
-        "monochromeImage": "./assets/sogn-safe-icon/png-mono-white/Symbol-Only-Mono-White-1024.png"
+        "monochromeImage": "./assets/sogn-safe-icon/png-symbol-square-mono/Symbol-Only-Square-Mono-White-1024.png"
       },
       "package": "no.hvl.sognsafe",
       "permissions": [
@@ -40,8 +40,8 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/sogn-safe-icon/png-symbol/Symbol-Only-Metallic-1024.png",
-          "imageWidth": 240,
+          "image": "./assets/sogn-safe-icon/png-symbol-square/Symbol-Only-Square-Metallic-1024.png",
+          "imageWidth": 300,
           "resizeMode": "contain",
           "backgroundColor": "#0B1013"
         }
