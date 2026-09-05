@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "SOGN SAFE",
+    "slug": "sogn-safe",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "sognsafe",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "no.hvl.sognsafe",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "SOGN SAFE uses your location to calculate distance to the nearest safe shelter and to guide your evacuation path during active incidents.",
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#121417"
+      },
+      "package": "no.hvl.sognsafe"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#121417"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "SOGN SAFE uses your location to show the nearest verified safe zone and guide your evacuation."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#D93829"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

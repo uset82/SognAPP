@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="140 119 744 762" fill="none">
+  <title>SOGN SAFE / Symbol Only / Metallic</title>
+
+  <defs>
+    <linearGradient id="metalLeft" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F7F7F4"/>
+      <stop offset="0.34" stop-color="#D6DADD"/>
+      <stop offset="0.68" stop-color="#9AA1A5"/>
+      <stop offset="1" stop-color="#61686C"/>
+    </linearGradient>
+    <linearGradient id="metalRight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E9EBEA"/>
+      <stop offset="0.34" stop-color="#C1C6C8"/>
+      <stop offset="0.68" stop-color="#8B9296"/>
+      <stop offset="1" stop-color="#51585C"/>
+    </linearGradient>
+    <linearGradient id="bevelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#343A3D"/>
+      <stop offset="1" stop-color="#171C1F"/>
+    </linearGradient>
+    <linearGradient id="waveMetal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8A9195"/>
+      <stop offset="0.18" stop-color="#DDE1E1"/>
+      <stop offset="0.42" stop-color="#FAFAF8"/>
+      <stop offset="0.62" stop-color="#CBD1D3"/>
+      <stop offset="1" stop-color="#6E757A"/>
+    </linearGradient>
+    <linearGradient id="diamondMetal" x1="0.2" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#F2F3F1"/>
+      <stop offset="0.4" stop-color="#C8CDCF"/>
+      <stop offset="0.75" stop-color="#8E9599"/>
+      <stop offset="1" stop-color="#5A6165"/>
+    </linearGradient>
+  </defs>
+
+  <g id="Symbol">
+    <g id="Ship">
+      <path id="Center Seam" d="M507 175 H517 V430 H507 Z" fill="#0D1114"/>
+      <path id="Ship Left" d="M507 175 L196 240 L196 467 L507 430 Z" fill="url(#metalLeft)"/>
+      <path id="Ship Right" d="M517 175 L828 240 L828 467 L517 430 Z" fill="url(#metalRight)"/>
+      <path id="Left Bevel" d="M196 467 L507 430 L507 416 L196 453 Z" fill="url(#bevelGrad)"/>
+      <path id="Right Bevel" d="M828 467 L517 430 L517 416 L828 453 Z" fill="url(#bevelGrad)"/>
+    </g>
+    <g id="Navigation Layers">
+      <path id="Wave 01 Shadow" d="M269 514 L512 498 L755 514 L512 530 Z" fill="#05080A" opacity="0.85"/>
+      <path id="Wave 01" d="M269 507 L512 491 L755 507 L512 523 Z" fill="url(#waveMetal)"/>
+      <path id="Wave 02 Shadow" d="M342 566 L512 552 L682 566 L512 580 Z" fill="#05080A" opacity="0.85"/>
+      <path id="Wave 02" d="M342 559 L512 545 L682 559 L512 573 Z" fill="url(#waveMetal)"/>
+      <path id="Wave 03 Shadow" d="M406 612 L512 600 L618 612 L512 624 Z" fill="#05080A" opacity="0.85"/>
+      <path id="Wave 03" d="M406 605 L512 593 L618 605 L512 617 Z" fill="url(#waveMetal)"/>
+    </g>
+    <g id="Direction Mark">
+      <path id="Direction Diamond" d="M512 660 L577 690 L512 825 L447 690 Z" fill="url(#diamondMetal)"/>
+    </g>
+  </g>
+</svg>
