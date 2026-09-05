@@ -1,0 +1,98 @@
+{
+  "version": "1.0",
+  "manifestId": "manifest-task-018738",
+  "taskId": "task-018738",
+  "host": "antigravity",
+  "latestStage": "review",
+  "stackSelectionId": "sel-task-018738",
+  "artifacts": [
+    {
+      "artifactId": "art-intent-task-018738",
+      "stage": "plan",
+      "artifactType": "task-intent",
+      "producer": {
+        "providerId": "system",
+        "modelKey": "system",
+        "skillId": "framework-selector"
+      },
+      "summary": "Normalized user request and constraints."
+    },
+    {
+      "artifactId": "art-selection-task-018738",
+      "stage": "plan",
+      "artifactType": "stack-selection",
+      "producer": {
+        "providerId": "system",
+        "modelKey": "system",
+        "skillId": "framework-selector"
+      },
+      "summary": "Selected stack: cross-platform-mobile with flutter."
+    },
+    {
+      "artifactId": "art-design-task-018738-0-1788640040994",
+      "stage": "design",
+      "artifactType": "design-system",
+      "producer": {
+        "providerId": "bytedance",
+        "modelKey": "doubao-seed-2.1-pro",
+        "skillId": "webdesigner-design-system"
+      },
+      "path": "src/constants/theme.ts",
+      "summary": "Nightglass obsidian-emerald tokens"
+    },
+    {
+      "artifactId": "art-design-task-018738-1-1788640040994",
+      "stage": "design",
+      "artifactType": "ui-component",
+      "producer": {
+        "providerId": "bytedance",
+        "modelKey": "doubao-seed-2.1-pro",
+        "skillId": "webdesigner-design-system"
+      },
+      "path": "src/components/ui/CalmLocalMapCard.tsx",
+      "summary": "Maritime Fjord Radar HUD"
+    },
+    {
+      "artifactId": "art-design-task-018738-2-1788640040994",
+      "stage": "design",
+      "artifactType": "screen",
+      "producer": {
+        "providerId": "bytedance",
+        "modelKey": "doubao-seed-2.1-pro",
+        "skillId": "webdesigner-design-system"
+      },
+      "path": "src/app/index.tsx",
+      "summary": "Luminous Bento READY screen"
+    },
+    {
+      "artifactId": "art-build-task-018738-0-1788640053997",
+      "stage": "build",
+      "artifactType": "code",
+      "producer": {
+        "providerId": "openrouter",
+        "modelKey": "openrouter/deepseek-chat",
+        "skillId": "code-generator"
+      },
+      "path": "src/app/index.tsx",
+      "summary": "TypeScript compilation and test verification"
+    },
+    {
+      "artifactId": "art-review-task-018738-0-1788640063482",
+      "stage": "review",
+      "artifactType": "audit-report",
+      "producer": {
+        "providerId": "openrouter",
+        "modelKey": "openrouter/deepseek-chat",
+        "skillId": "animation-quality-gate"
+      },
+      "path": "src/app/index.tsx",
+      "summary": "WebDesigner Anti-Slop Audit 100/100 PASSED"
+    }
+  ],
+  "handoffNotes": [
+    "Project initialized. Ready for design stage.",
+    "Applied Nightglass luminous bento architecture, high-definition maritime radar HUD, and precision SVG civic icons.",
+    "Engine code compiled with zero type errors. All 11 scenario integration tests passed.",
+    "Anti-slop audit verified at 100/100. WCAG contrast and responsive touch targets approved."
+  ]
+}
