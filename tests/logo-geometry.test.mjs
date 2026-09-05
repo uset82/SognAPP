@@ -79,20 +79,18 @@ if (!existsSync(MASTER_SVG)) {
 }
 
 // 2. Verify Production PNG Assets
-console.log('\n[Test 2] Verifying production 1024x1024 metallic squircle PNG targets...');
+console.log('\n[Test 2] Verifying production 1024x1024 metallic squircle and fullbleed PNG targets...');
 const TARGET_PNGS = [
-  join(repoRoot, 'assets', 'icon.png'),
-  join(repoRoot, 'assets', 'splash-icon.png'),
-  join(repoRoot, 'assets', 'images', 'icon.png'),
-  join(repoRoot, 'assets', 'images', 'splash-icon.png'),
-  join(iconDir, 'Astra-Squircle-Master.png'),
-  join(iconDir, 'png-symbol-square', 'Symbol-Only-Square-Metallic-1024.png'),
-  join(iconDir, 'png-fullbleed', 'SOGN-SAFE-App-Icon-FullBleed-1024.png'),
+  { path: join(repoRoot, 'assets', 'icon.png'), expectedHash: '7daf8644d9b1646514e270794e9ff858' },
+  { path: join(repoRoot, 'assets', 'splash-icon.png'), expectedHash: '7daf8644d9b1646514e270794e9ff858' },
+  { path: join(repoRoot, 'assets', 'images', 'icon.png'), expectedHash: '7daf8644d9b1646514e270794e9ff858' },
+  { path: join(repoRoot, 'assets', 'images', 'splash-icon.png'), expectedHash: '7daf8644d9b1646514e270794e9ff858' },
+  { path: join(iconDir, 'Astra-Squircle-Master.png'), expectedHash: '7daf8644d9b1646514e270794e9ff858' },
+  { path: join(iconDir, 'png-symbol-square', 'Symbol-Only-Square-Metallic-1024.png'), expectedHash: '7daf8644d9b1646514e270794e9ff858' },
+  { path: join(iconDir, 'png-fullbleed', 'SOGN-SAFE-App-Icon-FullBleed-1024.png'), expectedHash: '18c0ba6ca1888ce35fcb47b8fa5751f2' },
 ];
 
-const EXPECTED_HASH = '7daf8644d9b1646514e270794e9ff858';
-
-for (const pngPath of TARGET_PNGS) {
+for (const { path: pngPath, expectedHash } of TARGET_PNGS) {
   const relPath = pngPath.replace(repoRoot, '').replace(/^[\\/]/, '');
   if (!existsSync(pngPath)) {
     console.log(`  FAIL: Missing asset: ${relPath}`);
@@ -119,8 +117,8 @@ for (const pngPath of TARGET_PNGS) {
     continue;
   }
 
-  if (hash !== EXPECTED_HASH) {
-    console.log(`  FAIL: Hash mismatch (${hash} != ${EXPECTED_HASH}): ${relPath}`);
+  if (hash !== expectedHash) {
+    console.log(`  FAIL: Hash mismatch (${hash} != ${expectedHash}): ${relPath}`);
     allPassed = false;
     continue;
   }
