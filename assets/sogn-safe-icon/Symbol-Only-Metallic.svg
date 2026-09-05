@@ -1,44 +1,58 @@
-<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" role="img" aria-label="SOGN SAFE symbol">
-  <title>SOGN SAFE</title>
-  <desc>Metallic symbol only, transparent background.</desc>
-
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="184.5 91 884 859.5" preserveAspectRatio="none" fill="none">
+  <title>SOGN SAFE — Logoapp reference master</title>
+  <desc>Editable vector reconstruction measured from Logoapp.png. Two tapered upper panels, two folded tiers and a solid downward triangular tip.</desc>
   <defs>
-    <linearGradient id="bowTL" x1="0.15" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FFFFFF" />
-      <stop offset="0.40" stop-color="#E8EBE6" />
-      <stop offset="1" stop-color="#9CA0A0" />
-    </linearGradient>
-    <linearGradient id="bowTR" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#8E9396" />
-      <stop offset="1" stop-color="#3F4447" />
-    </linearGradient>
-    <linearGradient id="bowBevelL" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#6E7377" />
-      <stop offset="1" stop-color="#3A3F42" />
-    </linearGradient>
-    <linearGradient id="bowBevelR" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#555A5D" />
-      <stop offset="1" stop-color="#252A2D" />
-    </linearGradient>
-    <linearGradient id="chevTop" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#F6F7F4" />
-      <stop offset="0.5" stop-color="#D8D9D5" />
-      <stop offset="1" stop-color="#7A8084" />
-    </linearGradient>
-    <linearGradient id="chevBottom" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#A8ADAF" />
-      <stop offset="1" stop-color="#454A4D" />
-    </linearGradient>
+    <linearGradient id="tile" x1="626" y1="91" x2="626" y2="949" gradientUnits="userSpaceOnUse"><stop stop-color="#1C262E"/><stop offset=".43" stop-color="#0C1419"/><stop offset="1" stop-color="#050A0D"/></linearGradient>
+    <linearGradient id="rim" x1="626" y1="93" x2="626" y2="947" gradientUnits="userSpaceOnUse"><stop stop-color="#52616E"/><stop offset=".38" stop-color="#293740"/><stop offset="1" stop-color="#18242B"/></linearGradient>
+    <linearGradient id="leftMetal" x1="550" y1="296" x2="405" y2="535" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset=".45" stop-color="#F2F3F3"/><stop offset="1" stop-color="#C5C9CC"/></linearGradient>
+    <linearGradient id="rightMetal" x1="635" y1="253" x2="835" y2="537" gradientUnits="userSpaceOnUse"><stop stop-color="#D5D9DB"/><stop offset=".38" stop-color="#9CA4A9"/><stop offset="1" stop-color="#727C83"/></linearGradient>
+    <linearGradient id="edge" x1="619" y1="440" x2="624" y2="482" gradientUnits="userSpaceOnUse"><stop stop-color="#B2B8BB"/><stop offset=".38" stop-color="#525B60"/><stop offset="1" stop-color="#11181C"/></linearGradient>
+    <linearGradient id="bandLeft" x1="623" y1="518" x2="485" y2="618" gradientUnits="userSpaceOnUse"><stop stop-color="#FAFBFB"/><stop offset=".55" stop-color="#E0E3E4"/><stop offset="1" stop-color="#F8F9F9"/></linearGradient>
+    <linearGradient id="bandRight" x1="626" y1="512" x2="831" y2="623" gradientUnits="userSpaceOnUse"><stop stop-color="#BEC5C9"/><stop offset=".45" stop-color="#9AA3A9"/><stop offset="1" stop-color="#D6DCDF"/></linearGradient>
+    <linearGradient id="lowerLeft" x1="625" y1="602" x2="497" y2="659" gradientUnits="userSpaceOnUse"><stop stop-color="#FAFBFB"/><stop offset="1" stop-color="#D8DCDD"/></linearGradient>
+    <linearGradient id="lowerRight" x1="626" y1="601" x2="794" y2="663" gradientUnits="userSpaceOnUse"><stop stop-color="#AEB7BD"/><stop offset="1" stop-color="#8D999F"/></linearGradient>
+    <linearGradient id="tipLeft" x1="547" y1="700" x2="626" y2="774" gradientUnits="userSpaceOnUse"><stop stop-color="#F7F8F8"/><stop offset="1" stop-color="#C5CDD1"/></linearGradient>
+    <linearGradient id="tipRight" x1="626" y1="701" x2="690" y2="766" gradientUnits="userSpaceOnUse"><stop stop-color="#7E8B93"/><stop offset="1" stop-color="#A5AFB5"/></linearGradient>
+    <filter id="tileShadow" x="-.2" y="-.2" width="1.4" height="1.5" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="25" stdDeviation="23" flood-color="#161A1D" flood-opacity=".42"/></filter>
+    <filter id="metalShadow" x="-.2" y="-.2" width="1.4" height="1.5" color-interpolation-filters="sRGB"><feDropShadow dx="0" dy="15" stdDeviation="11" flood-color="#000000" flood-opacity=".65"/></filter>
+    <clipPath id="metalClip"><path d="M614 250 Q617 247 616 254 L604 462 L425 540 Q420 542 418 537 L392 459 Q390 454 394 451 Z M638 250 Q635 247 636 255 L647 462 L825 540 Q830 542 832 536 L856 460 Q859 454 854 450 Z M306 607 L625 510 L943 607 L850 607 L625 559 L401 607 Z M411 648 L625 601 L838 648 Q809 659 788 660 L625 649 L465 660 Q438 660 411 648 Z M509 702 L625 699 L741 702 L625 773 Z"/></clipPath>
   </defs>
-
-  <path id="Ship Top Left" d="M 512 174 L 229 401 L 512 401 Z" fill="url(#bowTL)" />
-  <path id="Ship Top Right" d="M 512 174 L 795 401 L 512 401 Z" fill="url(#bowTR)" />
-  <path id="Ship Bevel Left" d="M 229 401 L 320 540 L 512 560 L 512 401 Z" fill="url(#bowBevelL)" />
-  <path id="Ship Bevel Right" d="M 795 401 L 704 540 L 512 560 L 512 401 Z" fill="url(#bowBevelR)" />
-  <line id="Ship Horizontal Seam" x1="229" y1="401" x2="795" y2="401" stroke="#0B1013" stroke-width="3" />
-  <line id="Ship Vertical Seam" x1="512" y1="174" x2="512" y2="560" stroke="#0B1013" stroke-width="3" />
-  <path id="Wave 1 Top" d="M 343 557 L 681 557 L 886 628 L 138 628 Z" fill="url(#chevTop)" />
-  <path id="Wave 1 Bottom" d="M 138 628 L 886 628 L 512 695 Z" fill="url(#chevBottom)" />
-  <line id="Wave 1 Seam" x1="138" y1="628" x2="886" y2="628" stroke="#0B1013" stroke-width="3" />
-  <path id="Wave 2" d="M 334 743 L 690 743 L 512 837 Z" fill="url(#wave2Top)" />
+  
+  <g id="App-icon">
+    <g id="Silver-symbol" filter="url(#metalShadow)">
+      <g id="Upper-panels">
+        <path id="Left-panel-depth" d="M392 458 L418 540 Q421 548 427 547 L611 479 Q618 476 617 469 L616 252 L603 462 L423 539 Z" fill="url(#edge)"/>
+        <path id="Right-panel-depth" d="M636 252 L635 470 Q634 477 642 480 L824 547 Q830 549 834 540 L857 459 L826 540 L647 462 Z" fill="url(#edge)"/>
+        <path id="Left-panel-face" d="M614 250 Q617 247 616 254 L604 462 L425 540 Q420 542 418 537 L392 459 Q390 454 394 451 Z" fill="url(#leftMetal)" stroke="#DFE4E7" stroke-width="2" stroke-linejoin="round"/>
+        <path id="Right-panel-face" d="M638 250 Q635 247 636 255 L647 462 L825 540 Q830 542 832 536 L856 460 Q859 454 854 450 Z" fill="url(#rightMetal)" stroke="#BDC5CA" stroke-width="2" stroke-linejoin="round"/>
+        <path id="Bright-inside-bevel" d="M614 254 L604 462 L616 471 M638 254 L647 462 L636 471" stroke="#FFFFFF" stroke-opacity=".72" stroke-width="2"/>
+      </g>
+      <g id="Wide-folded-tier">
+        <path id="Wide-tier-depth" d="M306 607 Q354 614 402 613 L625 568 L848 613 Q897 614 943 607 L850 605 L625 559 L401 605 Z" fill="#333D43"/>
+        <path id="Wide-tier-left" d="M306 607 L625 510 L625 559 L401 607 Z" fill="url(#bandLeft)"/>
+        <path id="Wide-tier-right" d="M625 510 L943 607 L850 607 L625 559 Z" fill="url(#bandRight)"/>
+        <path id="Wide-tier-light" d="M306 607 L625 510 L943 607 M625 512 L625 558" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M306 607 L401 607 L625 559 L850 607 L943 607" stroke="#B4BDC2" stroke-width="1.3"/>
+      </g>
+      <g id="Lower-folded-tier">
+        <path id="Lower-tier-depth" d="M411 648 Q440 667 466 666 L625 655 L787 666 Q816 664 838 648 L788 659 L625 647 L465 659 Z" fill="#343F45"/>
+        <path id="Lower-tier-left" d="M411 648 L625 601 L625 649 L465 660 Q438 660 411 648 Z" fill="url(#lowerLeft)"/>
+        <path id="Lower-tier-right" d="M625 601 L838 648 Q809 659 788 660 L625 649 Z" fill="url(#lowerRight)"/>
+        <path id="Lower-tier-light" d="M411 648 L625 601 L838 648 M625 603 L625 649" stroke="#FFFFFF" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M411 648 Q438 660 465 660 L625 649 L788 660 Q812 660 838 648" stroke="#CAD1D5" stroke-width="1.3"/>
+      </g>
+      <g id="Solid-triangular-tip">
+        <path id="Tip-depth" d="M509 703 L625 778 L741 703 L625 769 Z" fill="#3E494F"/>
+        <path id="Tip-left" d="M509 702 L625 699 L625 773 Z" fill="url(#tipLeft)"/>
+        <path id="Tip-right" d="M625 699 L741 702 L625 773 Z" fill="url(#tipRight)"/>
+        <path id="Tip-light" d="M509 702 L625 699 L741 702 M625 701 L625 772" stroke="#EFF3F5" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M509 702 L625 773 L741 702" stroke="#B8C2C8" stroke-width="1.5" stroke-linejoin="round"/>
+      </g>
+      <g id="Brushed-metal-detail" clip-path="url(#metalClip)" stroke="#FFFFFF" stroke-width=".35" opacity=".08">
+        <path d="M360 360L910 760 M360 366L910 766 M360 372L910 772 M360 378L910 778 M360 384L910 784 M360 390L910 790 M360 396L910 796 M360 402L910 802 M360 408L910 808 M360 414L910 814 M360 420L910 820 M360 426L910 826 M360 432L910 832 M360 438L910 838 M360 444L910 844 M360 450L910 850 M360 456L910 856 M360 462L910 862 M360 468L910 868 M360 474L910 874 M360 480L910 880 M360 486L910 886 M360 492L910 892 M360 498L910 898 M360 504L910 904 M360 510L910 910 M360 516L910 916 M360 522L910 922 M360 528L910 928 M360 534L910 934 M360 540L910 940 M360 546L910 946 M360 552L910 952 M360 558L910 958 M360 564L910 964 M360 570L910 970 M360 576L910 976 M360 582L910 982 M360 588L910 988 M360 594L910 994 M360 600L910 1000 M360 606L910 1006 M360 612L910 1012 M360 618L910 1018 M360 624L910 1024 M360 630L910 1030 M360 636L910 1036 M360 642L910 1042 M360 648L910 1048 M360 654L910 1054 M360 660L910 1060 M360 666L910 1066 M360 672L910 1072 M360 678L910 1078 M360 684L910 1084 M360 690L910 1090 M360 696L910 1096 M360 702L910 1102"/>
+        <path d="M430 110L980 510 M430 116L980 516 M430 122L980 522 M430 128L980 528 M430 134L980 534 M430 140L980 540 M430 146L980 546 M430 152L980 552 M430 158L980 558 M430 164L980 564 M430 170L980 570 M430 176L980 576 M430 182L980 582 M430 188L980 588 M430 194L980 594 M430 200L980 600 M430 206L980 606 M430 212L980 612 M430 218L980 618 M430 224L980 624 M430 230L980 630 M430 236L980 636 M430 242L980 642 M430 248L980 648 M430 254L980 654 M430 260L980 660 M430 266L980 666 M430 272L980 672 M430 278L980 678 M430 284L980 684 M430 290L980 690 M430 296L980 696 M430 302L980 702 M430 308L980 708 M430 314L980 714 M430 320L980 720 M430 326L980 726 M430 332L980 732 M430 338L980 738 M430 344L980 744 M430 350L980 750"/>
+      </g>
+    </g>
+  </g>
+  
 </svg>
