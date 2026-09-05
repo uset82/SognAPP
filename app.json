@@ -22,7 +22,11 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#121417"
       },
-      "package": "no.hvl.sognsafe"
+      "package": "no.hvl.sognsafe",
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -56,6 +60,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3061df7f-5c9b-409c-b4cb-99ff05132785"
+      }
+    },
+    "owner": "uset182"
   }
 }
