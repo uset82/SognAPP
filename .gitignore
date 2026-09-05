@@ -3,9 +3,6 @@
 # dependencies
 node_modules/
 .workbuddy-ai/
-prototipo/
-logoapp_files/
-*.mp4
 
 # Expo
 .expo/
