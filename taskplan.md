@@ -758,9 +758,12 @@ Project is technically ready for an iOS distribution build.
 
 # PHASE 30 — TestFlight build
 
-This phase requires human/Apple credentials or approval.
+This phase requires Apple Developer credentials to generate the iOS Distribution Certificate and Provisioning Profile.
 
-BLOCKED: Awaiting developer interactive login in terminal via `npx eas login` with Apple Developer credentials to execute `eas build --platform ios --profile production`.
+EAS Configuration Status:
+- Expo Account: `@uset182` authenticated.
+- EAS Project: `@uset182/sogn-safe` created and linked (Project ID: `3061df7f-5c9b-409c-b4cb-99ff05132785`).
+- Ready to build: Run `npx eas build --platform ios --profile production` in terminal.
 
 - [ ] Run iOS EAS build (`eas build --platform ios --profile production`).
 - [ ] Verify build succeeds.
