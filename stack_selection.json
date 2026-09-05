@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "selectionId": "sel-task-018738",
+  "experienceType": "cross-platform-mobile",
+  "frontendRuntime": "flutter",
+  "backendRuntime": "node-express",
+  "dataLayer": "none",
+  "deploymentTarget": "mobile-store",
+  "designProvider": "stitch",
+  "integrations": [],
+  "rationale": [
+    "Matched recommended stack for cross-platform-mobile",
+    "Selected flutter for frontend and node-express for backend.",
+    "Configured deployment to mobile-store."
+  ]
+}

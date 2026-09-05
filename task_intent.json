@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "taskId": "task-018738",
+  "title": "SOGN SAFE",
+  "prompt": "SOGN SAFE civilian emergency mobile application for Flåm, Norway. Scandinavian civic emergency design with Nightglass luminous bento architecture, topographical maritime radar, and offline resilience.",
+  "requestedStages": [
+    "plan",
+    "design",
+    "build",
+    "security",
+    "review",
+    "deploy"
+  ],
+  "constraints": {
+    "experienceType": "cross-platform-mobile",
+    "requiresSEO": false,
+    "requiresVision": false,
+    "requiresImageGeneration": false,
+    "requiresAnimatedUI": false,
+    "requiresGSAPAnimation": false,
+    "requires3DScrollCanvas": false,
+    "requiresVideoToSite": false,
+    "requiresThreeUI": false,
+    "requiresImageToThreeJS": false,
+    "requiresFrictionVector": false,
+    "requiresSmoothShadow": false,
+    "requiresToolcraft": false,
+    "requiresUISkills": false,
+    "requiresStitch": false,
+    "latencyPreference": "balanced",
+    "budgetPreference": "balanced",
+    "designProvider": "stitch"
+  },
+  "context": {
+    "host": "antigravity",
+    "sourceDocs": [],
+    "currentArtifactIds": []
+  }
+}
