@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import Svg, { Path, Circle, Rect, Line, Defs, LinearGradient, Stop } from 'react-native-svg';
+import Svg, { Path, Circle, Rect, Line, Defs, LinearGradient, RadialGradient, Stop, G } from 'react-native-svg';
 import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
 import { SafeZone } from '../../types/incident';
-import { CompassIcon, ChevronRightIcon } from './CivicIcons';
+import { CompassIcon, ChevronRightIcon, RadarReticleIcon } from './CivicIcons';
 
 interface CalmLocalMapCardProps {
   userLocationName?: string;
@@ -16,169 +16,190 @@ export const CalmLocalMapCard: React.FC<CalmLocalMapCardProps> = ({
   userLocationName = 'Flåm Kai / Sentrum',
   safeZones,
   onPressExplore,
-  statusText = 'Normal conditions • Waterfront clear',
+  statusText = 'Normal maritime conditions • Harbor perimeter open',
 }) => {
   return (
     <View style={styles.cardContainer} accessible accessibilityRole="summary">
-      {/* Map Header */}
+      {/* Cockpit HUD Header */}
       <View style={styles.cardHeader}>
         <View style={styles.headerLeft}>
-          <Text style={styles.headerTitle}>LOCAL SITUATION MAP</Text>
-          <Text style={styles.headerSubtitle}>Inner Aurlandsfjord • Flåm Sector</Text>
+          <View style={styles.headerTagRow}>
+            <RadarReticleIcon size={14} color="#38BDF8" />
+            <Text style={styles.headerTitle}>MARITIM RADAR & SITUASJONSKART</Text>
+          </View>
+          <Text style={styles.coordinatesText}>60°51'48"N  07°06'44"E • INDRE AURLANDSFJORD</Text>
         </View>
         <View style={styles.calmBadge}>
-          <View style={styles.calmDot} />
-          <Text style={styles.calmBadgeText}>CLEAR</Text>
+          <View style={styles.calmPulseDot} />
+          <Text style={styles.calmBadgeText}>SEKTOR SIKRET</Text>
         </View>
       </View>
 
-      {/* Cartographic Surface */}
+      {/* High-Tech Nautical Chart Surface */}
       <View style={styles.mapSurface}>
-        <Svg width="100%" height="180" viewBox="0 0 360 180" preserveAspectRatio="none">
+        <Svg width="100%" height="220" viewBox="0 0 360 220" preserveAspectRatio="none">
           <Defs>
-            <LinearGradient id="fjordGradient" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%" stopColor="#0B1A2C" stopOpacity="1" />
-              <Stop offset="100%" stopColor="#07111D" stopOpacity="1" />
+            <LinearGradient id="waterGradient" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%" stopColor="#081726" stopOpacity="1" />
+              <Stop offset="60%" stopColor="#040D18" stopOpacity="1" />
+              <Stop offset="100%" stopColor="#071420" stopOpacity="1" />
             </LinearGradient>
-            <LinearGradient id="landGradient" x1="0" y1="0" x2="0" y2="1">
-              <Stop offset="0%" stopColor="#121720" stopOpacity="1" />
-              <Stop offset="100%" stopColor="#0D1117" stopOpacity="1" />
+            <LinearGradient id="shoreGradient" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%" stopColor="#111923" stopOpacity="1" />
+              <Stop offset="100%" stopColor="#0B0F15" stopOpacity="1" />
             </LinearGradient>
+            <RadialGradient id="radarScanAura" cx="22%" cy="48%" r="45%">
+              <Stop offset="0%" stopColor="#38BDF8" stopOpacity="0.18" />
+              <Stop offset="60%" stopColor="#38BDF8" stopOpacity="0.04" />
+              <Stop offset="100%" stopColor="#38BDF8" stopOpacity="0" />
+            </RadialGradient>
           </Defs>
 
-          {/* Fjord Water Channel (Top Region) */}
+          {/* Fjord Water Body */}
           <Path
-            d="M 0 0 L 360 0 L 360 70 Q 240 78 180 72 T 0 68 Z"
-            fill="url(#fjordGradient)"
+            d="M 0 0 L 360 0 L 360 90 Q 250 102 180 94 T 0 88 Z"
+            fill="url(#waterGradient)"
           />
 
-          {/* Bathymetry / Water Flow Contours */}
+          {/* Bathymetry Depth Iso-Contours */}
           <Path
-            d="M 0 25 Q 120 32 240 28 T 360 30"
-            stroke="rgba(56, 189, 248, 0.12)"
-            strokeWidth="1"
-            fill="none"
-          />
-          <Path
-            d="M 0 45 Q 150 54 280 48 T 360 52"
-            stroke="rgba(56, 189, 248, 0.16)"
-            strokeWidth="1"
-            fill="none"
-          />
-
-          {/* Shoreline / Kai Boundary */}
-          <Path
-            d="M 0 68 Q 120 72 180 72 Q 240 78 360 70"
-            stroke="#1E3A5F"
-            strokeWidth="2.5"
-            fill="none"
-          />
-
-          {/* Land / Valley Surface (Bottom Region) */}
-          <Path
-            d="M 0 70 L 360 72 L 360 180 L 0 180 Z"
-            fill="url(#landGradient)"
-          />
-
-          {/* Mountain Topography Contour Lines */}
-          <Path
-            d="M 0 105 Q 90 95 180 112 T 360 102"
-            stroke="rgba(255, 255, 255, 0.05)"
+            d="M 0 30 Q 130 38 250 34 T 360 36"
+            stroke="rgba(56, 189, 248, 0.14)"
             strokeWidth="1"
             strokeDasharray="4,4"
             fill="none"
           />
           <Path
-            d="M 0 140 Q 110 132 220 145 T 360 138"
+            d="M 0 55 Q 160 66 280 60 T 360 64"
+            stroke="rgba(56, 189, 248, 0.18)"
+            strokeWidth="1"
+            fill="none"
+          />
+
+          {/* Glowing Shoreline Border */}
+          <Path
+            d="M 0 88 Q 180 94 250 102 T 360 90"
+            stroke="#1D3855"
+            strokeWidth="3"
+            fill="none"
+          />
+
+          {/* Landmass Basin */}
+          <Path
+            d="M 0 90 L 360 92 L 360 220 L 0 220 Z"
+            fill="url(#shoreGradient)"
+          />
+
+          {/* Mountain Elevation Contour Curves */}
+          <Path
+            d="M 0 130 Q 100 120 200 138 T 360 126"
+            stroke="rgba(255, 255, 255, 0.05)"
+            strokeWidth="1"
+            fill="none"
+          />
+          <Path
+            d="M 0 170 Q 120 158 240 176 T 360 168"
             stroke="rgba(255, 255, 255, 0.04)"
             strokeWidth="1"
+            strokeDasharray="6,4"
             fill="none"
           />
 
-          {/* Radar Horizon Grid Concentric Arc */}
-          <Circle
-            cx="65"
-            cy="90"
-            r="38"
-            stroke="rgba(56, 189, 248, 0.12)"
-            strokeWidth="1"
-            fill="none"
-          />
-          <Circle
-            cx="65"
-            cy="90"
-            r="70"
-            stroke="rgba(56, 189, 248, 0.07)"
-            strokeWidth="1"
-            strokeDasharray="2,3"
-            fill="none"
-          />
+          {/* Concentric Radar Horizon Rings around Civilian Location */}
+          <Circle cx="80" cy="105" r="90" fill="url(#radarScanAura)" />
+          <Circle cx="80" cy="105" r="40" stroke="rgba(56, 189, 248, 0.2)" strokeWidth="1" fill="none" />
+          <Circle cx="80" cy="105" r="75" stroke="rgba(56, 189, 248, 0.12)" strokeWidth="1" strokeDasharray="3,3" fill="none" />
+          <Circle cx="80" cy="105" r="115" stroke="rgba(56, 189, 248, 0.06)" strokeWidth="1" fill="none" />
+
+          {/* Nautical Range Crosshairs */}
+          <Line x1="15" y1="105" x2="145" y2="105" stroke="rgba(56, 189, 248, 0.15)" strokeWidth="1" strokeDasharray="2,2" />
+          <Line x1="80" y1="40" x2="80" y2="170" stroke="rgba(56, 189, 248, 0.15)" strokeWidth="1" strokeDasharray="2,2" />
         </Svg>
 
-        {/* Fjord Water Label */}
-        <View style={styles.fjordBadge}>
-          <Text style={styles.fjordLabel}>AURLANDSFJORDEN</Text>
+        {/* Fjord Water Identity Badge */}
+        <View style={styles.waterOverlayBadge}>
+          <Text style={styles.waterOverlayTitle}>AURLANDSFJORDEN • 185m DYP</Text>
         </View>
 
-        {/* Civilian Location Pin */}
-        <View style={styles.civilianPin}>
-          <View style={styles.civilianPulseRing} />
-          <View style={styles.civilianCoreDot} />
-          <View style={styles.calloutBubble}>
-            <Text style={styles.calloutLabel}>YOU ARE HERE</Text>
-            <Text style={styles.calloutLocation}>{userLocationName}</Text>
+        {/* Civilian GPS Target Reticle */}
+        <View style={styles.civilianReticle}>
+          <View style={styles.pulseAura} />
+          <View style={styles.corePin} />
+          <View style={styles.reticleCallout}>
+            <Text style={styles.reticleEyebrow}>DEG HER • GPS 5m</Text>
+            <Text style={styles.reticleLocation}>{userLocationName}</Text>
           </View>
         </View>
 
-        {/* Safe Assembly Shelter 1: Flåm Skule */}
+        {/* Shelter Pin 1: Flåm Skule (Primary Heated Reception) */}
         <View style={styles.shelterPin1}>
+          <View style={styles.shelterBeaconGlow} />
           <View style={styles.shelterBadge}>
-            <Text style={styles.shelterBadgeIcon}>▲</Text>
+            <Text style={styles.shelterSymbol}>▲</Text>
           </View>
-          <View style={styles.shelterTagBubble}>
-            <Text style={styles.shelterName}>Flåm Skule</Text>
-            <Text style={styles.shelterDistance}>650m • 45m elev</Text>
+          <View style={styles.shelterCapsule}>
+            <Text style={styles.shelterTitle}>Flåm Skule & Hall</Text>
+            <Text style={styles.shelterMetric}>650m • 8 min gang • +18m</Text>
           </View>
         </View>
 
-        {/* Safe Assembly Shelter 2: Fretheim Høyde */}
+        {/* Shelter Pin 2: Fretheim Høyde (Safe High Ground) */}
         <View style={styles.shelterPin2}>
+          <View style={styles.shelterBeaconGlow} />
           <View style={styles.shelterBadge}>
-            <Text style={styles.shelterBadgeIcon}>▲</Text>
+            <Text style={styles.shelterSymbol}>▲</Text>
           </View>
-          <View style={styles.shelterTagBubble}>
-            <Text style={styles.shelterName}>Fretheim Høyde</Text>
-            <Text style={styles.shelterDistance}>850m • 90m elev</Text>
+          <View style={styles.shelterCapsule}>
+            <Text style={styles.shelterTitle}>Fretheim Høyde</Text>
+            <Text style={styles.shelterMetric}>850m • 11 min • +45m HØYDE</Text>
           </View>
         </View>
 
-        {/* Map Scale & Compass */}
-        <View style={styles.mapFooterBar}>
-          <Text style={styles.scaleText}>500 m</Text>
-          <View style={styles.scaleBar} />
-          <View style={styles.compassRow}>
-            <CompassIcon size={12} color={Colors.textMuted} />
-            <Text style={styles.northIndicator}>N</Text>
+        {/* Bottom Chart HUD (Compass + Scale Bar) */}
+        <View style={styles.chartHudBar}>
+          <Text style={styles.scaleDistanceText}>SKALA: 500 M</Text>
+          <View style={styles.scaleBarLine} />
+          <View style={styles.compassContainer}>
+            <CompassIcon size={12} color="#94A3B8" />
+            <Text style={styles.compassLabel}>N</Text>
           </View>
         </View>
       </View>
 
-      {/* Status Bar Beneath Map */}
+      {/* Live Maritime Telemetry Row */}
+      <View style={styles.telemetryRow}>
+        <View style={styles.telemetryItem}>
+          <Text style={styles.telemetryLabel}>FJORDNIVÅ</Text>
+          <Text style={styles.telemetryValue}>0.4m NORMAL</Text>
+        </View>
+        <View style={styles.telemetryDivider} />
+        <View style={styles.telemetryItem}>
+          <Text style={styles.telemetryLabel}>BØLGEHØYDE</Text>
+          <Text style={styles.telemetryValue}>ROLOG SFJORD</Text>
+        </View>
+        <View style={styles.telemetryDivider} />
+        <View style={styles.telemetryItem}>
+          <Text style={styles.telemetryLabel}>HAVNESTATUS</Text>
+          <Text style={styles.telemetryValue}>ÅPEN SEILAS</Text>
+        </View>
+      </View>
+
+      {/* Interactive Exploration Footer */}
       <TouchableOpacity 
         style={styles.statusFooter}
         onPress={onPressExplore}
-        activeOpacity={onPressExplore ? 0.75 : 1}
+        activeOpacity={0.8}
         accessibilityRole="button"
-        accessibilityLabel="View safe places details"
+        accessibilityLabel="Se verifiserte tryggesteder"
       >
-        <View style={styles.statusDotRow}>
-          <View style={styles.statusDot} />
-          <Text style={styles.statusFooterText}>{statusText}</Text>
+        <View style={styles.footerLeft}>
+          <View style={styles.footerGreenDot} />
+          <Text style={styles.footerStatusText}>{statusText}</Text>
         </View>
         {onPressExplore && (
-          <View style={styles.exploreLinkRow}>
-            <Text style={styles.exploreLink}>View Safe Places</Text>
-            <ChevronRightIcon size={14} color={Colors.textSecondary} />
+          <View style={styles.exploreActionBtn}>
+            <Text style={styles.exploreActionText}>Se Tryggesteder</Text>
+            <ChevronRightIcon size={14} color="#38BDF8" />
           </View>
         )}
       </TouchableOpacity>
@@ -188,259 +209,322 @@ export const CalmLocalMapCard: React.FC<CalmLocalMapCardProps> = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: Colors.surface,
+    backgroundColor: '#0E131A',
     borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.lg,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: BorderRadius.xl,
     overflow: 'hidden',
     marginBottom: Spacing.md,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 5,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
-    backgroundColor: Colors.surfaceRaised,
+    paddingVertical: 12,
+    backgroundColor: '#121822',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
   },
   headerLeft: {
     flex: 1,
   },
+  headerTagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   headerTitle: {
     ...Typography.caption,
-    color: Colors.textSecondary,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-    fontSize: 11,
-  },
-  headerSubtitle: {
-    ...Typography.caption,
-    color: Colors.textMuted,
+    color: '#E2E8F0',
+    fontWeight: '800',
+    letterSpacing: 1,
     fontSize: 10,
-    marginTop: 1,
+  },
+  coordinatesText: {
+    ...Typography.caption,
+    color: '#64748B',
+    fontSize: 9,
+    fontFamily: 'monospace',
+    letterSpacing: 0.5,
+    marginTop: 2,
   },
   calmBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(16, 185, 129, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    borderColor: 'rgba(52, 211, 153, 0.35)',
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: BorderRadius.full,
   },
-  calmDot: {
+  calmPulseDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: Colors.safetyGreenText,
+    backgroundColor: '#34D399',
     marginRight: 5,
   },
   calmBadgeText: {
     ...Typography.caption,
-    color: Colors.safetyGreenText,
-    fontWeight: '700',
-    fontSize: 10,
-    letterSpacing: 0.5,
+    color: '#6EE7B7',
+    fontWeight: '800',
+    fontSize: 9,
+    letterSpacing: 0.8,
   },
   mapSurface: {
-    height: 180,
-    backgroundColor: '#0A0E14',
+    height: 220,
+    backgroundColor: '#070C12',
     position: 'relative',
     overflow: 'hidden',
   },
-  fjordBadge: {
+  waterOverlayBadge: {
     position: 'absolute',
-    top: 8,
+    top: 10,
     left: Spacing.md,
-    backgroundColor: 'rgba(7, 17, 29, 0.65)',
+    backgroundColor: 'rgba(6, 16, 26, 0.75)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: BorderRadius.xs,
     borderWidth: 1,
-    borderColor: 'rgba(56, 189, 248, 0.15)',
+    borderColor: 'rgba(56, 189, 248, 0.2)',
   },
-  fjordLabel: {
+  waterOverlayTitle: {
     ...Typography.caption,
-    color: '#4B8898',
+    color: '#38BDF8',
     fontWeight: '700',
-    letterSpacing: 1.2,
+    letterSpacing: 1,
     fontSize: 9,
   },
-  civilianPin: {
+  civilianReticle: {
     position: 'absolute',
-    top: 76,
-    left: 48,
+    top: 92,
+    left: 62,
     alignItems: 'center',
   },
-  civilianPulseRing: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: 'rgba(56, 189, 248, 0.22)',
+  pulseAura: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(56, 189, 248, 0.25)',
     position: 'absolute',
-    top: -5,
-    left: 17,
+    top: -9,
   },
-  civilianCoreDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: Colors.routeBlue,
-    borderWidth: 2,
+  corePin: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#0284C7',
+    borderWidth: 3,
     borderColor: '#FFFFFF',
-    alignSelf: 'center',
+    shadowColor: '#38BDF8',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
   },
-  calloutBubble: {
-    backgroundColor: 'rgba(24, 29, 38, 0.92)',
+  reticleCallout: {
+    backgroundColor: 'rgba(15, 23, 42, 0.94)',
     borderWidth: 1,
-    borderColor: 'rgba(56, 189, 248, 0.35)',
+    borderColor: '#38BDF8',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: BorderRadius.xs,
     marginTop: 4,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
   },
-  calloutLabel: {
+  reticleEyebrow: {
     ...Typography.caption,
-    color: Colors.routeBlue,
-    fontWeight: '700',
-    fontSize: 9,
-    letterSpacing: 0.5,
+    color: '#38BDF8',
+    fontWeight: '800',
+    fontSize: 8,
+    letterSpacing: 0.8,
   },
-  calloutLocation: {
+  reticleLocation: {
     ...Typography.caption,
-    color: Colors.textPrimary,
+    color: '#FFFFFF',
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   shelterPin1: {
     position: 'absolute',
-    bottom: 22,
-    right: 24,
+    bottom: 28,
+    right: 14,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
   shelterPin2: {
     position: 'absolute',
-    top: 76,
-    right: 18,
+    top: 96,
+    right: 12,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
+  shelterBeaconGlow: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(16, 185, 129, 0.25)',
+    position: 'absolute',
+    left: -2,
+  },
   shelterBadge: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: Colors.safetyGreen,
-    borderWidth: 1.5,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#059669',
+    borderWidth: 2,
     borderColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  shelterBadgeIcon: {
+  shelterSymbol: {
     color: '#FFFFFF',
-    fontSize: 8,
-    fontWeight: '800',
+    fontSize: 9,
+    fontWeight: '900',
   },
-  shelterTagBubble: {
-    backgroundColor: 'rgba(11, 36, 24, 0.88)',
+  shelterCapsule: {
+    backgroundColor: 'rgba(6, 28, 18, 0.92)',
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    borderColor: 'rgba(52, 211, 153, 0.4)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: BorderRadius.xs,
   },
-  shelterName: {
+  shelterTitle: {
     ...Typography.caption,
-    color: Colors.safetyGreenText,
+    color: '#A7F3D0',
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '800',
   },
-  shelterDistance: {
+  shelterMetric: {
     ...Typography.caption,
-    color: Colors.textMuted,
+    color: '#6EE7B7',
     fontSize: 9,
+    fontWeight: '600',
   },
-  mapFooterBar: {
+  chartHudBar: {
     position: 'absolute',
     bottom: 8,
     left: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(18, 22, 29, 0.7)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    backgroundColor: 'rgba(10, 15, 24, 0.8)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: BorderRadius.xs,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
-  scaleText: {
+  scaleDistanceText: {
     ...Typography.caption,
-    color: Colors.textMuted,
+    color: '#94A3B8',
     fontSize: 9,
+    fontFamily: 'monospace',
+    fontWeight: '700',
   },
-  scaleBar: {
+  scaleBarLine: {
     width: 24,
     height: 2,
-    backgroundColor: Colors.textMuted,
+    backgroundColor: '#64748B',
   },
-  compassRow: {
+  compassContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginLeft: 6,
-    gap: 2,
+    gap: 3,
   },
-  northIndicator: {
+  compassLabel: {
     ...Typography.caption,
-    color: Colors.textMuted,
+    color: '#94A3B8',
     fontSize: 9,
+    fontWeight: '800',
+  },
+  telemetryRow: {
+    flexDirection: 'row',
+    backgroundColor: '#0B1017',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    paddingVertical: 8,
+    paddingHorizontal: Spacing.md,
+  },
+  telemetryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  telemetryLabel: {
+    ...Typography.caption,
+    color: '#64748B',
+    fontSize: 8,
     fontWeight: '700',
+    letterSpacing: 0.8,
+    marginBottom: 2,
+  },
+  telemetryValue: {
+    ...Typography.caption,
+    color: '#38BDF8',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  telemetryDivider: {
+    width: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    marginVertical: 2,
   },
   statusFooter: {
     paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
-    backgroundColor: Colors.surface,
+    paddingVertical: 12,
+    backgroundColor: '#121822',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    minHeight: 44,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+    minHeight: 46,
   },
-  statusDotRow: {
+  footerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  statusDot: {
+  footerGreenDot: {
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    backgroundColor: Colors.safetyGreenText,
+    backgroundColor: '#34D399',
     marginRight: 8,
   },
-  statusFooterText: {
+  footerStatusText: {
     ...Typography.caption,
-    color: Colors.textSecondary,
+    color: '#94A3B8',
     fontSize: 12,
   },
-  exploreLinkRow: {
+  exploreActionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    gap: 4,
+    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(56, 189, 248, 0.25)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
   },
-  exploreLink: {
+  exploreActionText: {
     ...Typography.caption,
-    color: Colors.textPrimary,
-    fontWeight: '600',
-    fontSize: 12,
+    color: '#38BDF8',
+    fontWeight: '700',
+    fontSize: 11,
   },
 });

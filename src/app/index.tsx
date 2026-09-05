@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
@@ -15,6 +15,8 @@ import {
   OfflineInfoIcon,
   LanguageIcon,
   ChevronRightIcon,
+  PhoneCallIcon,
+  RadarReticleIcon,
 } from '../components/ui/CivicIcons';
 
 export default function ReadyScreen() {
@@ -32,6 +34,7 @@ export default function ReadyScreen() {
     offlineCacheStatus,
   } = useEmergency();
 
+  const isNorwegian = language === 'no';
   const [isReadinessOpen, setIsReadinessOpen] = useState(false);
   const [isSafePlacesOpen, setIsSafePlacesOpen] = useState(false);
   const [isOfflineInfoOpen, setIsOfflineInfoOpen] = useState(false);
@@ -42,255 +45,328 @@ export default function ReadyScreen() {
     router.push('/alert');
   };
 
+  const handleCallEmergency = (number: string) => {
+    Linking.openURL(`tel:${number}`).catch(() => {});
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Scandinavian Public Safety Header */}
-        <View style={styles.topBar}>
-          <View style={styles.officialPill}>
-            <View style={styles.norwayFlagDot} />
-            <Text style={styles.officialPillText}>
-              {language === 'no' ? 'OFFENTLIG NØDVARSEL' : 'CIVILIAN EMERGENCY SYSTEM'}
-            </Text>
+        {/* Top Civic Authority Navigation Bar */}
+        <View style={styles.topNavigation}>
+          <View style={styles.topNavLeft}>
+            <View style={styles.norwayPill}>
+              <View style={styles.flagDotRed} />
+              <View style={styles.flagDotBlue} />
+              <Text style={styles.norwayPillText}>SIVILFORSVARET • INDRE SOGN</Text>
+            </View>
           </View>
-          <View style={styles.sectorTag}>
-            <Text style={styles.sectorTagText}>SECTOR 4-B</Text>
+          
+          <View style={styles.topNavRight}>
+            <View style={styles.signalBadge}>
+              <View style={styles.signalDot} />
+              <Text style={styles.signalText}>5G SIKRET</Text>
+            </View>
+
+            {/* Segmented Language Selector */}
+            <TouchableOpacity 
+              style={styles.langSegment} 
+              onPress={toggleLanguage}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={`Bytt språk. Nåværende: ${language.toUpperCase()}`}
+            >
+              <Text style={[styles.langText, isNorwegian && styles.langActiveText]}>NO</Text>
+              <Text style={styles.langDivider}>|</Text>
+              <Text style={[styles.langText, !isNorwegian && styles.langActiveText]}>EN</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
-        {/* Brand Header */}
-        <View style={styles.header}>
-          <View style={styles.logoRow}>
+        {/* Brand Crest & District Identity */}
+        <View style={styles.brandHeader}>
+          <View style={styles.brandCrestRow}>
             <SognSafeLogo
-              size={36}
+              size={40}
               variant="small"
               accessibilityLabel={`${t.brandTitle} logo`}
             />
-            <View style={styles.brandTitles}>
-              <Text style={styles.brandTitle}>{t.brandTitle}</Text>
-              <Text style={styles.brandSubtitle}>
-                {language === 'no' ? 'INDRE SOGN • FLÅM & AURLAND' : 'INNER SOGN • FLÅM & AURLAND'}
+            <View style={styles.brandMeta}>
+              <Text style={styles.brandTitleText}>{t.brandTitle}</Text>
+              <Text style={styles.brandSectorText}>
+                {isNorwegian 
+                  ? 'OFFENTLIG KRISESYSTEM • SEKTOR 04-FLÅM' 
+                  : 'CIVILIAN CRISIS SYSTEM • SECTOR 04-FLÅM'}
               </Text>
             </View>
           </View>
-
-          {/* Language Toggle Pill */}
-          <TouchableOpacity 
-            style={styles.langPill} 
-            onPress={toggleLanguage}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel={`Toggle language. Current: ${language.toUpperCase()}`}
-          >
-            <LanguageIcon size={14} color={Colors.textSecondary} />
-            <Text style={styles.langText}>
-              {language === 'en' ? 'NO / EN' : 'EN / NO'}
-            </Text>
-          </TouchableOpacity>
         </View>
 
-        {/* Degraded Connection Banner */}
+        {/* Degraded Connectivity Warning */}
         {isDegradedConnection && (
-          <View style={styles.degradedBanner} accessible accessibilityRole="alert">
-            <View style={styles.degradedHeader}>
-              <View style={styles.degradedDot} />
-              <Text style={styles.degradedTitle}>{t.limitedConnectionTitle}</Text>
+          <View style={styles.degradedCard} accessible accessibilityRole="alert">
+            <View style={styles.degradedHeaderRow}>
+              <View style={styles.degradedBeaconDot} />
+              <Text style={styles.degradedHeading}>{t.limitedConnectionTitle}</Text>
             </View>
-            <Text style={styles.degradedSub}>{t.limitedConnectionSub}</Text>
+            <Text style={styles.degradedBodyText}>{t.limitedConnectionSub}</Text>
           </View>
         )}
 
-        {/* Luminous Bento SAFE Hero Card */}
-        <View style={styles.safeCard} accessible accessibilityRole="summary">
-          <View style={styles.safeCardGlowOverlay} />
+        {/* Luminous Bento SAFE Console (Primary Visual Anchor) */}
+        <View style={styles.safeConsoleCard} accessible accessibilityRole="summary">
+          <View style={styles.consoleGlowPool} />
           
-          <View style={styles.safeHeaderRow}>
-            <View style={styles.statusPill}>
-              <View style={styles.statusPulseDot} />
-              <Text style={styles.statusPillText}>{t.allClear}</Text>
+          <View style={styles.consoleHeader}>
+            <View style={styles.allClearBadge}>
+              <View style={styles.pulsingGreenAura} />
+              <View style={styles.greenCoreDot} />
+              <Text style={styles.allClearBadgeText}>
+                {isNorwegian ? 'ALT KLART • NORMAL SITUASJON' : 'ALL CLEAR • NOMINAL STATUS'}
+              </Text>
             </View>
-            <Text style={styles.statusTimestamp}>{lastSyncTimestamp}</Text>
+            <Text style={styles.liveClockText}>14:47 CET</Text>
           </View>
 
-          <Text style={styles.safeHeroTitle}>{t.safeTitle}</Text>
-          <Text style={styles.safeHeroDesc}>
-            {language === 'no' 
-              ? 'Ingen aktive hendelser eller nødvarsler i din overvåkede sektor.' 
-              : 'No active emergencies in your monitored sector. All municipal safety channels normal.'}
+          <Text style={styles.safeHeadingText}>
+            {isNorwegian ? 'INGEN FARE' : 'SAFE & SECURE'}
+          </Text>
+          <Text style={styles.safeSubheadText}>
+            {isNorwegian 
+              ? 'Ingen registrerte trusler eller evakueringsvarsler i Flåm, Aurland eller Nærøyfjorden.' 
+              : 'No active hazards or civil alerts recorded in Flåm, Aurland, or the Nærøyfjord sector.'}
           </Text>
 
-          <View style={styles.locationBar}>
-            <Text style={styles.locationLabel}>{t.monitoredZoneLabel}</Text>
-            <View style={styles.locationValueRow}>
-              <Text style={styles.locationValue}>{t.monitoredZoneValue}</Text>
-              <View style={styles.gpsActiveDot} />
+          {/* Live Sensor Telemetry Strip */}
+          <View style={styles.sensorGrid}>
+            <View style={styles.sensorColumn}>
+              <Text style={styles.sensorLabel}>FJORDVASSDRAG</Text>
+              <Text style={styles.sensorValue}>0.4m NORMAL</Text>
+            </View>
+            <View style={styles.sensorDivider} />
+            <View style={styles.sensorColumn}>
+              <Text style={styles.sensorLabel}>SKREDFARE</Text>
+              <Text style={styles.sensorValue}>NIVÅ 1 (GRØNN)</Text>
+            </View>
+            <View style={styles.sensorDivider} />
+            <View style={styles.sensorColumn}>
+              <Text style={styles.sensorLabel}>NØDNETT</Text>
+              <Text style={styles.sensorValue}>100% OPERATIVT</Text>
             </View>
           </View>
         </View>
 
-        {/* Calm Local Situation Map */}
+        {/* Calm Local Situation Radar Map */}
         <CalmLocalMapCard 
           safeZones={safeZones}
-          userLocationName="Flåm Kai / Sentrum"
-          statusText={t.normalMaritimeStatus}
+          userLocationName="Flåm Sentrum / Kai"
+          statusText={isNorwegian ? 'Normale maritime forhold • Havn åpen' : t.normalMaritimeStatus}
           onPressExplore={() => setIsSafePlacesOpen(true)}
         />
 
-        {/* Grouped Civic Utilities */}
-        <View style={styles.servicesSection}>
-          <Text style={styles.sectionLabel}>
-            {language === 'no' ? 'BEREDSKAP OG OFFENTLIGE TJENESTER' : 'PREPAREDNESS & CIVILIAN UTILITIES'}
+        {/* Luminous Glass Bento Section: Preparedness & Utilities */}
+        <View style={styles.bentoSection}>
+          <Text style={styles.bentoSectionLabel}>
+            {isNorwegian ? 'SIVIL SIKKERHET & BEREDSKAP' : 'CIVILIAN PREPAREDNESS & UTILITIES'}
           </Text>
 
-          <View style={styles.groupedListContainer}>
-            {/* 1. Emergency Readiness */}
-            <TouchableOpacity 
-              style={styles.groupedRow} 
-              onPress={() => setIsReadinessOpen(true)}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityLabel={t.readinessTitle}
-            >
-              <View style={[styles.iconWell, { borderColor: 'rgba(16, 185, 129, 0.3)' }]}>
-                <ReadinessIcon size={18} color="#6EE7B7" />
+          {/* Bento Hero Tile: 72-Hour Survival Kit (Interactive Progress) */}
+          <TouchableOpacity 
+            style={styles.heroBentoTile} 
+            onPress={() => setIsReadinessOpen(true)}
+            activeOpacity={0.82}
+            accessibilityRole="button"
+            accessibilityLabel={t.readinessTitle}
+          >
+            <View style={styles.heroBentoTop}>
+              <View style={styles.heroBentoIconWell}>
+                <ReadinessIcon size={22} color="#34D399" />
               </View>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowTitle}>{t.readinessTitle}</Text>
-                <Text style={styles.rowDesc}>{t.readinessSubtitle}</Text>
+              <View style={styles.heroBentoTag}>
+                <Text style={styles.heroBentoTagText}>DSB ANBEFALING</Text>
               </View>
-              <ChevronRightIcon size={16} color={Colors.textMuted} />
-            </TouchableOpacity>
+            </View>
 
-            <View style={styles.rowDivider} />
+            <Text style={styles.heroBentoTitle}>{t.readinessTitle}</Text>
+            <Text style={styles.heroBentoDesc}>
+              {isNorwegian 
+                ? 'Sjekkliste for 72-timers egenberedskap: drikkevann, mat, varme og batteriradio.' 
+                : t.readinessSubtitle}
+            </Text>
 
-            {/* 2. Safe Places */}
+            {/* Checklist Progress Bar */}
+            <View style={styles.checklistProgressRow}>
+              <View style={styles.progressBarTrack}>
+                <View style={[styles.progressBarFill, { width: '80%' }]} />
+              </View>
+              <Text style={styles.progressText}>4 / 5 KLARE</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Bento Split Row: Safe Places & Offline Info */}
+          <View style={styles.bentoSplitRow}>
+            {/* Split Tile 1: Safe Places */}
             <TouchableOpacity 
-              style={styles.groupedRow} 
+              style={styles.splitBentoTile}
               onPress={() => setIsSafePlacesOpen(true)}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
               accessibilityRole="button"
               accessibilityLabel={t.safePlacesTitle}
             >
-              <View style={[styles.iconWell, { borderColor: 'rgba(56, 189, 248, 0.3)' }]}>
-                <SafePlacesIcon size={18} color="#38BDF8" />
+              <View style={[styles.splitIconWell, { borderColor: 'rgba(56, 189, 248, 0.3)' }]}>
+                <SafePlacesIcon size={20} color="#38BDF8" />
               </View>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowTitle}>{t.safePlacesTitle}</Text>
-                <Text style={styles.rowDesc}>{t.safePlacesSubtitle}</Text>
+              <Text style={styles.splitTag}>+45m HØYDE</Text>
+              <Text style={styles.splitTitle}>{t.safePlacesTitle}</Text>
+              <Text style={styles.splitSubtitle}>
+                {isNorwegian ? 'Flåm Skule & Fretheim' : 'Flåm School & Fretheim'}
+              </Text>
+              <View style={styles.splitActionLink}>
+                <Text style={styles.splitActionText}>Se kart</Text>
+                <ChevronRightIcon size={12} color="#38BDF8" />
               </View>
-              <ChevronRightIcon size={16} color={Colors.textMuted} />
             </TouchableOpacity>
 
-            <View style={styles.rowDivider} />
-
-            {/* 3. Offline Information */}
+            {/* Split Tile 2: Offline Info */}
             <TouchableOpacity 
-              style={styles.groupedRow} 
+              style={styles.splitBentoTile}
               onPress={() => setIsOfflineInfoOpen(true)}
-              activeOpacity={0.7}
+              activeOpacity={0.8}
               accessibilityRole="button"
               accessibilityLabel={t.offlineInfoTitle}
             >
-              <View style={[styles.iconWell, { borderColor: 'rgba(245, 158, 11, 0.3)' }]}>
-                <OfflineInfoIcon size={18} color="#FDE68A" />
+              <View style={[styles.splitIconWell, { borderColor: 'rgba(253, 230, 138, 0.3)' }]}>
+                <OfflineInfoIcon size={20} color="#FDE68A" />
               </View>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowTitle}>{t.offlineInfoTitle}</Text>
-                <Text style={styles.rowDesc}>{t.offlineInfoSubtitle}</Text>
+              <Text style={[styles.splitTag, { color: '#FDE68A' }]}>OFFLINE KLAR</Text>
+              <Text style={styles.splitTitle}>{t.offlineInfoTitle}</Text>
+              <Text style={styles.splitSubtitle}>
+                {isNorwegian ? 'Lokal nødprotokoll' : 'Cached protocols'}
+              </Text>
+              <View style={styles.splitActionLink}>
+                <Text style={[styles.splitActionText, { color: '#FDE68A' }]}>Åpne guide</Text>
+                <ChevronRightIcon size={12} color="#FDE68A" />
               </View>
-              <ChevronRightIcon size={16} color={Colors.textMuted} />
-            </TouchableOpacity>
-
-            <View style={styles.rowDivider} />
-
-            {/* 4. Language Switch */}
-            <TouchableOpacity 
-              style={styles.groupedRow} 
-              onPress={toggleLanguage}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityLabel={t.languageLabel}
-            >
-              <View style={[styles.iconWell, { borderColor: 'rgba(198, 205, 215, 0.2)' }]}>
-                <LanguageIcon size={18} color="#C6CDD7" />
-              </View>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowTitle}>{t.languageLabel}</Text>
-                <Text style={styles.rowDesc}>
-                  {language === 'en' ? 'Active: English (Switch to Norsk)' : 'Aktivt: Norsk (Bytt til English)'}
-                </Text>
-              </View>
-              <ChevronRightIcon size={16} color={Colors.textMuted} />
             </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Sync & Local Storage Status */}
-        <View style={styles.metadataCard}>
-          <View style={styles.metaRow}>
-            <View style={styles.metaDot} />
-            <Text style={styles.metaText}>{offlineCacheStatus}</Text>
-          </View>
-          <Text style={styles.metaTime}>{lastSyncTimestamp}</Text>
-        </View>
-
-        {/* Refined Academic & Demonstration Simulator Drawer */}
-        <View style={styles.simulatorSection}>
-          <TouchableOpacity 
-            style={styles.simulatorHeaderToggle}
-            onPress={() => setIsSimulatorExpanded(!isSimulatorExpanded)}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel="Toggle HVL platform simulator controls"
-          >
-            <View style={styles.simHeaderLeft}>
-              <View style={styles.simTagBadge}>
-                <Text style={styles.simTagText}>HVL PROTOTYPE</Text>
-              </View>
-              <Text style={styles.simHeaderTitle}>Demonstration Controls</Text>
-            </View>
-            <Text style={styles.simToggleText}>
-              {isSimulatorExpanded ? 'HIDE ▲' : 'SHOW ▼'}
+          {/* Bento Tile 3: Fast Emergency Hotlines */}
+          <View style={styles.hotlinesCard}>
+            <Text style={styles.hotlinesTitle}>
+              {isNorwegian ? 'NØDNUMRE (ETT-TRYKKS ANROP)' : 'DIRECT EMERGENCY HOTLINES'}
             </Text>
+            <View style={styles.hotlinesRow}>
+              <TouchableOpacity 
+                style={styles.hotlineChip}
+                onPress={() => handleCallEmergency('112')}
+                activeOpacity={0.8}
+              >
+                <PhoneCallIcon size={12} color="#EF4444" />
+                <Text style={styles.hotlineNumber}>112</Text>
+                <Text style={styles.hotlineRole}>POLITI</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.hotlineChip}
+                onPress={() => handleCallEmergency('113')}
+                activeOpacity={0.8}
+              >
+                <PhoneCallIcon size={12} color="#10B981" />
+                <Text style={styles.hotlineNumber}>113</Text>
+                <Text style={styles.hotlineRole}>MEDISINSK</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.hotlineChip}
+                onPress={() => handleCallEmergency('110')}
+                activeOpacity={0.8}
+              >
+                <PhoneCallIcon size={12} color="#F59E0B" />
+                <Text style={styles.hotlineNumber}>110</Text>
+                <Text style={styles.hotlineRole}>BRANN</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.hotlineChip}
+                onPress={() => handleCallEmergency('116117')}
+                activeOpacity={0.8}
+              >
+                <PhoneCallIcon size={12} color="#38BDF8" />
+                <Text style={styles.hotlineNumber}>116 117</Text>
+                <Text style={styles.hotlineRole}>LEGEVAKT</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* Local Storage & Cache Telemetry */}
+        <View style={styles.storageTelemetryBar}>
+          <View style={styles.storageLeft}>
+            <View style={styles.storageDot} />
+            <Text style={styles.storageText}>{offlineCacheStatus}</Text>
+          </View>
+          <Text style={styles.storageSyncTime}>{lastSyncTimestamp}</Text>
+        </View>
+
+        {/* Tactical Simulator Console (HVL Academic Drill) */}
+        <View style={styles.simulatorChassis}>
+          <TouchableOpacity 
+            style={styles.simulatorToggleHeader}
+            onPress={() => setIsSimulatorExpanded(!isSimulatorExpanded)}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Åpne eller lukk simulatorkontroller"
+          >
+            <View style={styles.simTitleLeft}>
+              <View style={styles.simAmberLamp} />
+              <Text style={styles.simHeading}>HVL SIMULATOR & DRILL PANEL</Text>
+            </View>
+            <View style={styles.simToggleCapsule}>
+              <Text style={styles.simToggleCapsuleText}>
+                {isSimulatorExpanded ? 'LUKK ▲' : 'ÅPNE ▼'}
+              </Text>
+            </View>
           </TouchableOpacity>
 
           {isSimulatorExpanded && (
-            <View style={styles.simulatorBody}>
-              <Text style={styles.simulatorDesc}>{t.simDesc}</Text>
+            <View style={styles.simulatorExpandedBody}>
+              <Text style={styles.simInstructionText}>
+                {isNorwegian 
+                  ? 'Utløs simulerte kriser for å teste sivil evakueringsflyt, nødpush og kartruting.'
+                  : t.simDesc}
+              </Text>
 
               <TouchableOpacity 
-                style={styles.simulateAlertButton}
+                style={styles.triggerAlertButton}
                 onPress={handleStartFlåm}
                 activeOpacity={0.85}
                 accessibilityRole="button"
-                accessibilityLabel="Trigger Flåm passenger vessel collision scenario"
+                accessibilityLabel="Start Flåm passasjerskip kollisjonsscenario"
               >
-                <View style={styles.alertButtonBeacon} />
-                <Text style={styles.simulateAlertButtonText}>{t.startScenarioBtn}</Text>
+                <View style={styles.alertButtonAura} />
+                <Text style={styles.triggerAlertButtonText}>
+                  {isNorwegian ? '▶ START FLÅM SKIPSKOLLISJON' : t.startScenarioBtn}
+                </Text>
               </TouchableOpacity>
 
-              <View style={styles.simulatorRow}>
+              <View style={styles.simAuxRow}>
                 <TouchableOpacity 
-                  style={styles.simSecondaryButton}
+                  style={styles.simAuxButton}
                   onPress={toggleDegradedConnection}
                   activeOpacity={0.8}
-                  accessibilityRole="button"
-                  accessibilityLabel="Toggle degraded connection simulation"
                 >
-                  <Text style={styles.simSecondaryButtonText}>
+                  <Text style={styles.simAuxButtonText}>
                     {isDegradedConnection ? t.simRestoreBtn : t.simOfflineBtn}
                   </Text>
                 </TouchableOpacity>
 
                 {hasActiveIncident && (
                   <TouchableOpacity 
-                    style={[styles.simSecondaryButton, { borderColor: Colors.emergencyRed }]}
+                    style={[styles.simAuxButton, { borderColor: '#EF4444' }]}
                     onPress={() => router.push('/alert')}
                     activeOpacity={0.8}
-                    accessibilityRole="button"
-                    accessibilityLabel="Navigate to active emergency alert screen"
                   >
-                    <Text style={[styles.simSecondaryButtonText, { color: Colors.emergencyRed }]}>
+                    <Text style={[styles.simAuxButtonText, { color: '#EF4444' }]}>
                       {t.viewActiveAlertBtn}
                     </Text>
                   </TouchableOpacity>
@@ -321,265 +397,388 @@ export default function ReadyScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.canvas,
+    backgroundColor: '#07090C',
   },
   container: {
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.xs,
     paddingBottom: Spacing.xxl,
   },
-  topBar: {
+  topNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: 10,
     paddingVertical: 2,
   },
-  officialPill: {
+  topNavLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
   },
-  norwayFlagDot: {
+  norwayPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
+  flagDotRed: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#BA1E29',
+    backgroundColor: '#EF4444',
   },
-  officialPillText: {
+  flagDotBlue: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#38BDF8',
+    marginLeft: -3,
+  },
+  norwayPillText: {
     ...Typography.caption,
-    color: Colors.textMuted,
+    color: '#94A3B8',
     fontSize: 9,
-    letterSpacing: 1,
-    fontWeight: '700',
+    fontWeight: '800',
+    letterSpacing: 0.8,
   },
-  sectorTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  topNavRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  signalBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    borderColor: 'rgba(52, 211, 153, 0.25)',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
     borderRadius: BorderRadius.xs,
   },
-  sectorTagText: {
+  signalDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: '#34D399',
+  },
+  signalText: {
     ...Typography.caption,
-    color: Colors.textMuted,
+    color: '#6EE7B7',
     fontSize: 9,
-    fontWeight: '700',
-    letterSpacing: 0.5,
+    fontWeight: '800',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-    paddingBottom: Spacing.xs,
-  },
-  logoRow: {
+  langSegment: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-  },
-  brandTitles: {
-    justifyContent: 'center',
-  },
-  brandTitle: {
-    ...Typography.headline,
-    color: Colors.textPrimary,
-    letterSpacing: 0.5,
-    fontWeight: '700',
-    fontSize: 18,
-  },
-  brandSubtitle: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 9,
-    letterSpacing: 0.8,
-    fontWeight: '600',
-    marginTop: 1,
-  },
-  langPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: BorderRadius.full,
+    backgroundColor: '#131822',
     borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.surface,
-    minHeight: 34,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+    gap: 5,
   },
   langText: {
     ...Typography.caption,
-    color: Colors.textPrimary,
-    fontSize: 11,
+    color: '#64748B',
+    fontSize: 10,
     fontWeight: '700',
   },
-  degradedBanner: {
-    backgroundColor: Colors.warningAmberDark,
-    borderColor: Colors.warningAmberBorder,
+  langActiveText: {
+    color: '#FFFFFF',
+    fontWeight: '900',
+  },
+  langDivider: {
+    color: '#334155',
+    fontSize: 10,
+  },
+  brandHeader: {
+    marginBottom: 14,
+  },
+  brandCrestRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  brandMeta: {
+    justifyContent: 'center',
+  },
+  brandTitleText: {
+    ...Typography.title1,
+    color: '#FFFFFF',
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    fontSize: 22,
+  },
+  brandSectorText: {
+    ...Typography.caption,
+    color: '#94A3B8',
+    fontSize: 9,
+    letterSpacing: 1.2,
+    fontWeight: '700',
+    marginTop: 1,
+  },
+  degradedCard: {
+    backgroundColor: '#261707',
     borderWidth: 1,
+    borderColor: '#D97706',
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     marginBottom: Spacing.md,
   },
-  degradedHeader: {
+  degradedHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    marginBottom: 3,
+    marginBottom: 4,
   },
-  degradedDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: Colors.warningAmber,
+  degradedBeaconDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#F59E0B',
   },
-  degradedTitle: {
+  degradedHeading: {
     ...Typography.subhead,
-    color: Colors.warningAmberText,
-    fontWeight: '700',
+    color: '#FDE68A',
+    fontWeight: '800',
     fontSize: 13,
   },
-  degradedSub: {
+  degradedBodyText: {
     ...Typography.caption,
-    color: Colors.textSecondary,
+    color: '#CBD5E1',
     fontSize: 11,
     lineHeight: 16,
   },
-  safeCard: {
-    backgroundColor: '#0D1B13',
+  safeConsoleCard: {
+    backgroundColor: '#091610',
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.35)',
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
+    borderColor: 'rgba(52, 211, 153, 0.4)',
+    borderRadius: BorderRadius.xl,
+    padding: 18,
     marginBottom: Spacing.md,
     position: 'relative',
     overflow: 'hidden',
     shadowColor: '#10B981',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 6,
   },
-  safeCardGlowOverlay: {
+  consoleGlowPool: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 1,
-    backgroundColor: 'rgba(110, 231, 183, 0.3)',
+    height: 2,
+    backgroundColor: 'rgba(52, 211, 153, 0.6)',
   },
-  safeHeaderRow: {
+  consoleHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: 10,
   },
-  statusPill: {
+  allClearBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(16, 185, 129, 0.18)',
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.4)',
+    borderColor: 'rgba(52, 211, 153, 0.5)',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: BorderRadius.full,
   },
-  statusPulseDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: '#34D399',
-    marginRight: 6,
+  pulsingGreenAura: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: 'rgba(52, 211, 153, 0.25)',
+    position: 'absolute',
+    left: 7,
   },
-  statusPillText: {
-    ...Typography.caption,
-    color: '#6EE7B7',
-    fontWeight: '800',
-    letterSpacing: 0.5,
-    fontSize: 10,
-  },
-  statusTimestamp: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 10,
-  },
-  safeHeroTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
-    marginBottom: 4,
-  },
-  safeHeroDesc: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: Spacing.md,
-  },
-  locationBar: {
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
-    paddingTop: Spacing.sm,
-  },
-  locationLabel: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 9,
-    letterSpacing: 0.8,
-    fontWeight: '700',
-  },
-  locationValueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 2,
-  },
-  locationValue: {
-    ...Typography.subhead,
-    color: Colors.textPrimary,
-    fontWeight: '600',
-    fontSize: 13,
-  },
-  gpsActiveDot: {
+  greenCoreDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: '#34D399',
+    marginRight: 7,
   },
-  servicesSection: {
-    marginBottom: Spacing.md,
-  },
-  sectionLabel: {
+  allClearBadgeText: {
     ...Typography.caption,
-    color: Colors.textMuted,
-    letterSpacing: 1,
-    marginBottom: Spacing.xs,
+    color: '#A7F3D0',
+    fontWeight: '900',
+    letterSpacing: 0.8,
     fontSize: 10,
+  },
+  liveClockText: {
+    ...Typography.caption,
+    color: '#64748B',
+    fontFamily: 'monospace',
+    fontSize: 11,
     fontWeight: '700',
   },
-  groupedListContainer: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.lg,
-    overflow: 'hidden',
+  safeHeadingText: {
+    fontSize: 34,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
+    marginBottom: 4,
   },
-  groupedRow: {
+  safeSubheadText: {
+    ...Typography.body,
+    color: '#CBD5E1',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 16,
+  },
+  sensorGrid: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    borderRadius: BorderRadius.md,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  sensorColumn: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  sensorLabel: {
+    ...Typography.caption,
+    color: '#64748B',
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    marginBottom: 2,
+  },
+  sensorValue: {
+    ...Typography.caption,
+    color: '#34D399',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  sensorDivider: {
+    width: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    marginVertical: 2,
+  },
+  bentoSection: {
+    marginBottom: Spacing.md,
+  },
+  bentoSectionLabel: {
+    ...Typography.caption,
+    color: '#64748B',
+    letterSpacing: 1.2,
+    marginBottom: 8,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  heroBentoTile: {
+    backgroundColor: '#0F151F',
+    borderWidth: 1,
+    borderColor: 'rgba(52, 211, 153, 0.35)',
+    borderRadius: BorderRadius.xl,
+    padding: 16,
+    marginBottom: 10,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  heroBentoTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  heroBentoIconWell: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(52, 211, 153, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroBentoTag: {
+    backgroundColor: 'rgba(52, 211, 153, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(52, 211, 153, 0.3)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.xs,
+  },
+  heroBentoTagText: {
+    ...Typography.caption,
+    color: '#6EE7B7',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+  },
+  heroBentoTitle: {
+    ...Typography.headline,
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  heroBentoDesc: {
+    ...Typography.caption,
+    color: '#94A3B8',
+    fontSize: 12,
+    lineHeight: 16,
+    marginBottom: 14,
+  },
+  checklistProgressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 14,
-    minHeight: 64,
+    gap: 10,
   },
-  rowDivider: {
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    marginLeft: 58,
+  progressBarTrack: {
+    flex: 1,
+    height: 5,
+    backgroundColor: '#1E293B',
+    borderRadius: 2.5,
+    overflow: 'hidden',
   },
-  iconWell: {
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#10B981',
+    borderRadius: 2.5,
+  },
+  progressText: {
+    ...Typography.caption,
+    color: '#34D399',
+    fontSize: 10,
+    fontWeight: '800',
+    fontFamily: 'monospace',
+  },
+  bentoSplitRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+  },
+  splitBentoTile: {
+    flex: 1,
+    backgroundColor: '#0F151F',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: BorderRadius.xl,
+    padding: 14,
+    minHeight: 145,
+  },
+  splitIconWell: {
     width: 36,
     height: 36,
     borderRadius: 10,
@@ -587,164 +786,227 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginBottom: 8,
   },
-  rowContent: {
-    flex: 1,
-  },
-  rowTitle: {
-    ...Typography.subhead,
-    color: Colors.textPrimary,
-    fontWeight: '600',
-    fontSize: 14,
-  },
-  rowDesc: {
+  splitTag: {
     ...Typography.caption,
-    color: Colors.textMuted,
-    marginTop: 2,
-    fontSize: 11,
+    color: '#38BDF8',
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    marginBottom: 4,
   },
-  metadataCard: {
-    backgroundColor: Colors.surfaceRaised,
+  splitTitle: {
+    ...Typography.subhead,
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 13,
+  },
+  splitSubtitle: {
+    ...Typography.caption,
+    color: '#64748B',
+    fontSize: 10,
+    marginTop: 2,
+    marginBottom: 10,
+  },
+  splitActionLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    marginTop: 'auto',
+  },
+  splitActionText: {
+    ...Typography.caption,
+    color: '#38BDF8',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  hotlinesCard: {
+    backgroundColor: '#0F151F',
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: BorderRadius.xl,
+    padding: 14,
+  },
+  hotlinesTitle: {
+    ...Typography.caption,
+    color: '#64748B',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    marginBottom: 10,
+  },
+  hotlinesRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  hotlineChip: {
+    flex: 1,
+    backgroundColor: '#161F2E',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: BorderRadius.md,
+    paddingVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  hotlineNumber: {
+    ...Typography.caption,
+    color: '#FFFFFF',
+    fontWeight: '900',
+    fontSize: 13,
+  },
+  hotlineRole: {
+    ...Typography.caption,
+    color: '#64748B',
+    fontSize: 8,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  storageTelemetryBar: {
+    backgroundColor: '#0B0F15',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
+    paddingVertical: 8,
     marginBottom: Spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  metaRow: {
+  storageLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  metaDot: {
+  storageDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
     backgroundColor: '#34D399',
     marginRight: 6,
   },
-  metaText: {
+  storageText: {
     ...Typography.caption,
-    color: Colors.textSecondary,
-    fontSize: 11,
-  },
-  metaTime: {
-    ...Typography.caption,
-    color: Colors.textMuted,
+    color: '#94A3B8',
     fontSize: 10,
   },
-  simulatorSection: {
-    backgroundColor: Colors.surface,
+  storageSyncTime: {
+    ...Typography.caption,
+    color: '#64748B',
+    fontSize: 9,
+    fontFamily: 'monospace',
+  },
+  simulatorChassis: {
+    backgroundColor: '#0C1118',
     borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: BorderRadius.lg,
+    borderColor: 'rgba(245, 158, 11, 0.25)',
+    borderRadius: BorderRadius.xl,
     overflow: 'hidden',
   },
-  simulatorHeaderToggle: {
+  simulatorToggleHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: Spacing.md,
     paddingVertical: 12,
-    backgroundColor: Colors.surfaceRaised,
+    backgroundColor: '#121924',
   },
-  simHeaderLeft: {
+  simTitleLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  simTagBadge: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.3)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: BorderRadius.xs,
+  simAmberLamp: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#F59E0B',
   },
-  simTagText: {
+  simHeading: {
     ...Typography.caption,
-    color: '#F87171',
+    color: '#FDE68A',
     fontWeight: '800',
+    fontSize: 11,
+    letterSpacing: 0.8,
+  },
+  simToggleCapsule: {
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.full,
+  },
+  simToggleCapsuleText: {
+    ...Typography.caption,
+    color: '#FDE68A',
     fontSize: 9,
-    letterSpacing: 0.5,
+    fontWeight: '800',
   },
-  simHeaderTitle: {
-    ...Typography.caption,
-    color: Colors.textSecondary,
-    fontWeight: '600',
-    fontSize: 12,
-  },
-  simToggleText: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  simulatorBody: {
+  simulatorExpandedBody: {
     padding: Spacing.md,
     borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
   },
-  simulatorDesc: {
+  simInstructionText: {
     ...Typography.caption,
-    color: Colors.textMuted,
+    color: '#94A3B8',
     marginBottom: Spacing.md,
     lineHeight: 16,
     fontSize: 11,
   },
-  simulateAlertButton: {
+  triggerAlertButton: {
     backgroundColor: '#DC2626',
     paddingVertical: 14,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 8,
     marginBottom: Spacing.sm,
     minHeight: 48,
     shadowColor: '#DC2626',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
     elevation: 4,
   },
-  alertButtonBeacon: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FFFFFF',
+  alertButtonAura: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: BorderRadius.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
-  simulateAlertButtonText: {
+  triggerAlertButtonText: {
     ...Typography.headline,
     color: '#FFFFFF',
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 0.8,
-    fontSize: 14,
+    fontSize: 13,
   },
-  simulatorRow: {
+  simAuxRow: {
     flexDirection: 'row',
     gap: Spacing.sm,
   },
-  simSecondaryButton: {
+  simAuxButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
     paddingVertical: 10,
     borderRadius: BorderRadius.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.surfaceRaised,
+    backgroundColor: '#16202E',
     minHeight: 42,
   },
-  simSecondaryButtonText: {
+  simAuxButtonText: {
     ...Typography.caption,
-    color: Colors.textSecondary,
-    fontWeight: '600',
+    color: '#CBD5E1',
+    fontWeight: '700',
     fontSize: 11,
   },
 });
