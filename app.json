@@ -4,9 +4,14 @@
     "slug": "sogn-safe",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/sogn-safe-icon/png-fullbleed/SOGN-SAFE-App-Icon-FullBleed-1024.png",
+    "icon": "./assets/icon.png",
     "scheme": "sognsafe",
     "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B1013"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "no.hvl.sognsafe",
@@ -20,7 +25,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/sogn-safe-icon/png-symbol-square/Symbol-Only-Square-Metallic-1024.png",
+        "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#0B1013",
         "monochromeImage": "./assets/sogn-safe-icon/png-symbol-square-mono/Symbol-Only-Square-Mono-White-1024.png"
       },
@@ -40,7 +45,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/sogn-safe-icon/png-symbol-square/Symbol-Only-Square-Metallic-1024.png",
+          "image": "./assets/splash-icon.png",
           "imageWidth": 300,
           "resizeMode": "contain",
           "backgroundColor": "#0B1013"

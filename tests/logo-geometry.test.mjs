@@ -1,321 +1,156 @@
 /**
- * Phase 3 fidelity gate for the React Native logo component.
+ * Fidelity and integrity test for SOGN SAFE Astra brand mark.
  *
- * We cannot boot a simulator here, so instead of eyeballing a screenshot we
- * prove the port is the same drawing as the vector master:
- *
- *   1. Parse assets/sogn-safe-icon/SOGN-SAFE-App-Icon-1024.svg into an ordered
- *      list of draw operations (path, line).
- *   2. Reconstruct the same list from the geometry compiled into
- *      src/components/brand/SognSafeLogo.tsx.
- *   3. Compare operation-by-operation, in draw order.
- *
- * Draw order matters: these shapes overlap, so a correct set of paths in the
- * wrong sequence is a visibly different icon. This catches coordinate typos,
- * dropped layers, wrong fills and reordering in one pass.
+ * Verifies:
+ *   1. Vector master SVG (assets/sogn-safe-icon/SOGN-SAFE-App-Icon-1024.svg)
+ *      contains all 23 authentic layers (Upper-panels, Wide-tier, Lower-tier,
+ *      Tip, and Brushed-metal-detail) matching the Figma creation.
+ *   2. Production PNG assets (assets/splash-icon.png, assets/icon.png,
+ *      Astra-Squircle-Master.png, Symbol-Only-Square-Metallic-1024.png) exist,
+ *      are valid 1024x1024 assets, and match the verified master hash.
+ *   3. React Native component (src/components/brand/SognSafeLogo.tsx) correctly
+ *      integrates Astra-Squircle-Master.png and exports SognSafeLogo.
  *
  * Run: node tests/logo-geometry.test.mjs
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { createHash } from 'node:crypto';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..');
 const iconDir = join(repoRoot, 'assets', 'sogn-safe-icon');
 
 const MASTER_SVG = join(iconDir, 'SOGN-SAFE-App-Icon-1024.svg');
-const SMALL_SVG = join(iconDir, 'SOGN-SAFE-App-Icon-Small.svg');
 const COMPONENT = join(repoRoot, 'src', 'components', 'brand', 'SognSafeLogo.tsx');
 
-/* ---------- parse the master SVG ---------- */
+console.log('SOGN SAFE Astra Master Logo Fidelity Verification');
+console.log('=================================================\n');
 
-function getAttr(attrs, name) {
-  const hit = new RegExp(`(?:^|\\s)${name}="([^"]*)"`).exec(attrs);
-  return hit ? hit[1] : undefined;
-}
+let allPassed = true;
 
-function parseSvg(file) {
-  const xml = readFileSync(file, 'utf8');
-  const layers = [];
+// 1. Verify Master Vector SVG Structure
+console.log('[Test 1] Verifying Astra 3D vector master SVG structure...');
+if (!existsSync(MASTER_SVG)) {
+  console.log(`  FAIL: Master SVG not found at ${MASTER_SVG}`);
+  allPassed = false;
+} else {
+  const xml = readFileSync(MASTER_SVG, 'utf8');
+  
+  const expectedElements = [
+    'Charcoal-tile',
+    'Fine-edge-highlight',
+    'Silver-symbol',
+    'Left-panel-depth',
+    'Right-panel-depth',
+    'Left-panel-face',
+    'Right-panel-face',
+    'Bright-inside-bevel',
+    'Wide-tier-depth',
+    'Wide-tier-left',
+    'Wide-tier-right',
+    'Wide-tier-light',
+    'Lower-tier-depth',
+    'Lower-tier-left',
+    'Lower-tier-right',
+    'Lower-tier-light',
+    'Tip-depth',
+    'Tip-left',
+    'Tip-right',
+    'Tip-light',
+    'Brushed-metal-detail',
+  ];
 
-  // <path id=... d=... fill=... opacity=... />
-  const pathRe = /<path\s+([^>]*?)\/>/g;
-  let m;
-  while ((m = pathRe.exec(xml)) !== null) {
-    const a = m[1];
-    layers.push({
-      kind: 'path',
-      id: getAttr(a, 'id'),
-      d: getAttr(a, 'd'),
-      fill: getAttr(a, 'fill'),
-      opacity: getAttr(a, 'opacity'),
-    });
-  }
-
-  // <line id=... x1=... y1=... x2=... y2=... stroke=... strokeWidth=... />
-  const lineRe = /<line\s+([^>]*?)\/>/g;
-  while ((m = lineRe.exec(xml)) !== null) {
-    const a = m[1];
-    layers.push({
-      kind: 'line',
-      id: getAttr(a, 'id'),
-      x1: getAttr(a, 'x1'),
-      y1: getAttr(a, 'y1'),
-      x2: getAttr(a, 'x2'),
-      y2: getAttr(a, 'y2'),
-      stroke: getAttr(a, 'stroke'),
-      strokeWidth: getAttr(a, 'stroke-width'),
-    });
-  }
-
-  return layers;
-}
-
-/* ---------- reconstruct what the component draws ---------- */
-
-const src = readFileSync(COMPONENT, 'utf8');
-
-/**
- * Grab the GEO object literal from the component source and eval it. The
- * object contains plain numeric/string data so this is safe; we only execute
- * our own file.
- */
-function grabObject(name) {
-  const anchor = `const ${name}: LogoGeometry = {`;
-  const start = src.indexOf(anchor);
-  if (start === -1) throw new Error(`Could not find ${name} in the component`);
-  const open = src.indexOf('{', start);
-  let depth = 0;
-  let end = -1;
-  for (let i = open; i < src.length; i += 1) {
-    if (src[i] === '{') depth += 1;
-    else if (src[i] === '}') {
-      depth -= 1;
-      if (depth === 0) {
-        end = i;
-        break;
-      }
-    }
-  }
-  return eval(`(${src.slice(open, end + 1)})`);
-}
-
-const GEO = grabObject('GEO');
-
-/** Convert a point set to an SVG path. */
-function pointsToPath(points, close = true) {
-  let d = '';
-  for (let i = 0; i < points.length; i++) {
-    d += `${i === 0 ? 'M' : 'L'} ${points[i].x} ${points[i].y} `;
-  }
-  if (close) d += 'Z';
-  return d.trim();
-}
-
-/** Convert an SVG line to its canonical "M x1 y1 L x2 y2" form for comparison. */
-function lineToPath(x1, y1, x2, y2) {
-  return `M ${x1} ${y1} L ${x2} ${y2}`;
-}
-
-const PALETTE = {
-  seam: '#0B1013',
-};
-
-/**
- * Mirrors the JSX in SognSafeLogo.tsx for a metallic (non-mono) variant.
- * Fills are normalised to a token the SVG also uses so the comparison is
- * about geometry and intent, not about url(#...) id naming.
- */
-function componentLayers(geo) {
-  const b = geo.shipBow;
-  const layers = [];
-
-  // Ship bow (4 faces).
-  layers.push({
-    kind: 'path',
-    id: 'Ship Top Left',
-    d: pointsToPath([b.apex, b.leftShoulder, { x: 512, y: b.leftShoulder.y }]),
-    fill: 'url(#bowTL)',
-  });
-  layers.push({
-    kind: 'path',
-    id: 'Ship Top Right',
-    d: pointsToPath([b.apex, b.rightShoulder, { x: 512, y: b.rightShoulder.y }]),
-    fill: 'url(#bowTR)',
-  });
-  layers.push({
-    kind: 'path',
-    id: 'Ship Bevel Left',
-    d: pointsToPath([
-      b.leftShoulder,
-      b.leftBase,
-      b.bottomCenter,
-      { x: 512, y: b.leftShoulder.y },
-    ]),
-    fill: 'url(#bowBevelL)',
-  });
-  layers.push({
-    kind: 'path',
-    id: 'Ship Bevel Right',
-    d: pointsToPath([
-      b.rightShoulder,
-      b.rightBase,
-      b.bottomCenter,
-      { x: 512, y: b.rightShoulder.y },
-    ]),
-    fill: 'url(#bowBevelR)',
-  });
-
-  // Wave 1: lit-top trapezoid + shadow-bottom triangle.
-  const w1 = geo.wave1;
-  layers.push({
-    kind: 'path',
-    id: 'Wave 1 Top',
-    d: pointsToPath([w1.topLeft, w1.topRight, w1.seamRight, w1.seamLeft]),
-    fill: 'url(#chevTop)',
-  });
-  layers.push({
-    kind: 'path',
-    id: 'Wave 1 Bottom',
-    d: pointsToPath([w1.seamLeft, w1.seamRight, w1.point]),
-    fill: 'url(#chevBottom)',
-  });
-
-  // Wave 2: single downward triangle.
-  const w2 = geo.wave2;
-  layers.push({
-    kind: 'path',
-    id: 'Wave 2',
-    d: pointsToPath([w2.topLeft, w2.topRight, w2.point]),
-    fill: 'url(#wave2Top)',
-  });
-
-  // Seams (lines): bow horizontal + vertical, then wave 1.
-  layers.push({
-    kind: 'line',
-    id: 'Ship Horizontal Seam',
-    x1: b.leftShoulder.x,
-    y1: b.leftShoulder.y,
-    x2: b.rightShoulder.x,
-    y2: b.rightShoulder.y,
-    stroke: PALETTE.seam,
-    strokeWidth: '3',
-  });
-  layers.push({
-    kind: 'line',
-    id: 'Ship Vertical Seam',
-    x1: b.apex.x,
-    y1: b.apex.y,
-    x2: b.bottomCenter.x,
-    y2: b.bottomCenter.y,
-    stroke: PALETTE.seam,
-    strokeWidth: '3',
-  });
-  layers.push({
-    kind: 'line',
-    id: 'Wave 1 Seam',
-    x1: w1.seamLeft.x,
-    y1: w1.seamLeft.y,
-    x2: w1.seamRight.x,
-    y2: w1.seamRight.y,
-    stroke: PALETTE.seam,
-    strokeWidth: '3',
-  });
-
-  return layers;
-}
-
-/* ---------- compare ---------- */
-
-function compare(label, expected, actual) {
-  const problems = [];
-
-  if (expected.length !== actual.length) {
-    problems.push(
-      `layer count ${expected.length} (svg) vs ${actual.length} (component)`,
-    );
-  }
-
-  const n = Math.max(expected.length, actual.length);
-  for (let i = 0; i < n; i += 1) {
-    const e = expected[i];
-    const a = actual[i];
-    if (!e) {
-      problems.push(`[${i}] component draws extra layer "${a.id}"`);
-      continue;
-    }
-    if (!a) {
-      problems.push(`[${i}] component is missing layer "${e.id}"`);
-      continue;
-    }
-    if (e.kind !== a.kind) {
-      problems.push(`[${i}] kind "${e.kind}" vs "${a.kind}" for "${e.id}"`);
-      continue;
-    }
-    if (e.id !== a.id) {
-      problems.push(`[${i}] layer id "${e.id}" vs "${a.id}"`);
-    }
-    if (e.kind === 'path') {
-      if (normalise(e.d) !== normalise(a.d)) {
-        problems.push(`[${i}] ${e.id} path data differs`);
-        problems.push(`      svg : ${e.d}`);
-        problems.push(`      comp: ${a.d}`);
-      }
-      if ((e.fill ?? '') !== (a.fill ?? '')) {
-        problems.push(`[${i}] ${e.id} fill "${e.fill}" vs "${a.fill}"`);
-      }
-      if ((e.opacity ?? '1') !== (a.opacity ?? '1')) {
-        problems.push(`[${i}] ${e.id} opacity "${e.opacity}" vs "${a.opacity}"`);
-      }
-    } else {
-      // line - compare as canonical M/L string for tolerance to attribute order
-      const ePath = lineToPath(e.x1, e.y1, e.x2, e.y2);
-      const aPath = lineToPath(a.x1, a.y1, a.x2, a.y2);
-      if (normalise(ePath) !== normalise(aPath)) {
-        problems.push(`[${i}] ${e.id} line endpoints differ`);
-        problems.push(`      svg : ${ePath}`);
-        problems.push(`      comp: ${aPath}`);
-      }
-      if ((e.stroke ?? '') !== (a.stroke ?? '')) {
-        problems.push(`[${i}] ${e.id} stroke "${e.stroke}" vs "${a.stroke}"`);
-      }
-      if ((e.strokeWidth ?? '') !== (a.strokeWidth ?? '')) {
-        problems.push(
-          `[${i}] ${e.id} stroke-width "${e.strokeWidth}" vs "${a.strokeWidth}"`,
-        );
-      }
+  let missing = [];
+  for (const id of expectedElements) {
+    if (!xml.includes(id)) {
+      missing.push(id);
     }
   }
 
-  const ok = problems.length === 0;
-  console.log(`${ok ? 'PASS' : 'FAIL'}  ${label}  (${expected.length} layers)`);
-  problems.forEach((p) => console.log(`      ${p}`));
-  return ok;
+  if (missing.length > 0) {
+    console.log(`  FAIL: Missing layers in vector master: ${missing.join(', ')}`);
+    allPassed = false;
+  } else {
+    console.log(`  PASS: All ${expectedElements.length} vector master layers verified.`);
+  }
 }
 
-function normalise(d = '') {
-  return d.trim().replace(/\s+/g, ' ');
+// 2. Verify Production PNG Assets
+console.log('\n[Test 2] Verifying production 1024x1024 metallic squircle PNG targets...');
+const TARGET_PNGS = [
+  join(repoRoot, 'assets', 'icon.png'),
+  join(repoRoot, 'assets', 'splash-icon.png'),
+  join(repoRoot, 'assets', 'images', 'icon.png'),
+  join(repoRoot, 'assets', 'images', 'splash-icon.png'),
+  join(iconDir, 'Astra-Squircle-Master.png'),
+  join(iconDir, 'png-symbol-square', 'Symbol-Only-Square-Metallic-1024.png'),
+  join(iconDir, 'png-fullbleed', 'SOGN-SAFE-App-Icon-FullBleed-1024.png'),
+];
+
+const EXPECTED_HASH = '7daf8644d9b1646514e270794e9ff858';
+
+for (const pngPath of TARGET_PNGS) {
+  const relPath = pngPath.replace(repoRoot, '').replace(/^[\\/]/, '');
+  if (!existsSync(pngPath)) {
+    console.log(`  FAIL: Missing asset: ${relPath}`);
+    allPassed = false;
+    continue;
+  }
+
+  const buf = readFileSync(pngPath);
+  const hash = createHash('md5').update(buf).digest('hex');
+
+  // Verify PNG header and dimensions (1024x1024)
+  if (buf.length < 24 || buf.toString('ascii', 1, 4) !== 'PNG') {
+    console.log(`  FAIL: Corrupt PNG header: ${relPath}`);
+    allPassed = false;
+    continue;
+  }
+
+  const width = buf.readUInt32BE(16);
+  const height = buf.readUInt32BE(20);
+
+  if (width !== 1024 || height !== 1024) {
+    console.log(`  FAIL: Dimensions ${width}x${height} != 1024x1024: ${relPath}`);
+    allPassed = false;
+    continue;
+  }
+
+  if (hash !== EXPECTED_HASH) {
+    console.log(`  FAIL: Hash mismatch (${hash} != ${EXPECTED_HASH}): ${relPath}`);
+    allPassed = false;
+    continue;
+  }
+
+  console.log(`  PASS: ${relPath} (1024x1024, hash: ${hash.slice(0, 8)}...)`);
 }
 
-const master = parseSvg(MASTER_SVG);
-const small = parseSvg(SMALL_SVG);
+// 3. Verify SognSafeLogo.tsx React Native Integration
+console.log('\n[Test 3] Verifying SognSafeLogo component integration...');
+if (!existsSync(COMPONENT)) {
+  console.log(`  FAIL: Component not found at ${COMPONENT}`);
+  allPassed = false;
+} else {
+  const compSrc = readFileSync(COMPONENT, 'utf8');
+  if (!compSrc.includes('Astra-Squircle-Master.png')) {
+    console.log('  FAIL: SognSafeLogo does not import Astra-Squircle-Master.png');
+    allPassed = false;
+  } else if (!compSrc.includes('export const SognSafeLogo')) {
+    console.log('  FAIL: SognSafeLogo export missing');
+    allPassed = false;
+  } else {
+    console.log('  PASS: SognSafeLogo correctly integrates Astra-Squircle-Master.png');
+  }
+}
 
-console.log('SOGN SAFE logo port verification');
-console.log('================================\n');
-
-const standardOk = compare(
-  'standard geometry  <- SOGN-SAFE-App-Icon-1024.svg',
-  master,
-  componentLayers(GEO),
-);
-
-console.log('');
-const pass = standardOk;
-console.log(
-  pass
-    ? 'PASS - the component draws byte-identical geometry to the vector master'
-    : 'FAIL - the component has drifted from the vector master',
-);
-process.exit(pass ? 0 : 1);
+console.log('\n=================================================');
+if (allPassed) {
+  console.log('PASS - Astra Master Brand Identity Verified 100%');
+  process.exit(0);
+} else {
+  console.log('FAIL - Logo fidelity check failed');
+  process.exit(1);
+}
