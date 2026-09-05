@@ -168,28 +168,31 @@ function componentLayers(geo) {
     fill: 'url(#bowBevelR)',
   });
 
-  // Three chevron waves + the diamond.
-  for (const [n, c] of [
-    [1, geo.wave1],
-    [2, geo.wave2],
-    [3, geo.wave3],
-    [4, geo.diamond],
-  ]) {
-    layers.push({
-      kind: 'path',
-      id: n === 4 ? 'Diamond Top' : `Wave ${n} Top`,
-      d: pointsToPath([c.topLeft, c.topRight, c.seamRight, c.seamLeft]),
-      fill: 'url(#chevTop)',
-    });
-    layers.push({
-      kind: 'path',
-      id: n === 4 ? 'Diamond Bottom' : `Wave ${n} Bottom`,
-      d: pointsToPath([c.seamLeft, c.seamRight, c.point]),
-      fill: 'url(#chevBottom)',
-    });
-  }
+  // Wave 1: lit-top trapezoid + shadow-bottom triangle.
+  const w1 = geo.wave1;
+  layers.push({
+    kind: 'path',
+    id: 'Wave 1 Top',
+    d: pointsToPath([w1.topLeft, w1.topRight, w1.seamRight, w1.seamLeft]),
+    fill: 'url(#chevTop)',
+  });
+  layers.push({
+    kind: 'path',
+    id: 'Wave 1 Bottom',
+    d: pointsToPath([w1.seamLeft, w1.seamRight, w1.point]),
+    fill: 'url(#chevBottom)',
+  });
 
-  // Seams (lines).
+  // Wave 2: single downward triangle.
+  const w2 = geo.wave2;
+  layers.push({
+    kind: 'path',
+    id: 'Wave 2',
+    d: pointsToPath([w2.topLeft, w2.topRight, w2.point]),
+    fill: 'url(#wave2Top)',
+  });
+
+  // Seams (lines): bow horizontal + vertical, then wave 1.
   layers.push({
     kind: 'line',
     id: 'Ship Horizontal Seam',
@@ -210,23 +213,16 @@ function componentLayers(geo) {
     stroke: PALETTE.seam,
     strokeWidth: '3',
   });
-  for (const [n, c] of [
-    [1, geo.wave1],
-    [2, geo.wave2],
-    [3, geo.wave3],
-    [4, geo.diamond],
-  ]) {
-    layers.push({
-      kind: 'line',
-      id: n === 4 ? 'Diamond Seam' : `Wave ${n} Seam`,
-      x1: c.seamLeft.x,
-      y1: c.seamLeft.y,
-      x2: c.seamRight.x,
-      y2: c.seamRight.y,
-      stroke: PALETTE.seam,
-      strokeWidth: '3',
-    });
-  }
+  layers.push({
+    kind: 'line',
+    id: 'Wave 1 Seam',
+    x1: w1.seamLeft.x,
+    y1: w1.seamLeft.y,
+    x2: w1.seamRight.x,
+    y2: w1.seamRight.y,
+    stroke: PALETTE.seam,
+    strokeWidth: '3',
+  });
 
   return layers;
 }
