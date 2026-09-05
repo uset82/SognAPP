@@ -2,7 +2,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="884" height="859.5" viewBox="184.5 91 884 859.5">
   <title>SOGN SAFE</title>
   <desc>Single-colour white symbol on transparent background.</desc>
-<g id="Silver-symbol">
+<g id="Silver-symbol" transform="translate(626.5 520.75) scale(0.62) translate(-626.5 -520.75)">
       <g id="Upper-panels">
         <path id="Left-panel-depth" d="M392 458 L418 540 Q421 548 427 547 L611 479 Q618 476 617 469 L616 252 L603 462 L423 539 Z" fill="#FFFFFF"/>
         <path id="Right-panel-depth" d="M636 252 L635 470 Q634 477 642 480 L824 547 Q830 549 834 540 L857 459 L826 540 L647 462 Z" fill="#FFFFFF"/>

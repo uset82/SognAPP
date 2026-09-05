@@ -3,13 +3,14 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start",
+    "start": "node server.js",
+    "dev": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build": "expo export -p web",
     "build:web": "expo export -p web",
-    "serve": "npx serve dist",
+    "serve": "node server.js",
     "simulator": "node simulator/server.js",
     "test": "node tests/scenario.test.mjs && node tests/logo-geometry.test.mjs",
     "test:logo": "node tests/logo-geometry.test.mjs"

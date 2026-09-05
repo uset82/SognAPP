@@ -21,7 +21,7 @@
   <g id="App-icon">
     <rect id="Charcoal-tile" x="186" y="92" width="881" height="857" rx="191" fill="url(#tile)" stroke="#03080C" stroke-width="3" />
     <rect id="Fine-edge-highlight" x="191" y="96" width="871" height="848" rx="185" stroke="url(#rim)" stroke-width="3"/>
-    <g id="Silver-symbol" filter="url(#metalShadow)">
+    <g id="Silver-symbol" filter="url(#metalShadow)" transform="translate(626.5 520.75) scale(0.62) translate(-626.5 -520.75)">
       <g id="Upper-panels">
         <path id="Left-panel-depth" d="M392 458 L418 540 Q421 548 427 547 L611 479 Q618 476 617 469 L616 252 L603 462 L423 539 Z" fill="url(#edge)"/>
         <path id="Right-panel-depth" d="M636 252 L635 470 Q634 477 642 480 L824 547 Q830 549 834 540 L857 459 L826 540 L647 462 Z" fill="url(#edge)"/>

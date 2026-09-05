@@ -19,7 +19,7 @@
     <clipPath id="metalClip"><path d="M614 250 Q617 247 616 254 L604 462 L425 540 Q420 542 418 537 L392 459 Q390 454 394 451 Z M638 250 Q635 247 636 255 L647 462 L825 540 Q830 542 832 536 L856 460 Q859 454 854 450 Z M306 607 L625 510 L943 607 L850 607 L625 559 L401 607 Z M411 648 L625 601 L838 648 Q809 659 788 660 L625 649 L465 660 Q438 660 411 648 Z M509 702 L625 699 L741 702 L625 773 Z"/></clipPath>
   </defs>
   <g id="Symbol">
-    <g id="Silver-symbol" filter="url(#metalShadow)">
+    <g id="Silver-symbol" filter="url(#metalShadow)" transform="translate(626.5 520.75) scale(0.62) translate(-626.5 -520.75)">
       <g id="Upper-panels">
         <path id="Left-panel-depth" d="M392 458 L418 540 Q421 548 427 547 L611 479 Q618 476 617 469 L616 252 L603 462 L423 539 Z" fill="url(#edge)"/>
         <path id="Right-panel-depth" d="M636 252 L635 470 Q634 477 642 480 L824 547 Q830 549 834 540 L857 459 L826 540 L647 462 Z" fill="url(#edge)"/>
