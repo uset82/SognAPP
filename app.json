@@ -4,7 +4,7 @@
     "slug": "sogn-safe",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/sogn-safe-icon/png-fullbleed/SOGN-SAFE-App-Icon-FullBleed-1024.png",
     "scheme": "sognsafe",
     "userInterfaceStyle": "dark",
     "ios": {
@@ -20,8 +20,9 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundColor": "#121417"
+        "foregroundImage": "./assets/sogn-safe-icon/png-symbol/Symbol-Only-Metallic-1024.png",
+        "backgroundColor": "#0B1013",
+        "monochromeImage": "./assets/sogn-safe-icon/png-mono-white/Symbol-Only-Mono-White-1024.png"
       },
       "package": "no.hvl.sognsafe",
       "permissions": [
@@ -32,17 +33,17 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/sogn-safe-icon/png/SOGN-SAFE-App-Icon-128.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/sogn-safe-icon/png-symbol/Symbol-Only-Metallic-1024.png",
+          "imageWidth": 240,
           "resizeMode": "contain",
-          "backgroundColor": "#121417"
+          "backgroundColor": "#0B1013"
         }
       ],
       [
@@ -54,7 +55,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/icon.png",
+          "icon": "./assets/sogn-safe-icon/png-mono-white/Symbol-Only-Mono-White-128.png",
           "color": "#D93829"
         }
       ]
@@ -67,6 +68,7 @@
       "eas": {
         "projectId": "3061df7f-5c9b-409c-b4cb-99ff05132785"
       }
-    }
+    },
+    "owner": "uset182"
   }
 }
