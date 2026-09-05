@@ -2,61 +2,60 @@
  * SOGN SAFE Design Tokens
  * 
  * Visual direction:
- * - Scandinavian civic design
- * - Calm, trustworthy, robust, understated, public-service feeling
- * - High contrast, accessible minimum touch targets (>= 48px)
- * - Clear semantic role separation: Safety Green vs Emergency Red vs Restrained Amber
+ * - Official Figma Prototype (Scandinavian Civic Emergency System)
+ * - Clean, trustworthy, accessible, light Nordic aesthetic
+ * - Paper-white/warm cream canvas (#FBFBFA) with soft sage-green safe tint (#EDF5EE)
+ * - Deep forest green (#1B5E36) and high-visibility crimson (#C5221F)
+ * - High contrast, accessible touch targets (>= 48px)
  */
 
 export const Colors = {
-  // Neutral Canvas & Surfaces (Nightglass & Astra Metallic Tokens)
-  canvas: '#080B0F',
-  surface: '#0F151E',
-  surfaceRaised: '#151C28',
-  surfaceSubtle: '#1C2534',
-  carbonPlate: '#0B0F15',
-  border: 'rgba(255, 255, 255, 0.09)',
-  borderLight: 'rgba(255, 255, 255, 0.16)',
-  borderSubtle: 'rgba(255, 255, 255, 0.04)',
-  specularTop: 'rgba(255, 255, 255, 0.20)',
-
-  // Astra Metallic Steel Palette
-  metalHighlight: '#F8FAFC',
-  metalPrimary: '#E2E8F0',
-  metalSecondary: '#94A3B8',
-  metalShadow: '#475569',
-  metalEdge: 'rgba(203, 213, 225, 0.25)',
+  // Neutral Canvas & Surfaces (Figma Light Scandinavian Palette)
+  canvas: '#FBFBFA',
+  surface: '#FFFFFF',
+  surfaceRaised: '#F3F4F6',
+  surfaceSubtle: '#F9FAFB',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
+  borderSubtle: '#F9FAFB',
+  specularTop: 'rgba(255, 255, 255, 0.8)',
 
   // Text Hierarchy
-  textPrimary: '#FFFFFF',
-  textSecondary: '#CBD5E1',
-  textMuted: '#7E8B9B',
-  textFaint: '#475569',
+  textPrimary: '#111827',
+  textSecondary: '#4B5563',
+  textMuted: '#9CA3AF',
+  textFaint: '#D1D5DB',
   textOnColor: '#FFFFFF',
 
-  // Semantic Emergency Palette
-  emergencyRed: '#EF4444',
-  emergencyRedDark: '#2B1113',
-  emergencyRedBorder: '#F87171',
-  emergencyRedText: '#FCA5A5',
+  // Semantic Emergency Palette (Figma Crimson Red)
+  emergencyRed: '#C5221F',
+  emergencyRedDark: '#991B1B',
+  emergencyRedBorder: '#EF4444',
+  emergencyRedText: '#FEE2E2',
+  emergencyRedBg: '#FEF2F2',
 
-  // Safety / Normal State (High-grade Emerald)
-  safetyGreen: '#10B981',
-  safetyGreenDark: '#0B2418',
-  safetyGreenBorder: '#059669',
-  safetyGreenText: '#6EE7B7',
+  // Safety / Normal State (Figma Forest Green & Mint Tint)
+  safetyGreen: '#1B5E36',
+  safetyGreenDark: '#0F3D22',
+  safetyGreenBorder: '#D1E7D5',
+  safetyGreenText: '#1B5E36',
+  safetyGreenBg: '#EDF5EE',
 
-  // Warning / Degraded Connectivity
-  warningAmber: '#F59E0B',
-  warningAmberDark: '#2B1B09',
-  warningAmberBorder: '#D97706',
-  warningAmberText: '#FDE68A',
+  // Warning / Degraded Connectivity (Figma Amber)
+  warningAmber: '#D97706',
+  warningAmberDark: '#92400E',
+  warningAmberBorder: '#F59E0B',
+  warningAmberText: '#B45309',
+  warningAmberBg: '#FEF3C7',
 
-  // Accent / Map & Navigation
-  fjordTeal: '#0284C7',
+  // Fjord Cartography & Navigation
+  fjordWater: '#A7C7E7',
+  fjordWaterDeep: '#7EA6C8',
+  fjordTeal: '#2A5A66',
   fjordTealLight: '#38BDF8',
-  routeBlue: '#38BDF8',
-  routeBlueDark: '#082F49',
+  routeBlue: '#2563EB',
+  routeBlueDark: '#1D4ED8',
+  routeBlueAura: 'rgba(37, 99, 235, 0.15)',
 };
 
 export const Spacing = {
@@ -72,41 +71,41 @@ export const Typography = {
   fontFamily: 'System',
   hero: {
     fontSize: 34,
-    fontWeight: '700' as const,
+    fontWeight: '800' as const,
     lineHeight: 40,
     letterSpacing: -0.5,
   },
   title1: {
-    fontSize: 26,
-    fontWeight: '700' as const,
-    lineHeight: 32,
+    fontSize: 24,
+    fontWeight: '800' as const,
+    lineHeight: 30,
     letterSpacing: -0.3,
   },
   title2: {
     fontSize: 20,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     lineHeight: 26,
   },
   headline: {
     fontSize: 17,
-    fontWeight: '600' as const,
+    fontWeight: '700' as const,
     lineHeight: 22,
   },
   body: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '400' as const,
-    lineHeight: 22,
+    lineHeight: 21,
   },
   subhead: {
     fontSize: 14,
-    fontWeight: '500' as const,
+    fontWeight: '600' as const,
     lineHeight: 18,
   },
   caption: {
     fontSize: 12,
     fontWeight: '500' as const,
     lineHeight: 16,
-    letterSpacing: 0.5,
+    letterSpacing: 0.2,
   },
 };
 
@@ -115,6 +114,6 @@ export const BorderRadius = {
   sm: 8,
   md: 12,
   lg: 16,
-  xl: 24,
+  xl: 20,
   full: 9999,
 };

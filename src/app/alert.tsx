@@ -1,11 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
-import { Colors, Spacing, Typography, BorderRadius } from '../constants/theme';
-import { EmergencyButton } from '../components/ui';
-import { AlertTriangleIcon } from '../components/ui/CivicIcons';
+import { SognSafeLogo } from '../components/brand';
+import {
+  AlertTriangleSolidIcon,
+  PhoneVibrateIcon,
+  SpeakerSoundIcon,
+  ClockIcon,
+  ShieldCheckIcon,
+  MedicalCrossIcon,
+} from '../components/ui/CivicIcons';
 
 export default function AlertScreen() {
   const router = useRouter();
@@ -15,26 +21,13 @@ export default function AlertScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Top Emergency Header Bar */}
-        <View style={styles.alertHeaderBar}>
-          <View style={styles.emergencyPill}>
-            <View style={styles.pulseDot} />
-            <Text style={styles.emergencyPillText}>
-              {isNorwegian ? 'KRITISK SIVILT VARSEL' : 'CRITICAL CIVIC ALERT'}
-            </Text>
-          </View>
-
-          <View style={styles.deliveryBadges}>
-            <View style={styles.deliveryBadge}>
-              <Text style={styles.deliveryBadgeText}>HAPTIC</Text>
-            </View>
-            <View style={styles.deliveryBadge}>
-              <Text style={styles.deliveryBadgeText}>SOUND</Text>
-            </View>
-          </View>
+        {/* Top Header with Astra Logo */}
+        <View style={styles.topHeader}>
+          <SognSafeLogo size={34} variant="master" />
+          <Text style={styles.brandTitle}>SOGN SAFE</Text>
         </View>
 
-        {/* Degraded Connection Banner */}
+        {/* Degraded Connection Banner if offline */}
         {isDegradedConnection && (
           <View style={styles.degradedBanner}>
             <Text style={styles.degradedText}>
@@ -45,91 +38,116 @@ export default function AlertScreen() {
           </View>
         )}
 
-        {/* Hero Alert Title */}
-        <View style={styles.heroSection}>
-          <Text style={styles.alertCategory}>
-            {isNorwegian ? 'NØDVARSLING' : 'EMERGENCY ALERT'}
-          </Text>
-          <Text style={styles.incidentTitle}>
-            {isNorwegian 
-              ? 'Mulig skipskollisjon ved Flåm kai' 
-              : (incident?.title || 'Possible vessel collision near Flåm harbor')}
-          </Text>
-          <Text style={styles.incidentDesc}>
-            {isNorwegian
-              ? 'Stort passasjerskip melder om manøvreringssvikt ved innseiling mot Flåm kai.'
-              : (incident?.shortDescription || 'Large passenger vessel experiencing maneuvering failure approaching waterfront.')}
-          </Text>
-        </View>
-
-        {/* Major Affected Area Warning Card */}
-        <View style={styles.affectedAreaCard}>
-          <View style={styles.affectedHeaderRow}>
-            <View style={styles.affectedIconBadge}>
-              <AlertTriangleIcon size={18} color="#FFFFFF" />
-            </View>
-            <View style={styles.affectedTextCol}>
-              <Text style={styles.affectedHeading}>
-                {isNorwegian ? 'DU ER I BERØRT OMRÅDE' : 'YOU ARE INSIDE THE AFFECTED AREA'}
+        {/* Emergency Alert Red Card */}
+        <View style={styles.emergencyCard}>
+          <View style={styles.alertHeaderRow}>
+            <AlertTriangleSolidIcon size={32} color="#FFFFFF" />
+            <View style={styles.alertTitleCol}>
+              <Text style={styles.alertMainTitle}>
+                {isNorwegian ? 'NØDVARSLING' : 'EMERGENCY ALERT'}
               </Text>
-              <Text style={styles.affectedSub}>
+              <Text style={styles.alertSubtitle}>
                 {isNorwegian 
-                  ? 'Sone: Indre Flåm kai og havnebasseng' 
-                  : `Zone: ${incident?.affectedZoneName || 'Inner Kai Waterfront Zone A'}`}
+                  ? 'Mulig skipskollisjon ved Flåm kai' 
+                  : (incident?.title || 'Possible vessel collision near Flåm harbor')}
               </Text>
             </View>
           </View>
 
-          <View style={styles.instructionBox}>
-            <Text style={styles.instructionLead}>
-              {isNorwegian ? 'PÅLEGG:' : 'INSTRUCTION:'}
-            </Text>
-            <Text style={styles.instructionText}>
-              {isNorwegian 
-                ? 'Forlat havneområdet til fots umiddelbart. Trekk oppover mot Flåm skule.'
-                : 'Leave the harbor area now on foot. Proceed uphill toward Flåm School.'}
-            </Text>
-          </View>
+          <View style={styles.cardDivider} />
 
-          {/* Risk Window Indicator */}
-          <View style={styles.riskWindowRow}>
-            <Text style={styles.riskWindowLabel}>
-              {isNorwegian ? 'BEREGNET RISIKOVINDU:' : 'ESTIMATED RISK WINDOW:'}
-            </Text>
-            <Text style={styles.riskWindowValue}>
-              {isNorwegian ? '~15 minutter til kaiområdet' : '~15 min until impact perimeter'}
+          {/* Haptic & Sound notification row */}
+          <View style={styles.statusRow}>
+            <View style={styles.statusItem}>
+              <PhoneVibrateIcon size={16} color="#FFFFFF" />
+              <Text style={styles.statusItemText}>
+                {isNorwegian ? 'VIBERASJON PÅ' : 'VIBRATE ON'}
+              </Text>
+            </View>
+            <View style={styles.statusVerticalDivider} />
+            <View style={styles.statusItem}>
+              <SpeakerSoundIcon size={16} color="#FFFFFF" />
+              <Text style={styles.statusItemText}>
+                {isNorwegian ? 'LYD PÅ' : 'SOUND ON'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Bold Impact Headline */}
+        <View style={styles.headlineContainer}>
+          <Text style={styles.affectedHeadline}>
+            {isNorwegian 
+              ? 'DU ER INNENFOR\nDET BERØRTE OMRÅDET' 
+              : 'YOU ARE INSIDE\nTHE AFFECTED AREA'}
+          </Text>
+          <Text style={styles.leaveInstruction}>
+            {isNorwegian 
+              ? 'Forlat havneområdet nå.' 
+              : 'Leave the harbor area now.'}
+          </Text>
+        </View>
+
+        {/* Estimated Time Card */}
+        <View style={styles.timeCard}>
+          <ClockIcon size={32} color="#111827" strokeWidth={2.2} />
+          <View style={styles.timeTextCol}>
+            <Text style={styles.timeTitle}>~15 MINUTES</Text>
+            <Text style={styles.timeSubtitle}>
+              {isNorwegian 
+                ? 'Beregnet tid til mulig konsekvens' 
+                : 'Estimated time until possible impact'}
             </Text>
           </View>
         </View>
 
-        {/* Two Dominant Primary Touch Targets */}
+        {/* Action Buttons */}
         <View style={styles.actionContainer}>
-          <EmergencyButton
-            title={isNorwegian ? 'GÅ TIL TRYGGESTED' : 'GO TO SAFETY'}
-            subtitle={isNorwegian ? 'Flåm skule • 650 m • 8 min gangtid' : 'Flåm School • 650 m • 8 min walk'}
-            variant="primary-safety"
+          {/* Primary Green CTA */}
+          <TouchableOpacity
+            style={styles.primarySafetyButton}
             onPress={() => router.push('/safety')}
-          />
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel={isNorwegian ? 'Gå til trygghet' : 'Go to safety'}
+          >
+            <View style={styles.buttonLeftRow}>
+              <ShieldCheckIcon size={24} color="#FFFFFF" strokeWidth={2.5} />
+              <Text style={styles.primaryButtonText}>
+                {isNorwegian ? 'GÅ TIL TRYGGHET' : 'GO TO SAFETY'}
+              </Text>
+            </View>
+            <Text style={styles.buttonChevron}>›</Text>
+          </TouchableOpacity>
 
-          <EmergencyButton
-            title={isNorwegian ? 'JEG TRENGER HJELP' : 'I NEED HELP'}
-            subtitle={isNorwegian ? 'Dersom du er skadet eller innesperret' : 'If injured, trapped, or unable to evacuate'}
-            variant="outline-emergency"
+          {/* Secondary Red Outline CTA */}
+          <TouchableOpacity
+            style={styles.needHelpButton}
             onPress={() => router.push('/help')}
-          />
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={isNorwegian ? 'Jeg trenger hjelp' : 'I need help'}
+          >
+            <View style={styles.buttonLeftRow}>
+              <MedicalCrossIcon size={22} color="#C5221F" />
+              <Text style={styles.needHelpButtonText}>
+                {isNorwegian ? 'JEG TRENGER HJELP' : 'I NEED HELP'}
+              </Text>
+            </View>
+            <Text style={styles.needHelpChevron}>›</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Official Authority Metadata Footer */}
-        <View style={styles.footerMeta}>
-          <Text style={styles.footerOfficial}>
-            {isNorwegian 
-              ? 'Offisiell oppdatering · 14:47 · Indre Sogn Beredskapssamvirke' 
-              : 'Official update · 14:47 · Inner Sogn Emergency Coordination'}
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerTime}>
+            {isNorwegian ? 'Offisiell oppdatering · 14:45' : 'Official update · 14:45'}
           </Text>
-          <Text style={styles.footerDisclaimer}>
-            {isNorwegian 
-              ? 'Fiktiv studentprototype (HVL INN524) · Ring 112/113 ved reell livsfare' 
-              : 'Fictional student prototype (HVL INN524) · Call 112/113 in real emergencies'}
+          <Text style={styles.footerAgency}>
+            {isNorwegian ? 'Indre Sogn Beredskapsledelse' : 'Inner Sogn Emergency Coordination'}
+          </Text>
+          <Text style={styles.footerPrototype}>
+            {isNorwegian ? 'Fiktiv prototype' : 'Fictional prototype'}
           </Text>
         </View>
       </ScrollView>
@@ -140,203 +158,229 @@ export default function AlertScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.canvas,
+    backgroundColor: '#FFFFFF',
   },
   container: {
-    padding: Spacing.md,
-    paddingBottom: Spacing.xxl,
+    paddingBottom: 40,
   },
-  alertHeaderBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  emergencyPill: {
+  topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.emergencyRedDark,
-    borderColor: Colors.emergencyRedBorder,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: BorderRadius.full,
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 14,
   },
-  pulseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: Colors.emergencyRed,
-    marginRight: 8,
-  },
-  emergencyPillText: {
-    ...Typography.caption,
-    color: Colors.emergencyRedText,
+  brandTitle: {
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 1,
-    fontSize: 10,
-  },
-  deliveryBadges: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  deliveryBadge: {
-    backgroundColor: Colors.surfaceRaised,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: BorderRadius.xs,
-  },
-  deliveryBadgeText: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 9,
-    fontWeight: '700',
+    color: '#111827',
     letterSpacing: 0.5,
   },
   degradedBanner: {
-    backgroundColor: Colors.warningAmberDark,
-    borderColor: Colors.warningAmberBorder,
+    backgroundColor: '#FEF3C7',
     borderWidth: 1,
-    borderRadius: BorderRadius.sm,
+    borderColor: '#F59E0B',
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 10,
     paddingVertical: 6,
-    paddingHorizontal: Spacing.sm,
-    marginBottom: Spacing.md,
     alignItems: 'center',
   },
   degradedText: {
-    ...Typography.caption,
-    color: Colors.warningAmberText,
+    fontSize: 11,
+    color: '#92400E',
     fontWeight: '700',
-    fontSize: 10,
     letterSpacing: 0.5,
   },
-  heroSection: {
-    marginBottom: Spacing.lg,
+  emergencyCard: {
+    backgroundColor: '#C5221F',
+    borderRadius: 20,
+    marginHorizontal: 16,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 14,
+    shadowColor: '#C5221F',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 6,
   },
-  alertCategory: {
-    ...Typography.caption,
-    color: Colors.emergencyRed,
-    fontWeight: '800',
-    letterSpacing: 1.5,
-    fontSize: 11,
-    marginBottom: 4,
-  },
-  incidentTitle: {
-    ...Typography.title1,
-    color: Colors.textPrimary,
-    fontWeight: '800',
-    fontSize: 24,
-    lineHeight: 30,
-    marginBottom: Spacing.xs,
-  },
-  incidentDesc: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  affectedAreaCard: {
-    backgroundColor: Colors.emergencyRedDark,
-    borderColor: Colors.emergencyRedBorder,
-    borderWidth: 1.5,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.lg,
-  },
-  affectedHeaderRow: {
+  alertHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    gap: 14,
   },
-  affectedIconBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.emergencyRed,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.md,
-  },
-  affectedIcon: {
-    fontSize: 18,
-    color: '#FFFFFF',
-    fontWeight: '900',
-  },
-  affectedTextCol: {
+  alertTitleCol: {
     flex: 1,
   },
-  affectedHeading: {
-    ...Typography.subhead,
-    color: '#FFFFFF',
+  alertMainTitle: {
+    fontSize: 19,
     fontWeight: '800',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
-  affectedSub: {
-    ...Typography.caption,
-    color: Colors.emergencyRedText,
-    marginTop: 2,
-    fontSize: 11,
-  },
-  instructionBox: {
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-  },
-  instructionLead: {
-    ...Typography.caption,
-    color: Colors.emergencyRedText,
-    fontWeight: '800',
-    letterSpacing: 1,
-    fontSize: 10,
-    marginBottom: 4,
-  },
-  instructionText: {
-    ...Typography.headline,
+  alertSubtitle: {
+    fontSize: 14,
+    fontWeight: '500',
     color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
-    lineHeight: 22,
+    marginTop: 3,
+    lineHeight: 18,
   },
-  riskWindowRow: {
+  cardDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    marginVertical: 14,
+  },
+  statusRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: Spacing.xs,
+    justifyContent: 'space-around',
   },
-  riskWindowLabel: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 10,
+  statusItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  statusItemText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
-  riskWindowValue: {
-    ...Typography.caption,
-    color: Colors.warningAmberText,
+  statusVerticalDivider: {
+    width: 1,
+    height: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+  },
+  headlineContainer: {
+    alignItems: 'center',
+    marginTop: 28,
+    marginHorizontal: 20,
+  },
+  affectedHeadline: {
+    fontSize: 27,
+    fontWeight: '900',
+    color: '#C5221F',
+    textAlign: 'center',
+    letterSpacing: -0.5,
+    lineHeight: 33,
+  },
+  leaveInstruction: {
+    fontSize: 18,
     fontWeight: '700',
-    fontSize: 11,
+    color: '#111827',
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  timeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginTop: 24,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    gap: 16,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  timeTextCol: {
+    flex: 1,
+  },
+  timeTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#111827',
+    letterSpacing: 0.5,
+  },
+  timeSubtitle: {
+    fontSize: 13,
+    color: '#4B5563',
+    marginTop: 2,
   },
   actionContainer: {
-    gap: Spacing.md,
-    marginBottom: Spacing.lg,
+    marginTop: 20,
+    gap: 12,
   },
-  footerMeta: {
+  primarySafetyButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: Spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    justifyContent: 'space-between',
+    backgroundColor: '#1B5E36',
+    marginHorizontal: 16,
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    shadowColor: '#1B5E36',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  footerOfficial: {
-    ...Typography.caption,
-    color: Colors.textSecondary,
+  buttonLeftRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  primaryButtonText: {
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  buttonChevron: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    lineHeight: 26,
+  },
+  needHelpButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: '#C5221F',
+    marginHorizontal: 16,
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  needHelpButtonText: {
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#C5221F',
+    letterSpacing: 0.5,
+  },
+  needHelpChevron: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#C5221F',
+    lineHeight: 26,
+  },
+  footerContainer: {
+    alignItems: 'center',
+    marginTop: 24,
+    gap: 2,
+  },
+  footerTime: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  footerAgency: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  footerPrototype: {
     fontSize: 11,
-    marginBottom: 2,
-  },
-  footerDisclaimer: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 10,
+    color: '#D1D5DB',
+    marginTop: 2,
   },
 });

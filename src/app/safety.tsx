@@ -3,8 +3,17 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
-import { Colors, Spacing, Typography, BorderRadius } from '../constants/theme';
-import { EmergencyButton, TacticalMapSurface } from '../components/ui';
+import { SognSafeLogo } from '../components/brand';
+import { CivicRouteMapCard } from '../components/ui/CivicRouteMapCard';
+import {
+  ShieldCheckBadge,
+  ShieldCheckIcon,
+  WalkingPersonIcon,
+  ClockIcon,
+  CheckCircleSolidIcon,
+  ArrowsSwapIcon,
+  LocationPinIcon,
+} from '../components/ui/CivicIcons';
 
 export default function FindSafetyScreen() {
   const router = useRouter();
@@ -15,113 +24,116 @@ export default function FindSafetyScreen() {
   const activeZone = safeZones[selectedZoneIndex] || incident?.primarySafeZone;
 
   const handleNextSafeZone = () => {
-    setSelectedZoneIndex((prev) => (prev + 1) % safeZones.length);
+    setSelectedZoneIndex((prev) => (prev + 1) % (safeZones.length || 1));
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Navigation Bar */}
-        <View style={styles.topBar}>
-          <TouchableOpacity 
-            onPress={() => router.back()}
-            style={styles.backButton}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            accessibilityRole="button"
-            accessibilityLabel="Go back to emergency alert"
-          >
-            <Text style={styles.backText}>‹ {isNorwegian ? 'TILBAKE' : 'BACK'}</Text>
-          </TouchableOpacity>
-          <Text style={styles.topBarTitle}>
-            {isNorwegian ? 'ANBEFALT TILFLUKTSSTED' : 'NEAREST SAFE AREA'}
-          </Text>
-          <View style={{ width: 44 }} />
-        </View>
-
-        {/* Shelter Summary Card */}
-        <View style={styles.shelterCard}>
-          <View style={styles.statusRow}>
-            <View style={styles.confirmedPill}>
-              <View style={styles.greenDot} />
-              <Text style={styles.confirmedText}>
-                {activeZone?.status === 'OPEN_AND_CONFIRMED'
-                  ? (isNorwegian ? 'ÅPENT OG BEKREFTET' : 'OPEN AND CONFIRMED')
-                  : (isNorwegian ? 'BEREDSKAP' : 'STANDBY')}
+        {/* Top Header Bar (Astra Logo + Title + District Pill) */}
+        <View style={styles.topHeaderBar}>
+          <View style={styles.brandTitleCol}>
+            <SognSafeLogo size={42} variant="master" />
+            <View style={styles.titleTextCol}>
+              <Text style={styles.appTitleText}>SOGN SAFE</Text>
+              <Text style={styles.appSubtitleText}>
+                {isNorwegian ? 'Sivil beredskapsapp' : 'Civilian Emergency App'}
               </Text>
-            </View>
-            <Text style={styles.timeLabel}>
-              {isNorwegian ? 'Verifisert' : 'Verified'} {activeZone?.confirmedTimestamp || '14:46'}
-            </Text>
-          </View>
-
-          <Text style={styles.shelterName}>{activeZone?.name || 'Flåm Skule & Samfunnshus'}</Text>
-          <Text style={styles.shelterDesc}>
-            {activeZone?.shortDescription || 'Heated civic assembly shelter with first aid station.'}
-          </Text>
-
-          <View style={styles.metricGrid}>
-            <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>
-                {activeZone && activeZone.distanceMeters >= 1000
-                  ? `${(activeZone.distanceMeters / 1000).toFixed(1)} km`
-                  : `${activeZone?.distanceMeters || 650} m`}
-              </Text>
-              <Text style={styles.metricLabel}>{isNorwegian ? 'AVSTAND' : 'DISTANCE'}</Text>
-            </View>
-            <View style={styles.metricDivider} />
-            <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>{activeZone?.walkMinutes || 8} min</Text>
-              <Text style={styles.metricLabel}>{isNorwegian ? 'EST. GANGTID' : 'EST. WALK'}</Text>
-            </View>
-            <View style={styles.metricDivider} />
-            <View style={styles.metricItem}>
-              <Text style={styles.metricValue}>+{activeZone?.elevationMeters || 18} m</Text>
-              <Text style={styles.metricLabel}>{isNorwegian ? 'HØYDE OVER HAVET' : 'ELEVATION'}</Text>
             </View>
           </View>
 
-          {/* Cycle Shelter Option */}
-          <TouchableOpacity 
-            style={styles.cycleShelterBtn}
-            onPress={handleNextSafeZone}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel="Show alternative safe shelter"
-          >
-            <Text style={styles.cycleShelterBtnText}>
-              {isNorwegian ? 'VIS ET ANNET TRYGGESTED ›' : 'SHOW ANOTHER SAFE AREA ›'}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.locationPill}>
+            <LocationPinIcon size={14} color="#374151" />
+            <Text style={styles.locationPillText}>Inner Sogn</Text>
+          </View>
         </View>
 
-        {/* Schematic Route Overview Surface */}
-        <TacticalMapSurface
-          destinationName={activeZone?.name || 'Flåm Skule & Samfunnshus'}
-          distanceMeters={activeZone?.distanceMeters || 650}
-          walkMinutes={activeZone?.walkMinutes || 8}
-          blockedZoneName="Flåm Waterfront Kai 1-3"
-          instructionText={
-            isNorwegian
-              ? 'Ruten leder innover mot Nedre Brekkevegen bort fra flo- og kollisjonsfare ved kaien.'
-              : 'Route directs pedestrians inland via Nedre Brekkevegen away from waterfront collision surge.'
-          }
-        />
+        {/* Nearest Safe Area Card */}
+        <View style={styles.safeHeroCard}>
+          <View style={styles.heroTopRow}>
+            <ShieldCheckBadge size={48} badgeColor="#1B5E36" checkColor="#FFFFFF" />
+            <View style={styles.heroTextCol}>
+              <Text style={styles.heroPreHeading}>
+                {isNorwegian ? 'NÆRMESTE TRYGGESTED' : 'NEAREST SAFE AREA'}
+              </Text>
+              <Text style={styles.heroDestinationTitle}>
+                {activeZone?.name || (isNorwegian ? 'Flåm skule' : 'Flåm School')}
+              </Text>
+            </View>
+          </View>
 
-        {/* Primary Action Buttons */}
+          {/* Three Metric Pills */}
+          <View style={styles.metricPillsRow}>
+            {/* Distance */}
+            <View style={styles.metricPill}>
+              <WalkingPersonIcon size={16} color="#111827" />
+              <Text style={styles.metricPillText}>
+                {activeZone?.distanceMeters || 650} m
+              </Text>
+            </View>
+
+            {/* Walk Time */}
+            <View style={styles.metricPill}>
+              <ClockIcon size={16} color="#111827" />
+              <Text style={styles.metricPillText}>
+                {activeZone?.walkMinutes || 8} min walk
+              </Text>
+            </View>
+
+            {/* Confirmed Status */}
+            <View style={styles.metricPillConfirmed}>
+              <CheckCircleSolidIcon size={16} color="#1B5E36" />
+              <Text style={styles.metricPillConfirmedText}>
+                {isNorwegian ? 'ÅPEN OG BEKREFTET' : 'OPEN AND CONFIRMED'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Route Overview Map */}
+        <View style={styles.mapContainer}>
+          <CivicRouteMapCard 
+            mode="overview" 
+            destinationName={activeZone?.name || 'Flåm School'} 
+          />
+        </View>
+
+        {/* Action Buttons */}
         <View style={styles.actionContainer}>
-          <EmergencyButton
-            title={isNorwegian ? 'START SIKKER RUTE ›' : 'START SAFE ROUTE ›'}
-            subtitle={isNorwegian ? `Veiledning til ${activeZone?.name}` : `Turn-by-turn guidance to ${activeZone?.name}`}
-            variant="primary-safety"
+          {/* Primary Green CTA: START SAFE ROUTE */}
+          <TouchableOpacity
+            style={styles.startRouteButton}
             onPress={() => router.push('/evacuate')}
-          />
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel={isNorwegian ? 'Start trygg rute' : 'Start safe route'}
+          >
+            <ShieldCheckIcon size={24} color="#FFFFFF" strokeWidth={2.5} />
+            <Text style={styles.startRouteButtonText}>
+              {isNorwegian ? 'START TRYGG RUTE' : 'START SAFE ROUTE'}
+            </Text>
+          </TouchableOpacity>
 
-          <EmergencyButton
-            title={isNorwegian ? 'JEG TRENGER HJELP' : 'I NEED HELP'}
-            subtitle={isNorwegian ? 'Dersom du ikke kan evakuere selv' : 'If unable to evacuate safely'}
-            variant="outline-emergency"
-            onPress={() => router.push('/help')}
-          />
+          {/* Secondary Button: Show another safe area */}
+          <TouchableOpacity
+            style={styles.switchZoneButton}
+            onPress={handleNextSafeZone}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={isNorwegian ? 'Vis et annet trygt område' : 'Show another safe area'}
+          >
+            <ArrowsSwapIcon size={18} color="#111827" />
+            <Text style={styles.switchZoneButtonText}>
+              {isNorwegian ? 'Vis et annet trygt område' : 'Show another safe area'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Footer */}
+        <View style={styles.footerContainer}>
+          <Text style={styles.footerText}>
+            {isNorwegian ? 'Sist verifisert oppdatering · 14:46' : 'Last verified update · 14:46'}
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -131,133 +143,183 @@ export default function FindSafetyScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: Colors.canvas,
+    backgroundColor: '#FBFBFA',
   },
   container: {
-    padding: Spacing.md,
-    paddingBottom: Spacing.xxl,
+    paddingBottom: 40,
   },
-  topBar: {
+  topHeaderBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: Spacing.md,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 14,
   },
-  backButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    minHeight: 44,
+  brandTitleCol: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  titleTextCol: {
     justifyContent: 'center',
   },
-  backText: {
-    ...Typography.subhead,
-    color: Colors.textSecondary,
-    fontWeight: '700',
-  },
-  topBarTitle: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    letterSpacing: 1,
-    fontSize: 10,
-  },
-  shelterCard: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.safetyGreenBorder,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-  },
-  statusRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.sm,
-  },
-  confirmedPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.safetyGreenDark,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: BorderRadius.full,
-  },
-  greenDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: Colors.safetyGreenText,
-    marginRight: 6,
-  },
-  confirmedText: {
-    ...Typography.caption,
-    color: Colors.safetyGreenText,
-    fontWeight: '700',
-    fontSize: 11,
-  },
-  timeLabel: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 11,
-  },
-  shelterName: {
-    ...Typography.title1,
-    color: Colors.textPrimary,
-    marginBottom: 4,
-  },
-  shelterDesc: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: Spacing.md,
-  },
-  metricGrid: {
-    flexDirection: 'row',
-    backgroundColor: Colors.surfaceRaised,
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    marginBottom: Spacing.md,
-  },
-  metricItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  metricDivider: {
-    width: 1,
-    backgroundColor: Colors.border,
-  },
-  metricValue: {
-    ...Typography.title2,
-    color: Colors.textPrimary,
+  appTitleText: {
+    fontSize: 18,
     fontWeight: '800',
-  },
-  metricLabel: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    marginTop: 2,
-    fontSize: 9,
+    color: '#111827',
     letterSpacing: 0.5,
   },
-  cycleShelterBtn: {
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    paddingTop: Spacing.sm,
+  appSubtitleText: {
+    fontSize: 12,
+    color: '#4B5563',
+    fontWeight: '400',
+    marginTop: 1,
+  },
+  locationPill: {
+    flexDirection: 'row',
     alignItems: 'center',
-    minHeight: 40,
-    justifyContent: 'center',
+    gap: 5,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  cycleShelterBtnText: {
-    ...Typography.caption,
-    color: Colors.safetyGreenText,
+  locationPillText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#1F2937',
+  },
+  safeHeroCard: {
+    backgroundColor: '#EDF5EE',
+    borderRadius: 22,
+    marginHorizontal: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    gap: 14,
+  },
+  heroTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  heroTextCol: {
+    flex: 1,
+  },
+  heroPreHeading: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#1B5E36',
+    letterSpacing: 0.6,
+  },
+  heroDestinationTitle: {
+    fontSize: 27,
+    fontWeight: '800',
+    color: '#111827',
+    marginTop: 2,
+  },
+  metricPillsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  metricPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  metricPillText: {
+    fontSize: 13,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    color: '#111827',
+  },
+  metricPillConfirmed: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  metricPillConfirmedText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#1B5E36',
+    letterSpacing: 0.3,
+  },
+  mapContainer: {
+    marginHorizontal: 16,
+    marginTop: 14,
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   actionContainer: {
-    gap: Spacing.md,
-    marginTop: Spacing.sm,
+    marginTop: 16,
+    gap: 10,
+  },
+  startRouteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    backgroundColor: '#1B5E36',
+    marginHorizontal: 16,
+    borderRadius: 16,
+    paddingVertical: 18,
+    shadowColor: '#1B5E36',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  startRouteButtonText: {
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  switchZoneButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    paddingVertical: 14,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  switchZoneButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  footerContainer: {
+    alignItems: 'center',
+    marginTop: 18,
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#9CA3AF',
   },
 });
