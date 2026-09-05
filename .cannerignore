@@ -1,0 +1,6 @@
+node_modules/
+.git/
+prototipo/
+logoapp_files/
+*.mp4
+.expo/
