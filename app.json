@@ -55,7 +55,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/sogn-safe-icon/png-mono-white/Symbol-Only-Mono-White-128.png",
+          "icon": "./assets/sogn-safe-icon/png-symbol-square-mono/Symbol-Only-Square-Mono-White-1024.png",
           "color": "#D93829"
         }
       ]

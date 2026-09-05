@@ -1,10 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" fill="none">
   <g id="Symbol" fill="#000000">
-    <path id="Ship Left" d="M507 175 L196 240 L196 467 L507 430 Z"/>
-    <path id="Ship Right" d="M517 175 L828 240 L828 467 L517 430 Z"/>
-    <path id="Wave 01" d="M269 507 L512 491 L755 507 L512 523 Z"/>
-    <path id="Wave 02" d="M342 559 L512 545 L682 559 L512 573 Z"/>
-    <path id="Wave 03" d="M406 605 L512 593 L618 605 L512 617 Z"/>
-    <path id="Direction Diamond" d="M512 660 L577 690 L512 825 L447 690 Z"/>
+    <path id="Ship Top Left" d="M 512 250 L 215 445 L 512 445 Z" fill="url(#bowTL)" />
+    <path id="Ship Top Right" d="M 512 250 L 809 445 L 512 445 Z" fill="url(#bowTR)" />
+    <path id="Ship Bevel Left" d="M 215 445 L 280 525 L 512 550 L 512 445 Z" fill="url(#bowBevelL)" />
+    <path id="Ship Bevel Right" d="M 809 445 L 744 525 L 512 550 L 512 445 Z" fill="url(#bowBevelR)" />
+    <path id="Wave 1 Top" d="M 325 585 L 699 585 L 880 665 L 144 665 Z" fill="url(#chevTop)" />
+    <path id="Wave 1 Bottom" d="M 144 665 L 880 665 L 512 735 Z" fill="url(#chevBottom)" />
+    <path id="Wave 2 Top" d="M 392 765 L 632 765 L 760 812 L 264 812 Z" fill="url(#chevTop)" />
+    <path id="Wave 2 Bottom" d="M 264 812 L 760 812 L 512 855 Z" fill="url(#chevBottom)" />
+    <path id="Wave 3 Top" d="M 432 880 L 592 880 L 654 910 L 370 910 Z" fill="url(#chevTop)" />
+    <path id="Wave 3 Bottom" d="M 370 910 L 654 910 L 512 940 Z" fill="url(#chevBottom)" />
+    <path id="Diamond Top" d="M 458 958 L 566 958 L 552 978 L 472 978 Z" fill="url(#chevTop)" />
+    <path id="Diamond Bottom" d="M 472 978 L 552 978 L 512 998 Z" fill="url(#chevBottom)" />
   </g>
 </svg>

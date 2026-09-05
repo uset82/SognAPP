@@ -22,6 +22,12 @@ import Svg, {
  *
  * Layer ids mirror the Figma structure (Ship / Navigation Layers / Direction
  * Mark) so the design file and this component stay comparable.
+ *
+ * SYNC CONTRACT: GEO below must match the master SVG exactly —
+ * `tests/logo-geometry.test.mjs` fails if they drift. The other SVGs in
+ * `assets/sogn-safe-icon/` are not hand-edited; run
+ * `node .workbuddy-ai/tools/icon-pipeline/build-variants.mjs` to regenerate
+ * them from the master.
  */
 
 export type SognSafeLogoVariant =
@@ -91,7 +97,7 @@ interface LogoGeometry {
  * pentagon: two top corners, two widest points (the seam), and a tip.
  *
  * Heights / widths in 1024-master units:
- *   - ship bow   apex y=230, base y=552  -> height 322 (31%)
+ *   - ship bow   apex y=250, base y=550  -> height 300 (29%)
  *   - wave 1     y=585..735              -> height 150 (15%)
  *   - wave 2     y=765..855              -> height  90 ( 9%)
  *   - wave 3     y=880..940              -> height  60 ( 6%)

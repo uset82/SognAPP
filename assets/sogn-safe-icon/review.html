@@ -104,15 +104,43 @@
       </div>
       <div class="cmp">
         <img src="png-small/SOGN-SAFE-App-Icon-Small-64.png" width="96" height="96" alt="small 64">
-        <div class="lbl">Variant @ 64px &nbsp;·&nbsp; <span class="good">5 bands</span></div>
+        <div class="lbl">Variant @ 64px &nbsp;·&nbsp; <span class="warn">4 bands</span></div>
       </div>
     </div>
     <div class="note">
-      <strong>Why there are two.</strong> At 32px the master's three wave layers merge into
-      visual mud: the gaps between them are ~14 units at master scale, which is
-      <em>0.44px</em> when rendered at 32 — sub-pixel, so they vanish. The variant scales the
-      symbol up 1.22&times; and widens the gaps to ~32 units, which restores all five
-      separate elements. Both are shipped; pick whichever looks right to you.
+      <strong>Why there are two, and the honest trade.</strong> At 32px the master's three
+      wave layers merge into visual mud: the gaps between them are ~14 units at master scale,
+      which is <em>0.44px</em> when rendered at 32 — sub-pixel, so they vanish. The variant
+      scales the symbol up 1.22&times;, which restores all five separate elements there.
+      <br><br>
+      But it is not a straight win: <strong>at 64px the variant is worse</strong> (4 bands vs
+      the master's 5), because the 1.22&times; scale pushes the gaps back below one pixel at
+      that size. Read the table below before choosing — neither variant dominates.
+    </div>
+  </div>
+
+  <h2>React Native component</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Gate</th><th>Command</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Type safety</td><td><code>npx tsc --noEmit</code></td><td class="ok">PASS — zero errors</td></tr>
+        <tr><td>Metro bundle</td><td><code>npx expo export --platform ios</code></td><td class="ok">PASS — 1311 modules</td></tr>
+        <tr><td>Geometry vs master</td><td><code>npm run test:logo</code></td><td class="ok">PASS — 19 layers, exact</td></tr>
+        <tr><td>App Store icon rules</td><td>1024×1024, fully opaque</td><td class="ok">PASS</td></tr>
+        <tr><td>Android safe zone</td><td>symbol ≤ 66%</td><td class="ok">PASS — 61.7% (square variant)</td></tr>
+        <tr><td>Prebuild (android)</td><td><code>npx expo prebuild</code></td><td class="ok">PASS</td></tr>
+        <tr><td>Prebuild (ios)</td><td>—</td><td class="warn">SKIPPED — Expo cannot generate iOS projects on Windows</td></tr>
+        <tr><td>ESLint</td><td>—</td><td class="warn">N/A — no ESLint config in this project</td></tr>
+        <tr><td><code>wd audit</code></td><td>—</td><td class="warn">N/A — <code>wd</code> on npm is Selenium, not the WebDesigner tool</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="border-left-color:var(--green);">
+      The port is proven by construction, not by eye: <code>tests/logo-geometry.test.mjs</code>
+      parses this master SVG into an ordered layer list, rebuilds the same list from the
+      geometry compiled into <code>SognSafeLogo.tsx</code>, and compares them layer-by-layer
+      <em>in draw order</em>. Exact equality — a coordinate typo, dropped layer or reordering
+      fails it. Wired into <code>npm test</code>.
     </div>
   </div>
 
@@ -135,15 +163,25 @@
     <table>
       <thead><tr><th>Check</th><th>Measured</th><th>Spec</th><th>Result</th></tr></thead>
       <tbody>
-        <tr><td>Symbol width</td><td class="num">61.6%</td><td class="num">60–64%</td><td class="ok">PASS</td></tr>
-        <tr><td>Symbol height</td><td class="num">63.3%</td><td class="num">62–66%</td><td class="ok">PASS</td></tr>
-        <tr><td>Horizontal centre</td><td class="num">x 511.5</td><td class="num">x 512</td><td class="ok">PASS</td></tr>
-        <tr><td>Vertical centre</td><td class="num">y 499.0</td><td class="num">slightly above centre</td><td class="ok">PASS</td></tr>
+        <tr><td>Symbol width</td><td class="num">61.7%</td><td class="num">60–64%</td><td class="ok">PASS</td></tr>
+        <tr><td>Symbol height</td><td class="num">63.5%</td><td class="num">62–66%</td><td class="ok">PASS</td></tr>
+        <tr><td>Horizontal centre</td><td class="num">offset x 0.0</td><td class="num">centred</td><td class="ok">PASS</td></tr>
+        <tr><td>Vertical centre</td><td class="num">offset y −12.0</td><td class="num">centred</td><td class="ok">PASS — 1.2% high</td></tr>
         <tr><td>Left face luma</td><td class="num">183.8</td><td class="num">brighter</td><td class="ok">PASS</td></tr>
         <tr><td>Right face luma</td><td class="num">166.6</td><td class="num">darker</td><td class="ok">PASS</td></tr>
         <tr><td>Background</td><td class="num">rgb(19,26,30)</td><td class="num">deep blue-black</td><td class="ok">PASS</td></tr>
         <tr><td>Corner radius</td><td class="num">195px</td><td class="num">180–210px</td><td class="ok">PASS</td></tr>
-        <tr><td>Shape count</td><td class="num">13</td><td class="num">&lt; 30</td><td class="ok">PASS</td></tr>
+        <tr><td>Path count</td><td class="num">12 / 7</td><td class="num">&lt; 30</td><td class="ok">PASS</td></tr>
+        <tr><td>App Store icon</td><td class="num">1024², 0 transparent px</td><td class="num">opaque</td><td class="ok">PASS</td></tr>
+        <tr><td>Android safe zone</td><td class="num">61.7%</td><td class="num">≤ 66%</td><td class="ok">PASS</td></tr>
+        <tr style="background:rgba(245,158,11,.07);">
+          <td><strong>small variant width</strong></td>
+          <td class="num"><strong>75.4%</strong></td>
+          <td class="num">60–64%</td>
+          <td class="warn"><strong>DEVIATION</strong></td>
+        </tr>
+        <tr><td>monoWhite on dark</td><td class="num">19.2:1 flat · 83% @ 32px</td><td class="num">≥ 3:1</td><td class="ok">PASS</td></tr>
+        <tr><td>monoBlack on light</td><td class="num">19.3:1 flat · 80% @ 32px</td><td class="num">≥ 3:1</td><td class="ok">PASS</td></tr>
       </tbody>
     </table>
     <div class="note" style="border-left-color:var(--green);">
@@ -179,10 +217,15 @@
       <tbody>
         <tr><td><code>SOGN-SAFE-App-Icon-1024.svg</code></td><td>Master — rounded square, editable vector</td></tr>
         <tr><td><code>SOGN-SAFE-App-Icon-FullBleed.svg</code></td><td>Opaque square, no radius — App Store submission</td></tr>
-        <tr><td><code>SOGN-SAFE-App-Icon-Small.svg</code></td><td>Optimised for 32–64px</td></tr>
-        <tr><td><code>Symbol-Only-Metallic.svg</code></td><td>Symbol without background</td></tr>
-        <tr><td><code>Symbol-Only-Mono-White.svg</code> / <code>-Black.svg</code></td><td>Single-colour marks</td></tr>
+        <tr><td><code>SOGN-SAFE-App-Icon-Small.svg</code></td><td>Optimised for 32px (75.4% — see deviation)</td></tr>
+        <tr><td><code>Symbol-Only-*.svg</code></td><td>Tight-cropped symbol (<code>viewBox 140 119 744 762</code>)</td></tr>
+        <tr><td><code>Symbol-Only-Square-*.svg</code></td><td>Square 1024² transparent canvas — safe for adaptive icons</td></tr>
         <tr><td><code>png/</code> <code>png-small/</code> <code>png-fullbleed/</code></td><td>Renders at 1024·512·256·128·64·32</td></tr>
+        <tr><td><code>png-symbol/</code> <code>png-mono-white/</code> <code>png-mono-black/</code></td><td>Tight-cropped symbol renders</td></tr>
+        <tr><td><code>png-symbol-square/</code> <code>png-symbol-square-mono/</code></td><td>Square symbol renders</td></tr>
+        <tr><td><code>src/components/brand/SognSafeLogo.tsx</code></td><td>React Native component — 6 variants</td></tr>
+        <tr><td><code>tests/logo-geometry.test.mjs</code></td><td>Fidelity gate — compares component to this master</td></tr>
+        <tr><td><code>TASK_PLAN.md</code></td><td>Plan + implementation record</td></tr>
       </tbody>
     </table>
   </div>

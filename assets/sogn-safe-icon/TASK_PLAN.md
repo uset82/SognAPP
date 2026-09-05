@@ -239,6 +239,50 @@ adaptive icon foreground + monochrome, notification icon, web favicon.
 | Visual sign-off | side-by-side vs reference | **BLOCKED — needs the user's eyes.** Vision is unavailable in this session; every claim above is numeric. |
 | Prebuild / EAS | `npx expo prebuild --clean`, `eas build` | **Not run** — needs native toolchain / credentials. |
 
+## Phase 3.4 + submission checks — DONE (added after the first pass)
+
+| Check | Result |
+|---|---|
+| `monoWhite` on dark (`#0D0F12`, `#0B1013`) | 19.2:1 flat; **83%** of the mark still ≥ 3:1 at 32px after anti-aliasing — PASS |
+| `monoBlack` on light (`#F6F5F2`) | 19.3:1 flat; **80%** at 32px — PASS |
+| Inverted pairings | 1.1:1 — FAIL, as expected. That is why both mono variants exist. |
+| App Store icon | 1024×1024, 8-bit RGBA, **0 transparent pixels** — PASS |
+| Android adaptive safe zone | 61.7% — PASS |
+| `expo prebuild` (android) | PASS |
+| `expo prebuild` (ios) | **Not possible on Windows** — Expo skips iOS project generation off macOS/Linux |
+
+### Bug found and fixed: adaptive icon would have been clipped
+
+The `Symbol-Only-*.svg` exports are **tight-cropped** (`viewBox="140 119 744 762"`), so the
+symbol fills ~85% of the frame. That is correct for dropping the mark into a layout, but
+wrong for an Android adaptive icon: the OS only guarantees the central **66%** is visible,
+so the ship bow's outer corners and the diamond tip would have been cut off by the OEM mask
+(circle / squircle / rounded square). It also rendered at 1024×**1049**, not square.
+
+Measured with `check-safe-zone.mjs`:
+
+| foreground | canvas | symbol | verdict |
+|---|---|---|---|
+| tight-cropped `Symbol-Only-Metallic.svg` | 1024 × 1049 | 85.0% × 85.3% | **FAIL — clipped** |
+| new `Symbol-Only-Square-Metallic.svg` | 1024 × 1024 | 61.7% × 63.5% | PASS |
+
+Fix: generated `Symbol-Only-Square-{Metallic,Mono-White,Mono-Black}.svg` — full 1024×1024
+canvas, transparent background, symbol at its natural 61.7%. Generated from the geometry in
+`SognSafeLogo.tsx` so it cannot drift. `app.json` adaptive foreground, monochrome, splash and
+notification icon all repointed at the square variants. The tight-cropped files are kept for
+layout use, where trimming is what you want.
+
+### Note on `expo prebuild`
+
+Running it rewrote two npm scripts without asking: `android` and `ios` flipped from
+`expo start --*` to `expo run:*`, i.e. from "start the dev server" to "do a full native
+build" — which cannot even work for iOS on Windows. **Reverted manually.** If you run
+prebuild yourself, check `git diff package.json` afterwards.
+
+It also failed the first time on the safe-delete shim (`SAFE_DELETE_BULK_CONFIRM_REQUIRED`)
+while `expo-splash-screen` cleared its own generated drawables. Retry with
+`CODEBUDDY_SAFE_DELETE_ENABLED=0 npx expo prebuild --clean`.
+
 ## Not done / needs a decision
 
 1. **Visual sign-off** — the reference image still has to be compared by eye at 1024 and at 32px.

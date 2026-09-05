@@ -1,18 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="140 119 744 762" fill="none">
-  <title>SOGN SAFE / Symbol Only / Monochrome White</title>
-  <!-- Seam, bevels and drop shadows are omitted so they read as negative space. -->
-  <g id="Symbol" fill="#FFFFFF">
-    <g id="Ship">
-      <path id="Ship Left" d="M507 175 L196 240 L196 467 L507 430 Z"/>
-      <path id="Ship Right" d="M517 175 L828 240 L828 467 L517 430 Z"/>
-    </g>
-    <g id="Navigation Layers">
-      <path id="Wave 01" d="M269 507 L512 491 L755 507 L512 523 Z"/>
-      <path id="Wave 02" d="M342 559 L512 545 L682 559 L512 573 Z"/>
-      <path id="Wave 03" d="M406 605 L512 593 L618 605 L512 617 Z"/>
-    </g>
-    <g id="Direction Mark">
-      <path id="Direction Diamond" d="M512 660 L577 690 L512 825 L447 690 Z"/>
-    </g>
-  </g>
+<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" role="img" aria-label="SOGN SAFE symbol">
+  <title>SOGN SAFE</title>
+  <desc>Single-colour white symbol on transparent background.</desc>
+
+  <path id="Symbol" d="Ship Top Left Ship Top Right Ship Bevel Left Ship Bevel Right Wave 1 Top Wave 1 Bottom Wave 2 Top Wave 2 Bottom Wave 3 Top Wave 3 Bottom Diamond Top Diamond Bottom" fill="#FFFFFF" />
 </svg>
