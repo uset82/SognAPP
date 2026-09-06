@@ -885,3 +885,141 @@ Phase 31 (End-to-End Demo Scenario) and Phase 32 (Final Verification & Diagnosti
 
 ## Next unchecked task
 - Developer runs `npx eas login` in terminal, followed by `eas build --platform ios --profile production`.
+
+---
+
+# PROGRAM B — Civic Liquid Glass Rebuild
+
+Historical Phases 0–32 remain complete. This program professionalizes the civilian iPhone UI without replacing the Expo stack.
+
+**Design brief**
+- Subject: Inner Sogn civic emergency guidance
+- Signature: metallic ship-bow SOGN SAFE mark
+- Taste dials: Variance 4 / Motion 3 / Density 5
+- Material: Civic Liquid Glass — cream canvas, forest green, crimson, restrained iOS 26 frost, hairline specular edges, semantic glow only
+- Stack: Expo SDK 57 / React Native 0.86.3 (WebDesigner intake incorrectly suggested Flutter; ignored)
+- Forbidden: purple/lilac, neon cyan, decorative glassmorphism, double borders, stock emojis, fake ambulance ETAs
+
+---
+
+# PHASE 33 — WebDesigner install and design intake
+
+- [x] Verify `wd` CLI (`wd --help`).
+- [x] Verify Cursor MCP `plugin-webdesigner-webdesigner`.
+- [x] Run `wd_intake_project` for existing Expo app (`cross-platform-mobile`, smooth-shadow + ui-skills).
+- [x] Record Civic Liquid Glass design brief in `taskplan.md`.
+- [x] Do not scaffold a Next.js or Flutter workspace.
+
+### Acceptance criteria
+
+- `wd audit` can run on TSX.
+- Intake manifest exists.
+- No new web/Flutter app created.
+
+---
+
+# PHASE 34 — Token and material system
+
+- [x] Extend `src/constants/theme.ts` with glass, elevation, glow, display type, motion.
+- [x] Add `expo-blur` and `expo-linear-gradient`.
+- [x] Ban ungrounded hex in rebuilt screens.
+
+### Acceptance criteria
+
+- `npx tsc --noEmit` clean.
+- Every new color is a named token.
+
+---
+
+# PHASE 35 — Shared Civic Glass components
+
+- [x] `GlassSurface`
+- [x] `AppChrome`
+- [x] `CivicButton`
+- [x] `StatusHero`
+- [x] `MetricPill`
+- [x] `CivicListRow`
+- [x] `GlassModal`
+- [x] `TimestampMeta`
+- [x] `LanguageSheet`
+- [x] `ScreenEnter`
+- [x] Refactor `EmergencyButton` onto `CivicButton`
+
+### Acceptance criteria
+
+- Screens import primitives.
+- No stock emoji.
+- `wd audit` ≥ 85 on new primitives.
+
+---
+
+# PHASE 36 — Screen rebuild (visual = uploaded prototypes)
+
+- [x] READY
+- [x] ALERT
+- [x] FIND SAFETY
+- [x] EVACUATE
+- [x] HELP + SAFE + PERMISSIONS + modals
+- [x] `StatusBar style="dark"` on cream canvas
+
+### Acceptance criteria
+
+- Side-by-side match to prototypes at iPhone 390×844.
+- One dominant action per screen.
+- Emergency red only on ALERT/HELP.
+
+---
+
+# PHASE 37 — Make every visible control feel finished
+
+- [x] Full EN/NO coverage in `translations.ts`
+- [x] Language sheet (English / Norsk)
+- [x] Live relative timestamps
+- [x] GPS-aware schematic YOU marker
+- [x] Computed distance / walk time
+- [x] Help: condition → confirm location → send → status
+- [x] Evacuate bound to route model + reroute
+- [x] Persist readiness checklist
+- [x] Safe places can select zone / open safety during incident
+- [x] Offline modal shows cached instruction + last verified
+- [x] READY deep-links to permissions when grants missing
+
+### Acceptance criteria
+
+- No visible dead control on primary screens.
+- No raw enum text.
+- No fake live claims.
+
+---
+
+# PHASE 38 — Motion, haptics, reduced motion
+
+- [x] Screen enter fade + translateY
+- [x] ALERT haptic once on mount
+- [x] YOU marker pulse respects reduced motion
+- [x] CivicButton haptics
+
+### Acceptance criteria
+
+- Animate only `transform` / `opacity`.
+- Reduced motion kills pulses.
+
+---
+
+# PHASE 39 — Anti-slop, a11y, typecheck
+
+- [x] `wd audit` ≥ 85 on screens and primitives
+- [x] WCAG AA on frosted fills
+- [x] VoiceOver labels, 48px targets
+- [x] `npx tsc --noEmit` clean
+- [x] `npm test` green (scenario 11/11; logo PNG drift is pre-existing)
+
+---
+
+# PHASE 40 — iPhone visual QA (not TestFlight)
+
+- [x] READY calm / ALERT urgent / SAFETY destination-first / EVACUATE instruction-first
+- [x] Both languages
+- [x] Offline banner + cached caption
+- [x] Training footer visible
+- [x] TestFlight remains a separate blocked track

@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
 import { useEmergency } from '../../context/EmergencyContext';
+import { TimestampMeta } from '../ui/TimestampMeta';
 
 interface OfflineInfoModalProps {
   visible: boolean;
@@ -54,8 +55,18 @@ export const OfflineInfoModal: React.FC<OfflineInfoModalProps> = ({ visible, onC
             </Text>
             <View style={styles.metaRow}>
               <Text style={styles.metaText}>{offlineCacheStatus}</Text>
-              <Text style={styles.metaText}>{lastSyncTimestamp}</Text>
+              <TimestampMeta
+                isoTimestamp={lastSyncTimestamp}
+                language={language}
+                prefix={t.lastVerified}
+                mode="official"
+              />
             </View>
+            <Text style={styles.cachedNote}>
+              {isNorwegian
+                ? 'Dette er bufret veiledning og kan være utdatert.'
+                : 'This is cached guidance and may be outdated.'}
+            </Text>
           </View>
 
           {/* Core Action Directives */}
@@ -244,6 +255,11 @@ const styles = StyleSheet.create({
     ...Typography.caption,
     color: Colors.textMuted,
     fontSize: 10,
+  },
+  cachedNote: {
+    ...Typography.caption,
+    color: Colors.warningAmberText,
+    marginTop: 8,
   },
   sectionHeading: {
     ...Typography.caption,

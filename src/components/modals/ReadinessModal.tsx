@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
 import { useEmergency } from '../../context/EmergencyContext';
 
@@ -76,11 +77,22 @@ export const ReadinessModal: React.FC<ReadinessModalProps> = ({ visible, onClose
     warmth: true,
   });
 
+  useEffect(() => {
+    AsyncStorage.getItem('@sogn_safe_readiness')
+      .then((stored) => {
+        if (stored) {
+          setCheckedItems(JSON.parse(stored));
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
   const toggleItem = (id: string) => {
-    setCheckedItems((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setCheckedItems((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      AsyncStorage.setItem('@sogn_safe_readiness', JSON.stringify(next)).catch(() => undefined);
+      return next;
+    });
   };
 
   const completedCount = Object.values(checkedItems).filter(Boolean).length;

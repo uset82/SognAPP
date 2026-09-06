@@ -10,6 +10,8 @@ interface CalmLocalMapCardProps {
   safeZones: SafeZone[];
   onPressExplore?: () => void;
   statusText?: string;
+  youOffsetX?: number;
+  youOffsetY?: number;
 }
 
 export const CalmLocalMapCard: React.FC<CalmLocalMapCardProps> = ({
@@ -17,6 +19,8 @@ export const CalmLocalMapCard: React.FC<CalmLocalMapCardProps> = ({
   safeZones,
   onPressExplore,
   statusText,
+  youOffsetX = 0,
+  youOffsetY = 0,
 }) => {
   return (
     <TouchableOpacity 
@@ -123,7 +127,7 @@ export const CalmLocalMapCard: React.FC<CalmLocalMapCardProps> = ({
         </View>
 
         {/* Civilian User GPS Location Dot */}
-        <View style={styles.userLocationContainer}>
+        <View style={[styles.userLocationContainer, { transform: [{ translateX: youOffsetX }, { translateY: youOffsetY }] }]}>
           <View style={styles.userPulseAura} />
           <View style={styles.userCoreDot} />
         </View>

@@ -12,12 +12,10 @@ function AppNavigation() {
 
   useEffect(() => {
     const unsubscribe = registerNotificationListeners(
-      (notification) => {
-        // When notification is received in foreground, trigger the incident in context
+      () => {
         triggerFlamScenario();
       },
-      (incidentId) => {
-        // When notification is tapped by user from background/lockscreen
+      () => {
         triggerFlamScenario();
         router.push('/alert');
       }
@@ -32,7 +30,7 @@ function AppNavigation() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: Colors.canvas },
+        contentStyle: { backgroundColor: Colors.canvasMint },
         animation: 'fade',
       }}
     >
@@ -51,7 +49,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider style={{ backgroundColor: Colors.canvas }}>
       <EmergencyProvider>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
         <AppNavigation />
       </EmergencyProvider>
     </SafeAreaProvider>

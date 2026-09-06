@@ -1,19 +1,22 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
-import { SognSafeLogo } from '../components/brand';
-import { ShieldCheckBadge } from '../components/ui/CivicIcons';
+import { Colors } from '../constants/theme';
+import { AppChrome, CivicAtmosphere, CivicButton, GlassSurface, ScreenEnter, ShieldCheckBadge } from '../components/ui';
 
 export default function SafeConfirmationScreen() {
   const router = useRouter();
-  const { incident, reportIAmSafe, language, clearScenario } = useEmergency();
-  const isNorwegian = language === 'no';
+  const { incident, reportIAmSafe, t, clearScenario, enrichedZones, selectedZoneId } = useEmergency();
 
   useEffect(() => {
     reportIAmSafe();
   }, [reportIAmSafe]);
+
+  const shelter =
+    enrichedZones.find((zone) => zone.id === selectedZoneId) ||
+    incident?.primarySafeZone;
 
   const handleReturnHome = () => {
     clearScenario();
@@ -22,62 +25,36 @@ export default function SafeConfirmationScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.topHeader}>
-          <SognSafeLogo size={36} variant="master" />
-          <Text style={styles.brandTitle}>SOGN SAFE</Text>
-        </View>
-
-        <View style={styles.content}>
-          <View style={styles.badgeWrapper}>
-            <ShieldCheckBadge size={72} badgeColor="#1B5E36" checkColor="#FFFFFF" />
-          </View>
-
-          <Text style={styles.headline}>
-            {isNorwegian ? 'STATUS: REGISTRERT TRYGG' : 'SAFE STATUS RECORDED'}
-          </Text>
-          
-          <Text style={styles.subtext}>
-            {isNorwegian
-              ? 'Din status er formidlet til beredskapsledelsen. Du er registrert som gjort rede for i trygt samlingsområde.'
-              : 'Your status has been transmitted to authorities. You are registered as accounted for in the safe assembly area.'}
-          </Text>
-
-          {/* Info Card */}
-          <View style={styles.infoCard}>
-            <View style={styles.shelterHeaderRow}>
-              <Text style={styles.infoTitle}>
-                {isNorwegian ? 'REGISTRERT SAMLINGSSTED' : 'REGISTERED ASSEMBLY SHELTER'}
-              </Text>
-              <View style={styles.confirmedPill}>
-                <Text style={styles.confirmedPillText}>
-                  {isNorwegian ? 'BEKREFTET' : 'CONFIRMED'}
-                </Text>
+      <CivicAtmosphere>
+      <ScreenEnter>
+        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+          <AppChrome title={t.brandTitle} centered compact />
+          <View style={styles.content}>
+            <ShieldCheckBadge size={72} badgeColor={Colors.safetyGreen} checkColor={Colors.textOnColor} />
+            <Text style={styles.headline}>{t.safeRecorded}</Text>
+            <Text style={styles.subtext}>{t.safeRecordedBody}</Text>
+            <GlassSurface tone="mint" glow="safe" style={styles.card}>
+              <View style={styles.cardInner}>
+                <View style={styles.row}>
+                  <Text style={styles.infoTitle}>{t.registeredShelter}</Text>
+                  <View style={styles.pill}>
+                    <Text style={styles.pillText}>{t.confirmed}</Text>
+                  </View>
+                </View>
+                <Text style={styles.shelter}>{shelter?.name || 'Flåm School'}</Text>
+                <Text style={styles.body}>{t.remainUntilCleared}</Text>
               </View>
-            </View>
-            <Text style={styles.shelterName}>
-              {incident?.primarySafeZone?.name || 'Flåm School'}
-            </Text>
-            <Text style={styles.infoBody}>
-              {isNorwegian
-                ? 'Vennligst bli værende i samlingsområdet inntil nødetatene eller kommunen bekrefter at havneområdet er sikret.'
-                : 'Please remain in the safe assembly area until emergency personnel confirm the harbor zone is cleared.'}
-            </Text>
+            </GlassSurface>
           </View>
-        </View>
-
-        {/* Primary Action Button */}
-        <TouchableOpacity
-          style={styles.returnButton}
-          onPress={handleReturnHome}
-          activeOpacity={0.85}
-          accessibilityRole="button"
-        >
-          <Text style={styles.returnButtonText}>
-            {isNorwegian ? 'TILBAKE TIL HOVEDSKJERM' : 'RETURN TO DASHBOARD'}
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
+          <CivicButton
+            title={t.returnDashboard}
+            variant="primary-safety"
+            onPress={handleReturnHome}
+            style={styles.cta}
+          />
+        </ScrollView>
+      </ScreenEnter>
+      </CivicAtmosphere>
     </SafeAreaView>
   );
 }
@@ -85,61 +62,39 @@ export default function SafeConfirmationScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FBFBFA',
+    backgroundColor: Colors.canvas,
   },
   container: {
     paddingBottom: 40,
-  },
-  topHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingVertical: 14,
-  },
-  brandTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111827',
-    letterSpacing: 0.5,
   },
   content: {
     alignItems: 'center',
     paddingHorizontal: 20,
     marginTop: 20,
   },
-  badgeWrapper: {
-    marginBottom: 20,
-  },
   headline: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#1B5E36',
+    color: Colors.safetyGreen,
     textAlign: 'center',
     letterSpacing: 0.3,
+    marginTop: 20,
   },
   subtext: {
     fontSize: 15,
-    color: '#4B5563',
+    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 22,
     marginTop: 10,
     marginBottom: 24,
   },
-  infoCard: {
+  card: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    padding: 20,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
   },
-  shelterHeaderRow: {
+  cardInner: {
+    padding: 20,
+  },
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -148,49 +103,33 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#6B7280',
+    color: Colors.textMuted,
     letterSpacing: 0.5,
   },
-  confirmedPill: {
-    backgroundColor: '#EDF5EE',
+  pill: {
+    backgroundColor: Colors.safetyGreenBg,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
   },
-  confirmedPillText: {
+  pillText: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#1B5E36',
+    color: Colors.safetyGreen,
   },
-  shelterName: {
+  shelter: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#111827',
+    color: Colors.textPrimary,
     marginBottom: 8,
   },
-  infoBody: {
+  body: {
     fontSize: 14,
-    color: '#4B5563',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
-  returnButton: {
-    backgroundColor: '#1B5E36',
+  cta: {
     marginHorizontal: 20,
     marginTop: 28,
-    borderRadius: 16,
-    paddingVertical: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#1B5E36',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  returnButtonText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
   },
 });

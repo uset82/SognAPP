@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
 import { useEmergency } from '../../context/EmergencyContext';
 import { SafeZone } from '../../types/incident';
@@ -10,8 +11,17 @@ interface SafePlacesModalProps {
 }
 
 export const SafePlacesModal: React.FC<SafePlacesModalProps> = ({ visible, onClose }) => {
-  const { language, t, safeZones } = useEmergency();
+  const router = useRouter();
+  const { language, t, safeZones, hasActiveIncident, setSelectedZoneId } = useEmergency();
   const isNorwegian = language === 'no';
+
+  const handleSelectZone = (zone: SafeZone) => {
+    setSelectedZoneId(zone.id);
+    onClose();
+    if (hasActiveIncident) {
+      router.push('/safety');
+    }
+  };
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
@@ -49,7 +59,14 @@ export const SafePlacesModal: React.FC<SafePlacesModalProps> = ({ visible, onClo
           {safeZones.map((zone: SafeZone, index: number) => {
             const isConfirmed = zone.status === 'OPEN_AND_CONFIRMED';
             return (
-              <View key={zone.id} style={styles.zoneCard}>
+              <TouchableOpacity
+                key={zone.id}
+                style={styles.zoneCard}
+                onPress={() => handleSelectZone(zone)}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel={zone.name}
+              >
                 {/* Zone Header */}
                 <View style={styles.zoneHeader}>
                   <View style={styles.numberBadge}>
@@ -109,7 +126,7 @@ export const SafePlacesModal: React.FC<SafePlacesModalProps> = ({ visible, onClo
                     ))}
                   </View>
                 )}
-              </View>
+              </TouchableOpacity>
             );
           })}
 

@@ -11,19 +11,28 @@ import Svg, {
   Polygon,
 } from 'react-native-svg';
 import { CompassArrowIcon } from './CivicIcons';
+import { YouPulse } from './YouPulse';
 
 interface CivicRouteMapCardProps {
   mode?: 'overview' | 'turn-by-turn';
   destinationName?: string;
   userStep?: number;
+  youOffsetX?: number;
+  youOffsetY?: number;
+  youLabel?: string;
 }
 
 export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
   mode = 'overview',
   destinationName = 'Flåm School',
   userStep = 1,
+  youOffsetX = 0,
+  youOffsetY = 0,
+  youLabel = 'YOU',
 }) => {
   const isTurnByTurn = mode === 'turn-by-turn';
+  const youX = (isTurnByTurn ? 155 : 180) + youOffsetX + (userStep > 1 ? -18 : 0);
+  const youY = (isTurnByTurn ? 255 : 260) + youOffsetY + (userStep > 1 ? -70 : 0);
 
   return (
     <View style={styles.container}>
@@ -298,7 +307,7 @@ export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
             <Circle cx="-30" cy="-1" r="9" fill="#144627" />
             <Path d="M-34 -4 L-30 -8 L-26 -4 V2 H-34 Z" fill="#FFFFFF" />
             <SvgText x="8" y="0" fill="#FFFFFF" fontSize="9.5" fontWeight="800" textAnchor="middle">
-              Flåm School
+              {destinationName}
             </SvgText>
             <SvgText x="8" y="9" fill="#D1FAE5" fontSize="7.5" fontWeight="600" textAnchor="middle">
               Safe Area
@@ -310,33 +319,21 @@ export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
             <Circle cx="-30" cy="-1" r="9" fill="#144627" />
             <Path d="M-34 -4 L-30 -8 L-26 -4 V2 H-34 Z" fill="#FFFFFF" />
             <SvgText x="8" y="3" fill="#FFFFFF" fontSize="10" fontWeight="700" textAnchor="middle">
-              Flåm School
+              {destinationName}
             </SvgText>
             {/* Connecting dot to route start */}
             <Circle cx="0" cy="18" r="4" fill="#1B5E36" stroke="#FFFFFF" strokeWidth="2" />
           </G>
         )}
 
-        {/* User GPS Pin: "YOU" */}
-        {isTurnByTurn ? (
-          <G transform="translate(155, 255)">
-            <Circle cx="0" cy="0" r="16" fill="rgba(37, 99, 235, 0.25)" />
-            <Circle cx="0" cy="0" r="7" fill="#2563EB" stroke="#FFFFFF" strokeWidth="2" />
-            <Rect x="-18" y="10" width="36" height="18" rx="6" fill="#2563EB" />
-            <SvgText x="0" y="23" fill="#FFFFFF" fontSize="9" fontWeight="800" textAnchor="middle">
-              YOU
-            </SvgText>
-          </G>
-        ) : (
-          <G transform="translate(180, 260)">
-            <Circle cx="0" cy="0" r="16" fill="rgba(37, 99, 235, 0.25)" />
-            <Circle cx="0" cy="0" r="7" fill="#2563EB" stroke="#FFFFFF" strokeWidth="2" />
-            <Rect x="-18" y="10" width="36" height="18" rx="6" fill="#2563EB" />
-            <SvgText x="0" y="23" fill="#FFFFFF" fontSize="9" fontWeight="800" textAnchor="middle">
-              YOU
-            </SvgText>
-          </G>
-        )}
+        <G transform={`translate(${youX}, ${youY})`}>
+          <YouPulse cx={0} cy={0} />
+          <Circle cx="0" cy="0" r="7" fill="#2563EB" stroke="#FFFFFF" strokeWidth="2" />
+          <Rect x="-18" y="10" width="36" height="18" rx="6" fill="#2563EB" />
+          <SvgText x="0" y="23" fill="#FFFFFF" fontSize="9" fontWeight="800" textAnchor="middle">
+            {youLabel}
+          </SvgText>
+        </G>
 
         {/* Scale bar indicator */}
         <G transform="translate(20, 345)">

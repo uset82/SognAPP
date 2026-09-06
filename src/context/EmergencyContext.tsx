@@ -1,19 +1,30 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Incident, SafeZone, EvacuationRoute, HelpCondition, HelpRequest } from '../types/incident';
 import { Language, TranslationStrings, translations } from '../constants/translations';
-import { 
-  triggerEmergencyAlertHaptic, 
-  triggerSafetyConfirmationHaptic, 
-  triggerWarningHaptic 
+import {
+  triggerEmergencyAlertHaptic,
+  triggerSafetyConfirmationHaptic,
+  triggerWarningHaptic,
 } from '../services/haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { 
-  registerDeviceWithSimulator, 
-  fetchIncidentFromSimulator, 
-  transmitHelpRequestToSimulator, 
-  transmitSafeReportToSimulator 
+import {
+  registerDeviceWithSimulator,
+  fetchIncidentFromSimulator,
+  transmitHelpRequestToSimulator,
+  transmitSafeReportToSimulator,
 } from '../services/api';
 import { getCachedPushToken } from '../services/notificationService';
+import {
+  Coordinates,
+  FLAM_WATERFRONT_COORDINATES,
+  getCurrentCivicLocation,
+  projectCoordsToSchematic,
+  calculateHaversineDistanceMeters,
+  estimateWalkingMinutes,
+  SchematicOffset,
+} from '../services/locationService';
+import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 
 interface EmergencyContextType {
   hasActiveIncident: boolean;
@@ -27,8 +38,13 @@ interface EmergencyContextType {
   safeZones: SafeZone[];
   lastSyncTimestamp: string;
   offlineCacheStatus: string;
-  
-  // Actions
+  civicCoords: Coordinates;
+  civicOffset: SchematicOffset;
+  locationPermissionGranted: boolean;
+  notificationPermissionGranted: boolean;
+  selectedZoneId: string;
+  enrichedZones: SafeZone[];
+
   triggerFlamScenario: () => void;
   clearScenario: () => void;
   submitHelpRequest: (condition: HelpCondition) => Promise<void>;
@@ -37,6 +53,8 @@ interface EmergencyContextType {
   toggleDegradedConnection: () => void;
   toggleLanguage: () => void;
   setLanguage: (lang: Language) => void;
+  setSelectedZoneId: (id: string) => void;
+  refreshPermissions: () => Promise<void>;
 }
 
 export const verifiedSafeZones: SafeZone[] = [
@@ -119,6 +137,19 @@ export const flamIncidentMock: Incident = {
 
 const EmergencyContext = createContext<EmergencyContextType | undefined>(undefined);
 
+const enrichZones = (coords: Coordinates): SafeZone[] =>
+  verifiedSafeZones.map((zone) => {
+    const distanceMeters = calculateHaversineDistanceMeters(coords, {
+      latitude: zone.latitude,
+      longitude: zone.longitude,
+    });
+    return {
+      ...zone,
+      distanceMeters,
+      walkMinutes: estimateWalkingMinutes(distanceMeters, zone.elevationMeters ?? 10),
+    };
+  });
+
 export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [hasActiveIncident, setHasActiveIncident] = useState(false);
   const [incident, setIncident] = useState<Incident | null>(null);
@@ -126,18 +157,41 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isDegradedConnection, setIsDegradedConnection] = useState(false);
   const [isSafeReported, setIsSafeReported] = useState(false);
   const [testMode] = useState(true);
-  const [language, setLanguage] = useState<Language>('en');
-  const [safeZones] = useState<SafeZone[]>(verifiedSafeZones);
-  const [lastSyncTimestamp] = useState('Today 20:45 CET');
+  const [language, setLanguageState] = useState<Language>('en');
+  const [safeZones, setSafeZones] = useState<SafeZone[]>(verifiedSafeZones);
+  const [lastSyncTimestamp, setLastSyncTimestamp] = useState(new Date().toISOString());
   const [offlineCacheStatus] = useState('Up to date • Stored locally on device');
+  const [civicCoords, setCivicCoords] = useState<Coordinates>(FLAM_WATERFRONT_COORDINATES);
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
+  const [notificationPermissionGranted, setNotificationPermissionGranted] = useState(false);
+  const [selectedZoneId, setSelectedZoneId] = useState(defaultSafeZone.id);
 
-  // Hydrate from AsyncStorage on startup & register with simulator
+  const persistLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    AsyncStorage.setItem('@sogn_safe_language', lang).catch(() => undefined);
+  };
+
+  const refreshPermissions = useCallback(async () => {
+    try {
+      const loc = await Location.getForegroundPermissionsAsync();
+      setLocationPermissionGranted(loc.status === 'granted');
+    } catch {
+      setLocationPermissionGranted(false);
+    }
+    try {
+      const notif = await Notifications.getPermissionsAsync();
+      setNotificationPermissionGranted(notif.status === 'granted');
+    } catch {
+      setNotificationPermissionGranted(false);
+    }
+  }, []);
+
   useEffect(() => {
     async function loadStoredState() {
       try {
         const storedLang = await AsyncStorage.getItem('@sogn_safe_language');
         if (storedLang === 'en' || storedLang === 'no') {
-          setLanguage(storedLang);
+          setLanguageState(storedLang);
         }
         const storedIncident = await AsyncStorage.getItem('@sogn_safe_cached_incident');
         if (storedIncident) {
@@ -145,21 +199,32 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setIncident(parsed);
           setHasActiveIncident(true);
         }
+        const storedZone = await AsyncStorage.getItem('@sogn_safe_selected_zone');
+        if (storedZone) {
+          setSelectedZoneId(storedZone);
+        }
 
-        // Register device with simulator
+        const civic = await getCurrentCivicLocation();
+        setCivicCoords(civic.coords);
+        setLocationPermissionGranted(civic.permissionGranted);
+        setSafeZones(enrichZones(civic.coords));
+        setLastSyncTimestamp(new Date().toISOString());
+
+        await refreshPermissions();
+
         const pushToken = await getCachedPushToken();
         await registerDeviceWithSimulator('IPHONE-TEST-01', pushToken);
       } catch {
-        // Fallback gracefully to default memory state
+        setSafeZones(enrichZones(FLAM_WATERFRONT_COORDINATES));
       }
     }
     loadStoredState();
 
-    // Periodic sync with simulator dispatcher if reachable
     const interval = setInterval(async () => {
       try {
         const remoteState = await fetchIncidentFromSimulator();
         if (remoteState) {
+          setLastSyncTimestamp(new Date().toISOString());
           if (typeof remoteState.isDegradedConnection === 'boolean') {
             setIsDegradedConnection(remoteState.isDegradedConnection);
           }
@@ -167,7 +232,6 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             setIncident(remoteState.incident);
             setHasActiveIncident(true);
           } else if (!remoteState.hasActiveIncident && !isSafeReported) {
-            // If remote cleared incident and user is not mid-flow
             setHasActiveIncident(false);
             setIncident(null);
           }
@@ -178,17 +242,15 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [isSafeReported]);
+  }, [isSafeReported, refreshPermissions]);
 
   const toggleLanguage = () => {
-    setLanguage((prev) => {
-      const next = prev === 'en' ? 'no' : 'en';
-      AsyncStorage.setItem('@sogn_safe_language', next).catch(() => {});
-      return next;
-    });
+    persistLanguage(language === 'en' ? 'no' : 'en');
   };
 
   const t = translations[language];
+  const civicOffset = projectCoordsToSchematic(civicCoords);
+  const enrichedZones = safeZones;
 
   const triggerFlamScenario = () => {
     setIncident(flamIncidentMock);
@@ -196,7 +258,8 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsSafeReported(false);
     setActiveHelpRequest(null);
     triggerEmergencyAlertHaptic();
-    AsyncStorage.setItem('@sogn_safe_cached_incident', JSON.stringify(flamIncidentMock)).catch(() => {});
+    setLastSyncTimestamp(new Date().toISOString());
+    AsyncStorage.setItem('@sogn_safe_cached_incident', JSON.stringify(flamIncidentMock)).catch(() => undefined);
   };
 
   const clearScenario = () => {
@@ -205,10 +268,11 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setActiveHelpRequest(null);
     setIsSafeReported(false);
     triggerSafetyConfirmationHaptic();
-    AsyncStorage.removeItem('@sogn_safe_cached_incident').catch(() => {});
+    AsyncStorage.removeItem('@sogn_safe_cached_incident').catch(() => undefined);
   };
 
   const submitHelpRequest = async (condition: HelpCondition) => {
+    const locationName = 'Flåm Kai / Sentrum';
     const newRequest: HelpRequest = {
       id: `help-${Date.now().toString().slice(-4)}`,
       incidentId: incident?.id || 'inc-test',
@@ -216,26 +280,25 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       state: 'RECEIVED',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       approximateLocation: {
-        name: 'Near Flåm Station / Waterfront Area',
-        latitude: 60.8635,
-        longitude: 7.1145,
+        name: locationName,
+        latitude: civicCoords.latitude,
+        longitude: civicCoords.longitude,
       },
       deviceId: 'IPHONE-TEST-01',
     };
     setActiveHelpRequest(newRequest);
+    await transmitHelpRequestToSimulator(condition, 'IPHONE-TEST-01', locationName);
 
-    // Transmit to simulator backend
-    await transmitHelpRequestToSimulator(condition, 'IPHONE-TEST-01', 'Near Flåm Waterfront Area');
-
-    // Simulate simulator acknowledgment after 2 seconds for classroom demo
     setTimeout(() => {
-      setActiveHelpRequest((prev) => 
-        prev ? {
-          ...prev,
-          state: 'ACKNOWLEDGED',
-          acknowledgedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          responderNote: 'Hovedredningssentralen / Local response team has registered your location.',
-        } : null
+      setActiveHelpRequest((prev) =>
+        prev
+          ? {
+              ...prev,
+              state: 'ACKNOWLEDGED',
+              acknowledgedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              responderNote: 'Hovedredningssentralen / Local response team has registered your location.',
+            }
+          : null
       );
     }, 2000);
   };
@@ -264,6 +327,11 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     });
   };
 
+  const handleSelectZone = (id: string) => {
+    setSelectedZoneId(id);
+    AsyncStorage.setItem('@sogn_safe_selected_zone', id).catch(() => undefined);
+  };
+
   return (
     <EmergencyContext.Provider
       value={{
@@ -278,6 +346,12 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         safeZones,
         lastSyncTimestamp,
         offlineCacheStatus,
+        civicCoords,
+        civicOffset,
+        locationPermissionGranted,
+        notificationPermissionGranted,
+        selectedZoneId,
+        enrichedZones,
         triggerFlamScenario,
         clearScenario,
         submitHelpRequest,
@@ -285,7 +359,9 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         reportIAmSafe,
         toggleDegradedConnection,
         toggleLanguage,
-        setLanguage,
+        setLanguage: persistLanguage,
+        setSelectedZoneId: handleSelectZone,
+        refreshPermissions,
       }}
     >
       {children}

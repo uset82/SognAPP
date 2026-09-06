@@ -112,6 +112,36 @@ export async function getCurrentCivicLocation(): Promise<{
 /**
  * Find the nearest confirmed open safe zone to a given coordinate
  */
+export interface SchematicOffset {
+  x: number;
+  y: number;
+}
+
+/**
+ * Project civic GPS onto the Flåm schematic so the YOU marker can move
+ * without a real map SDK. Waterfront is the origin; offsets are clamped.
+ */
+export function projectCoordsToSchematic(
+  coords: Coordinates,
+  origin: Coordinates = FLAM_WATERFRONT_COORDINATES
+): SchematicOffset {
+  const metersEast = calculateHaversineDistanceMeters(origin, {
+    latitude: origin.latitude,
+    longitude: coords.longitude,
+  });
+  const metersNorth = calculateHaversineDistanceMeters(origin, {
+    latitude: coords.latitude,
+    longitude: origin.longitude,
+  });
+  const eastSign = coords.longitude >= origin.longitude ? 1 : -1;
+  const northSign = coords.latitude >= origin.latitude ? 1 : -1;
+  const scale = 0.045;
+  return {
+    x: Math.max(-36, Math.min(36, eastSign * metersEast * scale)),
+    y: Math.max(-36, Math.min(36, -northSign * metersNorth * scale)),
+  };
+}
+
 export function findNearestSafeZone(
   currentCoords: Coordinates,
   availableZones: SafeZone[] = verifiedSafeZones
