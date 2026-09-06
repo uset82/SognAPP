@@ -22,6 +22,7 @@ import {
   WalkingPersonIcon,
   ArrowsSwapIcon,
 } from '../components/ui';
+import { AskDock } from '../components/chat/AskDock';
 
 export default function FindSafetyScreen() {
   const router = useRouter();
@@ -104,6 +105,8 @@ export default function FindSafetyScreen() {
               onPress={handleNextSafeZone}
             />
           </View>
+
+          <AskDock />
 
           <TimestampMeta
             isoTimestamp={lastSyncTimestamp}

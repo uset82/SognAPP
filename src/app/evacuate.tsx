@@ -20,6 +20,7 @@ import {
   TimestampMeta,
   UpArrowNavIcon,
 } from '../components/ui';
+import { AskDock } from '../components/chat/AskDock';
 
 export default function EvacuateScreen() {
   const router = useRouter();
@@ -173,6 +174,8 @@ export default function EvacuateScreen() {
               onPress={handleNextStep}
             />
           </View>
+
+          <AskDock onOpenChat={() => { void stopEmergencyAlert(); }} />
 
           <TimestampMeta
             isoTimestamp={lastSyncTimestamp}

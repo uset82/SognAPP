@@ -4,25 +4,30 @@ import { useRouter } from 'expo-router';
 import { Colors, Touch, Typography } from '../../constants/theme';
 import { useEmergencyChat } from '../../hooks/useEmergencyChat';
 import { GlassSurface } from '../ui/GlassSurface';
-import { ChatBubble } from './ChatBubble';
-import { SuggestionChips } from './SuggestionChips';
 import { VoiceStatusBar } from './VoiceStatusBar';
 
-export const HomeAssistantCard: React.FC = () => {
+interface AskDockProps {
+  /** Called before navigating to full chat (e.g. stop alert sound). */
+  onOpenChat?: () => void;
+}
+
+export const AskDock: React.FC<AskDockProps> = ({ onOpenChat }) => {
   const router = useRouter();
-  const chat = useEmergencyChat({ maxChips: 2, includeHelpChip: false, homeChips: true });
-  const visible = chat.messages.slice(-4);
+  const chat = useEmergencyChat({ maxChips: 0, includeHelpChip: false });
+
+  const handleOpenFull = () => {
+    onOpenChat?.();
+    router.push('/chat');
+  };
 
   return (
-    <GlassSurface tone="mint" glow="safe" style={styles.card}>
+    <GlassSurface tone="neutral" glow="none" style={styles.dock}>
       <View style={styles.header}>
-        <View style={styles.headerText}>
-          <Text style={styles.title}>{chat.copy.assistantTitle}</Text>
-          <Text style={styles.note}>{chat.copy.trainingNote}</Text>
-        </View>
+        <Text style={styles.title}>{chat.copy.assistantTitle}</Text>
         {Platform.OS === 'web' ? (
           <a
             href="/chat"
+            onClick={() => onOpenChat?.()}
             style={{
               textDecoration: 'none',
               color: Colors.safetyGreen,
@@ -37,7 +42,7 @@ export const HomeAssistantCard: React.FC = () => {
           </a>
         ) : (
           <Pressable
-            onPress={() => router.push('/chat')}
+            onPress={handleOpenFull}
             accessibilityRole="link"
             accessibilityLabel={chat.copy.openFullAssistant}
             style={styles.linkBtn}
@@ -47,33 +52,22 @@ export const HomeAssistantCard: React.FC = () => {
         )}
       </View>
 
-      <View style={styles.thread} accessibilityRole="text">
-        {visible.length === 0 ? (
-          <ChatBubble
-            message={{
-              id: 'intro',
-              role: 'assistant',
-              text: chat.copy.homeIntro,
-              timestamp: new Date().toISOString(),
-              source: 'system',
-              status: 'completed',
-              spoken: false,
-              incidentId: null,
-            }}
-          />
-        ) : (
-          visible.map((message) => <ChatBubble key={message.id} message={message} />)
-        )}
-        <VoiceStatusBar
-          state={chat.voiceState}
-          label={chat.statusLabel}
-          partial={chat.partial}
-          cloudNotice={chat.usingCloudStt ? chat.copy.cloudSttNotice : undefined}
-        />
-        {chat.errorCode ? <Text style={styles.errorText}>{chat.errorCode}</Text> : null}
-      </View>
+      <Text style={styles.note}>{chat.copy.trainingNote}</Text>
 
-      <SuggestionChips chips={chat.chips} onSelect={(prompt) => void chat.askAssistant(prompt, 'typed')} />
+      <VoiceStatusBar
+        state={chat.voiceState}
+        label={chat.statusLabel}
+        partial={chat.partial}
+        cloudNotice={chat.usingCloudStt ? chat.copy.cloudSttNotice : undefined}
+      />
+
+      {chat.errorCode ? <Text style={styles.errorText}>{chat.errorCode}</Text> : null}
+
+      {chat.messages.length > 0 ? (
+        <Text style={styles.lastAnswer} numberOfLines={3}>
+          {chat.messages[chat.messages.length - 1]?.text}
+        </Text>
+      ) : null}
 
       <View style={styles.composer}>
         <TextInput
@@ -111,30 +105,23 @@ export const HomeAssistantCard: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  card: {
+  dock: {
     marginHorizontal: 16,
-    marginTop: 14,
+    marginTop: 12,
     paddingBottom: 12,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    gap: 12,
-  },
-  headerText: {
-    flex: 1,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    gap: 8,
   },
   title: {
     ...Typography.headline,
     color: Colors.textPrimary,
-  },
-  note: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    marginTop: 2,
+    fontSize: 16,
   },
   linkBtn: {
     minHeight: Touch.minTarget,
@@ -145,14 +132,23 @@ const styles = StyleSheet.create({
     color: Colors.safetyGreen,
     fontWeight: '700',
   },
-  thread: {
-    maxHeight: 240,
-    paddingTop: 8,
+  note: {
+    ...Typography.caption,
+    color: Colors.textMuted,
+    paddingHorizontal: 14,
+    marginTop: 2,
+    marginBottom: 6,
   },
   errorText: {
     ...Typography.caption,
     color: Colors.warningAmberDark,
-    paddingHorizontal: 16,
+    paddingHorizontal: 14,
+    marginBottom: 6,
+  },
+  lastAnswer: {
+    ...Typography.subhead,
+    color: Colors.textPrimary,
+    paddingHorizontal: 14,
     marginBottom: 8,
   },
   composer: {
@@ -178,7 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.safetyGreen,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
   },
   micBtn: {
     minHeight: Touch.minTarget,

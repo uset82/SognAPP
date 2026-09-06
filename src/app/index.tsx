@@ -162,17 +162,6 @@ export default function ReadyScreen() {
                   <ShieldCheckIcon size={22} color={Colors.safetyGreen} />
                 </CircularIconContainer>
               }
-              label={language === 'no' ? 'Assistent' : 'Assistant'}
-              href="/chat"
-              onPress={() => router.push('/chat')}
-              accessibilityLabel={language === 'no' ? 'Assistent' : 'Assistant'}
-            />
-            <CivicListRow
-              icon={
-                <CircularIconContainer size={42} bgColor={Colors.safetyGreenBg}>
-                  <ShieldCheckIcon size={22} color={Colors.safetyGreen} />
-                </CircularIconContainer>
-              }
               label={t.howItWorksTitle}
               onPress={() => router.push('/welcome')}
               accessibilityLabel={t.howItWorksTitle}

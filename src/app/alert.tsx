@@ -20,6 +20,7 @@ import {
   TimestampMeta,
 } from '../components/ui';
 import { AlertTriangleSolidIcon } from '../components/ui/CivicIcons';
+import { AskDock } from '../components/chat/AskDock';
 import { triggerEmergencyAlertHaptic } from '../services/haptics';
 import { stopEmergencyAlert } from '../services/alertSound';
 import { requestNotificationPermissions } from '../services/notificationService';
@@ -133,17 +134,9 @@ export default function AlertScreen() {
               showChevron
               onPress={handleNeedHelp}
             />
-            <CivicButton
-              title={language === 'no' ? 'SPØR ASSISTENTEN' : 'ASK ASSISTANT'}
-              variant="outline-neutral"
-              showChevron
-              href="/chat"
-              onPress={() => {
-                void stopEmergencyAlert();
-                router.push('/chat');
-              }}
-            />
           </View>
+
+          <AskDock onOpenChat={() => { void stopEmergencyAlert(); }} />
 
           <View style={styles.footer}>
             <TimestampMeta
