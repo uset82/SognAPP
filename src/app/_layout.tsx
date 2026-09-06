@@ -16,6 +16,10 @@ function AppNavigation() {
   const { triggerFlamScenario } = useEmergency();
 
   useEffect(() => {
+    if (Platform.OS === 'web') {
+      return;
+    }
+
     const unsubscribe = registerNotificationListeners(
       () => {
         triggerFlamScenario();
@@ -69,6 +73,7 @@ function AppNavigation() {
       <Stack.Screen name="help" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
       <Stack.Screen name="safe" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
       <Stack.Screen name="permissions" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="chat" options={{ animation: 'fade' }} />
     </Stack>
   );
 }
@@ -76,7 +81,13 @@ function AppNavigation() {
 export default function RootLayout() {
   return (
     <WebAppShell>
-      <SafeAreaProvider style={{ flex: 1, minHeight: '100%', backgroundColor: Colors.canvas }}>
+      <SafeAreaProvider
+        style={
+          Platform.OS === 'web'
+            ? { minHeight: '100%', backgroundColor: Colors.canvas }
+            : { flex: 1, minHeight: '100%', backgroundColor: Colors.canvas }
+        }
+      >
         <EmergencyProvider>
           <StatusBar style="dark" />
           <AppNavigation />

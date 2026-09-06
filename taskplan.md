@@ -1023,3 +1023,14 @@ Historical Phases 0–32 remain complete. This program professionalizes the civi
 - [x] Offline banner + cached caption
 - [x] Training footer visible
 - [x] TestFlight remains a separate blocked track
+
+---
+
+# PHASE 41 — Voice + Chat assistant
+
+Tracked in `chatbox.md` (do not duplicate boxes here).
+
+- [x] Follow `chatbox.md` Voice phases 0–33 in order
+- [x] Mark each `chatbox.md` task `[x]` only after verification
+- [x] Do not start Voice work until Phases 0–40 above stay complete
+  Remaining: physical iPhone / TestFlight boxes in `chatbox.md` Phases 12–15, 18, 20, 22, 30–33.

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
 import { useEmergency } from '../../context/EmergencyContext';
+import { AppModal } from '../ui/AppModal';
 
 interface ReadinessModalProps {
   visible: boolean;
@@ -99,7 +100,7 @@ export const ReadinessModal: React.FC<ReadinessModalProps> = ({ visible, onClose
   const totalCount = READINESS_CHECKLIST.length;
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+    <AppModal visible={visible} onClose={onClose}>
       <View style={styles.modalRoot}>
         {/* Modal Handle & Header */}
         <View style={styles.header}>
@@ -218,7 +219,7 @@ export const ReadinessModal: React.FC<ReadinessModalProps> = ({ visible, onClose
           </View>
         </ScrollView>
       </View>
-    </Modal>
+    </AppModal>
   );
 };
 

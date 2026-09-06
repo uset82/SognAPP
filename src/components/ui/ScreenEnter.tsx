@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -16,7 +16,7 @@ export const ScreenEnter: React.FC<ScreenEnterProps> = ({ children }) => {
   const reduced = usePrefersReducedMotion();
 
   if (Platform.OS === 'web') {
-    return <View style={styles.fill}>{children}</View>;
+    return <>{children}</>;
   }
 
   return <NativeEnter reduced={reduced}>{children}</NativeEnter>;

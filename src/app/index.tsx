@@ -158,6 +158,16 @@ export default function ReadyScreen() {
                   <ShieldCheckIcon size={22} color={Colors.safetyGreen} />
                 </CircularIconContainer>
               }
+              label={language === 'no' ? 'Assistent' : 'Assistant'}
+              onPress={() => router.push('/chat')}
+              accessibilityLabel={language === 'no' ? 'Assistent' : 'Assistant'}
+            />
+            <CivicListRow
+              icon={
+                <CircularIconContainer size={42} bgColor={Colors.safetyGreenBg}>
+                  <ShieldCheckIcon size={22} color={Colors.safetyGreen} />
+                </CircularIconContainer>
+              }
               label={t.howItWorksTitle}
               onPress={() => router.push('/welcome')}
               accessibilityLabel={t.howItWorksTitle}
@@ -230,7 +240,7 @@ export default function ReadyScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    minHeight: 0,
+    minHeight: '100%',
     backgroundColor: Colors.canvas,
   },
   container: {

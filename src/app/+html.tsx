@@ -8,10 +8,31 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <style
           dangerouslySetInnerHTML={{
             __html: `
-              html, body { margin: 0; background: #E4EBE4; }
-              html, body, #root { min-height: 100%; }
-              body { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-              #root { display: block; }
+              html {
+                height: 100%;
+                -webkit-text-size-adjust: 100%;
+              }
+              body {
+                margin: 0 !important;
+                padding: 0 !important;
+                min-height: 100% !important;
+                background-color: #E4EBE4 !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: manipulation !important;
+                -webkit-tap-highlight-color: transparent !important;
+              }
+              #root {
+                min-height: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+              }
+              button, a, [role="button"] {
+                cursor: pointer;
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: transparent;
+              }
             `,
           }}
         />

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors, Touch, Typography } from '../../constants/theme';
 import { ChevronRightIcon } from './CivicIcons';
 
@@ -25,7 +25,7 @@ export const CivicListRow: React.FC<CivicListRowProps> = ({
     activeOpacity={0.75}
     accessibilityRole="button"
     accessibilityLabel={accessibilityLabel ?? label}
-    style={[styles.inner, !last && styles.divider]}
+    style={[styles.inner, !last && styles.divider, Platform.OS === 'web' && styles.webPointer]}
   >
     <View style={styles.left}>
       {icon}
@@ -71,5 +71,8 @@ const styles = StyleSheet.create({
   value: {
     ...Typography.subhead,
     color: Colors.safetyGreen,
+  },
+  webPointer: {
+    cursor: 'pointer',
   },
 });

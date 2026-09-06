@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BorderRadius, Colors, Elevation, Spacing, Touch, Typography } from '../../constants/theme';
@@ -21,6 +21,7 @@ interface CivicButtonProps {
   icon?: ReactNode;
   showChevron?: boolean;
   style?: ViewStyle;
+  href?: string;
 }
 
 export const CivicButton: React.FC<CivicButtonProps> = ({
@@ -32,13 +33,16 @@ export const CivicButton: React.FC<CivicButtonProps> = ({
   icon,
   showChevron = false,
   style,
+  href,
 }) => {
   const handlePress = () => {
     if (disabled) return;
-    if (variant === 'primary-emergency') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => undefined);
-    } else {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => undefined);
+    if (Platform.OS !== 'web') {
+      if (variant === 'primary-emergency') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => undefined);
+      } else {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => undefined);
+      }
     }
     onPress();
   };
@@ -72,6 +76,61 @@ export const CivicButton: React.FC<CivicButtonProps> = ({
             ? ['rgba(255,255,255,0.55)', 'rgba(255,245,244,0.72)']
             : ['rgba(255,255,255,0.5)', 'rgba(255,255,255,0.7)'];
 
+  const surface = (
+    <LinearGradient
+      colors={fill}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+      style={[
+        styles.base,
+        variant === 'outline-emergency' && styles.outlineEmergency,
+        variant === 'outline-neutral' && styles.outlineNeutral,
+      ]}
+    >
+      <LinearGradient
+        pointerEvents="none"
+        colors={['rgba(255,255,255,0.38)', 'transparent']}
+        style={styles.sheen}
+      />
+      <View style={styles.row}>
+        {icon ? <View style={styles.iconSlot}>{icon}</View> : null}
+        <View style={styles.textCol}>
+          <Text style={[styles.title, { color: textColor }]}>{title}</Text>
+          {subtitle ? (
+            <Text style={[styles.subtitle, { color: isSolid ? 'rgba(255,255,255,0.82)' : Colors.textSecondary }]}>
+              {subtitle}
+            </Text>
+          ) : null}
+        </View>
+        {showChevron ? <ChevronRightIcon size={20} color={textColor} /> : null}
+      </View>
+    </LinearGradient>
+  );
+
+  if (Platform.OS === 'web' && href) {
+    return (
+      <View style={[styles.lift, glow, disabled && styles.disabled, style]}>
+        <a
+          href={href}
+          aria-label={`${title}${subtitle ? `, ${subtitle}` : ''}`}
+          aria-disabled={disabled}
+          onClick={() => {
+            if (!disabled) {
+              handlePress();
+            }
+          }}
+          style={{
+            display: 'block',
+            textDecoration: 'none',
+            cursor: disabled ? 'default' : 'pointer',
+          }}
+        >
+          {surface}
+        </a>
+      </View>
+    );
+  }
+
   return (
     <Pressable
       style={({ pressed }) => [styles.lift, glow, disabled && styles.disabled, pressed && styles.pressed, style]}
@@ -80,34 +139,7 @@ export const CivicButton: React.FC<CivicButtonProps> = ({
       accessibilityRole="button"
       accessibilityLabel={`${title}${subtitle ? `, ${subtitle}` : ''}`}
     >
-      <LinearGradient
-        colors={fill}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={[
-          styles.base,
-          variant === 'outline-emergency' && styles.outlineEmergency,
-          variant === 'outline-neutral' && styles.outlineNeutral,
-        ]}
-      >
-        <LinearGradient
-          pointerEvents="none"
-          colors={['rgba(255,255,255,0.38)', 'transparent']}
-          style={styles.sheen}
-        />
-        <View style={styles.row}>
-          {icon ? <View style={styles.iconSlot}>{icon}</View> : null}
-          <View style={styles.textCol}>
-            <Text style={[styles.title, { color: textColor }]}>{title}</Text>
-            {subtitle ? (
-              <Text style={[styles.subtitle, { color: isSolid ? 'rgba(255,255,255,0.82)' : Colors.textSecondary }]}>
-                {subtitle}
-              </Text>
-            ) : null}
-          </View>
-          {showChevron ? <ChevronRightIcon size={20} color={textColor} /> : null}
-        </View>
-      </LinearGradient>
+      {surface}
     </Pressable>
   );
 };

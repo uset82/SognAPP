@@ -4,6 +4,8 @@ const path = require('path');
 const https = require('https');
 
 const PORT = process.env.PORT || 4000;
+const chatHits = new Map();
+const { transcribeWithWhisper } = require('./whisper');
 
 // State store
 let state = {
@@ -290,6 +292,155 @@ const server = http.createServer(async (req, res) => {
     addAgentLog('CITIZEN AGENT', `Civilian check-in: ${report.deviceId} accounted for at ${report.safeZoneName}`);
     res.writeHead(200);
     res.end(JSON.stringify({ success: true, totalSafe: state.safeReports.length }));
+    return;
+  }
+
+  const { answerQuestion, validateAgentResponse } = require('./localAgent');
+
+  const tooManyChatRequests = (ip) => {
+    const now = Date.now();
+    const recent = (chatHits.get(ip) || []).filter((stamp) => now - stamp < 60000);
+    recent.push(now);
+    chatHits.set(ip, recent);
+    return recent.length > 30;
+  };
+
+  if (req.method === 'POST' && pathname === '/api/agent/chat') {
+    const ip = req.socket.remoteAddress || 'local';
+    if (tooManyChatRequests(ip)) {
+      res.writeHead(429);
+      res.end(JSON.stringify({ type: 'error', message: 'Too many assistant requests.', action: null, speak: false }));
+      return;
+    }
+
+    const body = await parseBody(req);
+    const message = typeof body.message === 'string' ? body.message.slice(0, 500) : '';
+    if (!message) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ type: 'error', message: 'Missing message.', action: null, speak: false }));
+      return;
+    }
+
+    const rawSize = JSON.stringify(body).length;
+    if (rawSize > 20000) {
+      res.writeHead(413);
+      res.end(JSON.stringify({ type: 'error', message: 'Request too large.', action: null, speak: false }));
+      return;
+    }
+
+    const context = body.context || {};
+    const fallback = validateAgentResponse(answerQuestion(message, context));
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    const model = process.env.AGENT_MODEL || 'minimax/minimax-m3:free';
+
+    if (!apiKey) {
+      addAgentLog('ASSISTANT', 'Local verified-context answer (no OpenRouter key).');
+      res.writeHead(200);
+      res.end(JSON.stringify(fallback));
+      return;
+    }
+
+    try {
+      const { SOGN_SAFE_SYSTEM_PROMPT } = require('./agentPrompt');
+      const payload = JSON.stringify({
+        model,
+        messages: [
+          { role: 'system', content: SOGN_SAFE_SYSTEM_PROMPT },
+          { role: 'system', content: `Verified context JSON: ${JSON.stringify(context)}` },
+          ...((body.conversation || []).slice(-6).map((turn) => ({ role: turn.role, content: turn.text }))),
+          { role: 'user', content: message },
+        ],
+      });
+
+      const result = await new Promise((resolve, reject) => {
+        const request = https.request(
+          {
+            hostname: 'openrouter.ai',
+            path: '/api/v1/chat/completions',
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(payload),
+            },
+            timeout: 10000,
+          },
+          (upstream) => {
+            let data = '';
+            upstream.on('data', (chunk) => {
+              data += chunk;
+            });
+            upstream.on('end', () => resolve({ status: upstream.statusCode, data }));
+          }
+        );
+        request.on('error', reject);
+        request.on('timeout', () => {
+          request.destroy();
+          reject(new Error('timeout'));
+        });
+        request.write(payload);
+        request.end();
+      });
+
+      let parsed;
+      try {
+        parsed = JSON.parse(result.data);
+      } catch {
+        parsed = null;
+      }
+      const content = parsed?.choices?.[0]?.message?.content;
+      let modelJson = null;
+      if (typeof content === 'string') {
+        try {
+          modelJson = JSON.parse(content);
+        } catch {
+          const match = content.match(/\{[\s\S]*\}/);
+          modelJson = match ? JSON.parse(match[0]) : null;
+        }
+      }
+      const validated = validateAgentResponse(modelJson) || fallback;
+      addAgentLog('ASSISTANT', 'OpenRouter answer validated against allowed actions.');
+      res.writeHead(200);
+      res.end(JSON.stringify(validated));
+    } catch {
+      addAgentLog('ASSISTANT', 'OpenRouter unavailable. Local fallback used. No secret logged.');
+      res.writeHead(200);
+      res.end(JSON.stringify({ ...fallback, cached: true }));
+    }
+    return;
+  }
+
+  if (req.method === 'POST' && pathname === '/api/audio/transcribe') {
+    const body = await parseBody(req);
+    if (!body.audioBase64 || String(body.audioBase64).length > 2_000_000) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Invalid audio payload.' }));
+      return;
+    }
+
+    const whisperKey = process.env.WHISPER_API_KEY || process.env.OPENAI_API_KEY;
+    if (!whisperKey) {
+      addAgentLog('ASSISTANT', 'Whisper unavailable. No audio retained.');
+      res.writeHead(503);
+      res.end(JSON.stringify({ error: 'Transcription unavailable.' }));
+      return;
+    }
+
+    try {
+      const result = await transcribeWithWhisper(
+        body.audioBase64,
+        body.mimeType || 'audio/m4a',
+        body.language === 'no' ? 'no' : 'en',
+        whisperKey
+      );
+      addAgentLog('ASSISTANT', 'Audio transcribed. Recording discarded after processing.');
+      res.writeHead(200);
+      res.end(JSON.stringify({ transcript: result.text || '' }));
+    } catch {
+      addAgentLog('ASSISTANT', 'Whisper transcription failed. Recording discarded.');
+      res.writeHead(504);
+      res.end(JSON.stringify({ error: 'Transcription timeout or provider error.' }));
+    }
     return;
   }
 

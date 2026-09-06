@@ -63,26 +63,36 @@ export const GlassSurface: React.FC<GlassSurfaceProps> = ({
           },
         ]}
       >
-        <BlurView
-          intensity={blur}
-          tint={onColor ? 'dark' : 'light'}
-          style={StyleSheet.absoluteFill}
-        />
-        <View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              backgroundColor: fill,
-              ...(Platform.OS === 'web'
-                ? ({
-                    backdropFilter: `saturate(160%) blur(${blur}px)`,
-                    WebkitBackdropFilter: `saturate(160%) blur(${blur}px)`,
-                  } as ViewStyle)
-                : null),
-            },
-          ]}
-        />
+        {Platform.OS === 'web' ? (
+          <View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                backgroundColor: fill,
+                ...({
+                  backdropFilter: `saturate(140%) blur(${Math.min(blur, 14)}px)`,
+                  WebkitBackdropFilter: `saturate(140%) blur(${Math.min(blur, 14)}px)`,
+                  transform: 'translateZ(0)',
+                  WebkitTransform: 'translateZ(0)',
+                } as ViewStyle),
+              },
+            ]}
+          />
+        ) : (
+          <>
+            <BlurView
+              pointerEvents="none"
+              intensity={blur}
+              tint={onColor ? 'dark' : 'light'}
+              style={StyleSheet.absoluteFill}
+            />
+            <View
+              pointerEvents="none"
+              style={[StyleSheet.absoluteFill, { backgroundColor: fill }]}
+            />
+          </>
+        )}
         <LinearGradient
           pointerEvents="none"
           colors={[

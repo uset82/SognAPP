@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '../../constants/theme';
 
@@ -14,6 +14,7 @@ export const CivicAtmosphere: React.FC<CivicAtmosphereProps> = ({
 }) => (
   <View style={styles.root}>
     <LinearGradient
+      pointerEvents="none"
       colors={
         mood === 'alert'
           ? [Colors.canvasWarm, '#F3E4DE', Colors.canvasMint]
@@ -45,15 +46,27 @@ export const CivicAtmosphere: React.FC<CivicAtmosphereProps> = ({
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
-    minHeight: '100%',
-    overflow: 'visible',
+    ...Platform.select({
+      web: {
+        minHeight: '100%',
+        overflow: 'hidden',
+        position: 'relative',
+      },
+      default: { flex: 1, minHeight: '100%', overflow: 'hidden' },
+    }),
   },
   orb: {
     position: 'absolute',
     width: 280,
     height: 280,
     borderRadius: 140,
+    ...(Platform.OS === 'web'
+      ? ({
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)',
+          pointerEvents: 'none',
+        } as any)
+      : null),
   },
   orbTop: {
     top: -80,

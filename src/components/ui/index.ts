@@ -10,6 +10,7 @@ export * from './AppChrome';
 export * from './StatusHero';
 export * from './MetricPill';
 export * from './CivicListRow';
+export * from './AppModal';
 export * from './GlassModal';
 export * from './TimestampMeta';
 export * from './LanguageSheet';

@@ -16,9 +16,9 @@ export const WebAppShell: React.FC<WebAppShellProps> = ({ children }) => {
     return <>{children}</>;
   }
 
-  if (width < FRAME_BREAKPOINT) {
-    return <View style={styles.mobile}>{children}</View>;
-  }
+    if (width < FRAME_BREAKPOINT) {
+      return <>{children}</>;
+    }
 
   return (
     <View style={styles.stage}>

@@ -1,0 +1,98 @@
+import { Platform } from 'react-native';
+import Constants from 'expo-constants';
+import { AgentResponse, ConversationTurn, EmergencyAgentContext } from '../types/chat';
+import { ALLOWED_AGENT_ACTIONS } from '../types/chat';
+
+const getSimulatorServerUrl = (): string => {
+  if (Platform.OS === 'web') {
+    return 'http://localhost:4000';
+  }
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    return `http://${hostUri.split(':')[0]}:4000`;
+  }
+  return 'http://localhost:4000';
+};
+
+export const validateAgentResponse = (payload: unknown): AgentResponse | null => {
+  if (!payload || typeof payload !== 'object') {
+    return null;
+  }
+  const data = payload as Partial<AgentResponse>;
+  const types = ['answer', 'offer_help', 'offer_safe', 'offline', 'error'];
+  if (!data.type || !types.includes(data.type)) {
+    return null;
+  }
+  if (typeof data.message !== 'string' || data.message.trim().length === 0) {
+    return null;
+  }
+  let action = data.action ?? null;
+  if (action === 'NONE') {
+    action = null;
+  }
+  if (action && !ALLOWED_AGENT_ACTIONS.includes(action)) {
+    action = null;
+  }
+  return {
+    type: data.type,
+    message: data.message.trim().slice(0, 220),
+    action,
+    speak: data.speak !== false,
+    cached: Boolean(data.cached),
+  };
+};
+
+export const requestAgentChat = async (
+  message: string,
+  context: EmergencyAgentContext,
+  conversation: ConversationTurn[]
+): Promise<AgentResponse | null> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch(`${getSimulatorServerUrl()}/api/agent/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: message.slice(0, 500),
+        context,
+        conversation: conversation.slice(-6),
+      }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      return null;
+    }
+    return validateAgentResponse(await response.json());
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
+export const transcribeAudioOnBackend = async (
+  audioBase64: string,
+  mimeType: string,
+  language: 'en' | 'no'
+): Promise<string | null> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await fetch(`${getSimulatorServerUrl()}/api/audio/transcribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audioBase64, mimeType, language }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      return null;
+    }
+    const data = (await response.json()) as { transcript?: string };
+    return data.transcript?.trim() || null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+};

@@ -98,6 +98,7 @@ export default function WelcomeScreen() {
                 variant="primary-safety"
                 icon={<ShieldCheckIcon size={22} color={Colors.textOnColor} strokeWidth={2.5} />}
                 showChevron
+                href="/"
                 onPress={() => {
                   void handleContinue();
                 }}
@@ -124,7 +125,7 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    minHeight: 0,
+    minHeight: Platform.OS === 'web' ? '100%' : 0,
     backgroundColor: Colors.canvas,
   },
   container: {

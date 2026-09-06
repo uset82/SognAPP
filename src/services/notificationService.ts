@@ -7,20 +7,18 @@ import { Incident } from '../types/incident';
 const PUSH_TOKEN_STORAGE_KEY = '@sogn_safe_push_token';
 const PERMISSION_STATUS_KEY = '@sogn_safe_notification_permission';
 
-/**
- * Configure foreground notification behavior:
- * During emergency events, alert banners and sounds must show even if app is in foreground.
- */
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    shouldShowBanner: true,
-    shouldShowList: true,
-    priority: Notifications.AndroidNotificationPriority.MAX,
-  }),
-});
+if (Platform.OS !== 'web') {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+      priority: Notifications.AndroidNotificationPriority.MAX,
+    }),
+  });
+}
 
 export interface NotificationPermissionResult {
   status: Notifications.PermissionStatus;
@@ -172,7 +170,10 @@ export function registerNotificationListeners(
   onNotificationReceived?: (notification: Notifications.Notification) => void,
   onIncidentDeepLink?: (incidentId: string) => void
 ): () => void {
-  // Foreground listener
+  if (Platform.OS === 'web') {
+    return () => undefined;
+  }
+
   const receivedSubscription = Notifications.addNotificationReceivedListener((notification) => {
     onNotificationReceived?.(notification);
   });

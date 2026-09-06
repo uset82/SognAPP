@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { usePathname, useRouter } from 'expo-router';
 import { Colors, Touch, Typography } from '../../constants/theme';
 import { SognSafeLogo } from '../brand';
@@ -40,23 +40,34 @@ export const AppChrome: React.FC<AppChromeProps> = ({
     router.replace('/');
   };
 
-  const brandMark = (
-    <Pressable
-      onPress={handleGoHome}
-      disabled={isHome}
-      accessibilityRole={isHome ? 'header' : 'button'}
-      accessibilityLabel={title}
-      accessibilityHint={isHome ? undefined : backLabel}
-      hitSlop={8}
-      style={({ pressed }) => [styles.brand, centered && styles.centeredBrand, pressed && !isHome && styles.pressed]}
-    >
+  const brandInner = (
+    <>
       <SognSafeLogo size={compact ? (centered ? 34 : 36) : 42} variant="master" />
       <View>
         <Text style={styles.title}>{title}</Text>
         {subtitle && !centered ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
       </View>
-    </Pressable>
+    </>
   );
+
+  const brandMark =
+    Platform.OS === 'web' && !isHome ? (
+      <a href="/" aria-label={title} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <View style={[styles.brand, centered && styles.centeredBrand]}>{brandInner}</View>
+      </a>
+    ) : (
+      <Pressable
+        onPress={handleGoHome}
+        disabled={isHome}
+        accessibilityRole={isHome ? 'header' : 'button'}
+        accessibilityLabel={title}
+        accessibilityHint={isHome ? undefined : backLabel}
+        hitSlop={8}
+        style={({ pressed }) => [styles.brand, centered && styles.centeredBrand, pressed && !isHome && styles.pressed]}
+      >
+        {brandInner}
+      </Pressable>
+    );
 
   const chrome = centered ? (
     <View style={styles.centered}>{brandMark}</View>

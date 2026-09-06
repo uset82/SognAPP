@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { Platform } from 'react-native';
 import { Incident, SafeZone, EvacuationRoute, HelpCondition, HelpRequest } from '../types/incident';
 import { Language, TranslationStrings, translations } from '../constants/translations';
 import {
@@ -175,6 +176,12 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const refreshPermissions = useCallback(async () => {
+    if (Platform.OS === 'web') {
+      setLocationPermissionGranted(true);
+      setNotificationPermissionGranted(true);
+      return;
+    }
+
     try {
       const loc = await Location.getForegroundPermissionsAsync();
       setLocationPermissionGranted(loc.status === 'granted');
@@ -222,6 +229,15 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     }
     loadStoredState();
+
+    const isLocalSimulatorAvailable =
+      Platform.OS !== 'web' ||
+      (typeof window !== 'undefined' &&
+        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
+
+    if (!isLocalSimulatorAvailable) {
+      return;
+    }
 
     const interval = setInterval(async () => {
       try {

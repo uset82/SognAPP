@@ -133,6 +133,15 @@ export default function AlertScreen() {
               showChevron
               onPress={handleNeedHelp}
             />
+            <CivicButton
+              title={language === 'no' ? 'SPØR ASSISTENTEN' : 'ASK ASSISTANT'}
+              variant="outline-neutral"
+              showChevron
+              onPress={() => {
+                void stopEmergencyAlert();
+                router.push('/chat');
+              }}
+            />
           </View>
 
           <View style={styles.footer}>

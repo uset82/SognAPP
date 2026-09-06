@@ -144,6 +144,33 @@ async function runTests() {
     assert.strictEqual(deg.body.isDegradedConnection, true);
     console.log('  PASS: Network state set to DEGRADED.');
 
+    console.log('[Test 11b] Asking the local assistant for a verified destination...');
+    const chat = await request('/api/agent/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: 'Where should I go?',
+        context: {
+          hasActiveIncident: true,
+          nearestSafeZone: 'Flåm Skule & Samfunnshus',
+          lastVerifiedUpdate: '14:47',
+          selectedLanguage: 'en',
+        },
+        conversation: [],
+      }),
+    });
+    assert.strictEqual(chat.status, 200);
+    assert.match(chat.body.message, /Flåm Skule/i);
+    console.log('  PASS: Assistant returned a context-grounded destination.');
+
+    const transcribe = await request('/api/audio/transcribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ audioBase64: 'AAA', mimeType: 'audio/m4a', language: 'en' }),
+    });
+    assert.ok(transcribe.status === 400 || transcribe.status === 503);
+    console.log('  PASS: Transcribe endpoint rejects invalid/unconfigured audio safely.');
+
     // 11. End Incident & Return to Normal (Phase 31 Steps 22-23)
     console.log('[Test 11] Ending incident and broadcasting ALL CLEAR...');
     const end = await request('/api/scenario/end', { method: 'POST' });

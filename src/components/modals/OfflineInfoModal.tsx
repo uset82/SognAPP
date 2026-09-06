@@ -1,8 +1,9 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
 import { useEmergency } from '../../context/EmergencyContext';
 import { TimestampMeta } from '../ui/TimestampMeta';
+import { AppModal } from '../ui/AppModal';
 
 interface OfflineInfoModalProps {
   visible: boolean;
@@ -14,7 +15,7 @@ export const OfflineInfoModal: React.FC<OfflineInfoModalProps> = ({ visible, onC
   const isNorwegian = language === 'no';
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+    <AppModal visible={visible} onClose={onClose}>
       <View style={styles.modalRoot}>
         {/* Header */}
         <View style={styles.header}>
@@ -151,7 +152,7 @@ export const OfflineInfoModal: React.FC<OfflineInfoModalProps> = ({ visible, onC
           </View>
         </ScrollView>
       </View>
-    </Modal>
+    </AppModal>
   );
 };
 

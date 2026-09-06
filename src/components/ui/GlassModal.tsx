@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors, Touch, Typography } from '../../constants/theme';
+import { AppModal } from './AppModal';
 
 interface GlassModalProps {
   visible: boolean;
@@ -19,7 +20,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
   closeLabel,
   children,
 }) => (
-  <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+  <AppModal visible={visible} onClose={onClose}>
     <View style={styles.root}>
       <View style={styles.header}>
         <View style={styles.handle} />
@@ -40,7 +41,7 @@ export const GlassModal: React.FC<GlassModalProps> = ({
       </View>
       {children}
     </View>
-  </Modal>
+  </AppModal>
 );
 
 const styles = StyleSheet.create({
