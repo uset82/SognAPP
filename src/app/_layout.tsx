@@ -2,14 +2,16 @@ import React, { useEffect } from 'react';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EmergencyProvider, useEmergency } from '../context/EmergencyContext';
 import { Colors } from '../constants/theme';
+import { WELCOME_SEEN_KEY } from '../constants/storage';
 import { registerNotificationListeners } from '../services/notificationService';
 
 function AppNavigation() {
   const router = useRouter();
   const pathname = usePathname();
-  const { hasActiveIncident, triggerFlamScenario } = useEmergency();
+  const { triggerFlamScenario } = useEmergency();
 
   useEffect(() => {
     const unsubscribe = registerNotificationListeners(
@@ -28,10 +30,22 @@ function AppNavigation() {
   }, [triggerFlamScenario, router]);
 
   useEffect(() => {
-    if (hasActiveIncident && (pathname === '/' || pathname === '/index')) {
-      router.replace('/alert');
-    }
-  }, [hasActiveIncident, pathname, router]);
+    let cancelled = false;
+    AsyncStorage.getItem(WELCOME_SEEN_KEY)
+      .then((seen) => {
+        if (cancelled) {
+          return;
+        }
+        if (!seen && (pathname === '/' || pathname === '/index')) {
+          router.replace('/welcome');
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname, router]);
 
   return (
     <Stack
@@ -42,6 +56,7 @@ function AppNavigation() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="welcome" options={{ animation: 'fade' }} />
       <Stack.Screen name="alert" options={{ animation: 'fade' }} />
       <Stack.Screen name="safety" options={{ animation: 'slide_from_right' }} />
       <Stack.Screen name="evacuate" options={{ animation: 'slide_from_right' }} />

@@ -53,6 +53,19 @@ export interface TranslationStrings {
   closeBtn: string;
   cancelBtn: string;
   continueBtn: string;
+  backToHome: string;
+  howItWorksTitle: string;
+  welcomeTagline: string;
+  welcomeJob: string;
+  welcomeQuestionsTitle: string;
+  welcomeQ1: string;
+  welcomeQ2: string;
+  welcomeQ3: string;
+  welcomeQ4: string;
+  welcomeJourneyTitle: string;
+  welcomeJourney: string;
+  welcomeHelpNote: string;
+  soundOff: string;
 
   activeEmergencyTitle: string;
   activeEmergencySub: string;
@@ -196,6 +209,19 @@ export const translations: Record<Language, TranslationStrings> = {
     closeBtn: 'Close',
     cancelBtn: 'Cancel',
     continueBtn: 'Continue',
+    backToHome: 'Back to home',
+    howItWorksTitle: 'How the app works',
+    welcomeTagline: 'Guidance when seconds matter',
+    welcomeJob: 'SOGN SAFE turns a complex incident into four civilian answers.',
+    welcomeQuestionsTitle: 'Four civilian questions',
+    welcomeQ1: 'Am I in danger?',
+    welcomeQ2: 'Where should I go?',
+    welcomeQ3: 'How do I get there?',
+    welcomeQ4: 'What do I do if I cannot evacuate?',
+    welcomeJourneyTitle: 'The journey',
+    welcomeJourney: 'READY → ALERT → FIND SAFETY → EVACUATE → SAFE',
+    welcomeHelpNote: 'If you cannot move, I NEED HELP sends your condition and location to the training dispatcher. It is never a real 112 call.',
+    soundOff: 'SOUND OFF · tap to enable',
     activeEmergencyTitle: 'ACTIVE EMERGENCY ALERT',
     activeEmergencySub: 'Tap to open emergency route',
     permissionsNeededTitle: 'Permissions needed',
@@ -329,6 +355,19 @@ export const translations: Record<Language, TranslationStrings> = {
     closeBtn: 'Lukk',
     cancelBtn: 'Avbryt',
     continueBtn: 'Fortsett',
+    backToHome: 'Tilbake til start',
+    howItWorksTitle: 'Slik fungerer appen',
+    welcomeTagline: 'Veiledning når sekundene teller',
+    welcomeJob: 'SOGN SAFE gjør en kompleks hendelse om til fire sivile svar.',
+    welcomeQuestionsTitle: 'Fire sivile spørsmål',
+    welcomeQ1: 'Er jeg i fare?',
+    welcomeQ2: 'Hvor skal jeg gå?',
+    welcomeQ3: 'Hvordan kommer jeg dit?',
+    welcomeQ4: 'Hva gjør jeg hvis jeg ikke kan evakuere?',
+    welcomeJourneyTitle: 'Forløpet',
+    welcomeJourney: 'KLAR → VARSEL → FINN TRYGGHET → EVAKUER → TRYGG',
+    welcomeHelpNote: 'Hvis du ikke kan evakuere, sender JEG TRENGER HJELP tilstand og posisjon til øvingsoperatøren. Det er aldri et ekte 112-anrop.',
+    soundOff: 'LYD AV · trykk for å slå på',
     activeEmergencyTitle: 'AKTIV NØDVARSLING',
     activeEmergencySub: 'Trykk for å se evakueringsrute',
     permissionsNeededTitle: 'Tillatelser mangler',

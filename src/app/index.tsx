@@ -29,6 +29,7 @@ import {
   GlobeGridIcon,
   ShelterGroupIcon,
   ShieldCheckBadge,
+  ShieldCheckIcon,
 } from '../components/ui/CivicIcons';
 
 export default function ReadyScreen() {
@@ -142,6 +143,16 @@ export default function ReadyScreen() {
               }
               label={t.offlineInfoTitle}
               onPress={() => setIsOfflineInfoOpen(true)}
+            />
+            <CivicListRow
+              icon={
+                <CircularIconContainer size={42} bgColor={Colors.safetyGreenBg}>
+                  <ShieldCheckIcon size={22} color={Colors.safetyGreen} />
+                </CircularIconContainer>
+              }
+              label={t.howItWorksTitle}
+              onPress={() => router.push('/welcome')}
+              accessibilityLabel={t.howItWorksTitle}
             />
             <CivicListRow
               icon={

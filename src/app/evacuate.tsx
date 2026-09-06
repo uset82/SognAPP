@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
 import { Colors } from '../constants/theme';
+import { stopEmergencyAlert } from '../services/alertSound';
 import {
   AlertTriangleSolidIcon,
   AppChrome,
@@ -86,7 +87,16 @@ export default function EvacuateScreen() {
       <CivicAtmosphere>
       <ScreenEnter>
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-          <AppChrome title={t.brandTitle} compact district={t.districtName} />
+          <AppChrome
+            title={t.brandTitle}
+            compact
+            district={t.districtName}
+            onBack={() => {
+              void stopEmergencyAlert();
+              router.replace('/');
+            }}
+            backLabel={t.backToHome}
+          />
 
           <CivicButton
             title={activeStep.title}
@@ -151,7 +161,10 @@ export default function EvacuateScreen() {
               variant="primary-emergency"
               icon={<MedicalCrossIcon size={22} color={Colors.textOnColor} />}
               showChevron
-              onPress={() => router.push('/help')}
+              onPress={() => {
+                void stopEmergencyAlert();
+                router.push('/help');
+              }}
             />
             <CivicButton
               title={currentStepIndex < steps.length - 1 ? t.nextNavStep : t.confirmArrival}

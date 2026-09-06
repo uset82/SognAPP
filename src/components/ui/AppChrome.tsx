@@ -1,9 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Colors, Typography } from '../../constants/theme';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Colors, Touch, Typography } from '../../constants/theme';
 import { SognSafeLogo } from '../brand';
 import { GlassSurface } from './GlassSurface';
-import { LocationPinIcon } from './CivicIcons';
+import { ChevronLeftIcon, LocationPinIcon } from './CivicIcons';
 
 interface AppChromeProps {
   title?: string;
@@ -11,6 +11,8 @@ interface AppChromeProps {
   compact?: boolean;
   district?: string;
   centered?: boolean;
+  onBack?: () => void;
+  backLabel?: string;
 }
 
 export const AppChrome: React.FC<AppChromeProps> = ({
@@ -19,17 +21,15 @@ export const AppChrome: React.FC<AppChromeProps> = ({
   compact = false,
   district,
   centered = false,
+  onBack,
+  backLabel = 'Back',
 }) => {
-  if (centered) {
-    return (
-      <View style={styles.centered}>
-        <SognSafeLogo size={compact ? 34 : 36} variant="master" />
-        <Text style={styles.title}>{title}</Text>
-      </View>
-    );
-  }
-
-  return (
+  const brand = centered ? (
+    <View style={styles.centered}>
+      <SognSafeLogo size={compact ? 34 : 36} variant="master" />
+      <Text style={styles.title}>{title}</Text>
+    </View>
+  ) : (
     <View style={styles.row}>
       <View style={styles.brand}>
         <SognSafeLogo size={compact ? 36 : 42} variant="master" />
@@ -46,6 +46,26 @@ export const AppChrome: React.FC<AppChromeProps> = ({
           </View>
         </GlassSurface>
       ) : null}
+    </View>
+  );
+
+  if (!onBack) {
+    return brand;
+  }
+
+  return (
+    <View>
+      <Pressable
+        onPress={onBack}
+        accessibilityRole="button"
+        accessibilityLabel={backLabel}
+        hitSlop={8}
+        style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
+      >
+        <ChevronLeftIcon size={18} color={Colors.textPrimary} strokeWidth={2.4} />
+        <Text style={styles.backLabel}>{backLabel}</Text>
+      </Pressable>
+      {brand}
     </View>
   );
 };
@@ -97,6 +117,22 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 13,
     fontWeight: '600',
+    color: Colors.textPrimary,
+  },
+  back: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+    minHeight: Touch.minTarget,
+    paddingHorizontal: 16,
+    paddingRight: 20,
+  },
+  backPressed: {
+    opacity: 0.65,
+  },
+  backLabel: {
+    ...Typography.subhead,
     color: Colors.textPrimary,
   },
 });

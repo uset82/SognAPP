@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { Incident, SafeZone, EvacuationRoute, HelpCondition, HelpRequest } from '../types/incident';
 import { Language, TranslationStrings, translations } from '../constants/translations';
 import {
-  triggerEmergencyAlertHaptic,
   triggerSafetyConfirmationHaptic,
   triggerWarningHaptic,
 } from '../services/haptics';
@@ -15,6 +14,7 @@ import {
   transmitSafeReportToSimulator,
 } from '../services/api';
 import { getCachedPushToken, triggerLocalTestEmergencyNotification } from '../services/notificationService';
+import { playEmergencyAlert, stopEmergencyAlert } from '../services/alertSound';
 import {
   Coordinates,
   FLAM_WATERFRONT_COORDINATES,
@@ -269,7 +269,7 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setActiveHelpRequest(null);
     setLastSyncTimestamp(new Date().toISOString());
     AsyncStorage.setItem('@sogn_safe_cached_incident', JSON.stringify(flamIncidentMock)).catch(() => undefined);
-    triggerEmergencyAlertHaptic();
+    await playEmergencyAlert();
     await triggerLocalTestEmergencyNotification(flamIncidentMock);
     await startFlamScenarioOnSimulator();
   };
@@ -281,6 +281,7 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIncident(null);
     setActiveHelpRequest(null);
     setIsSafeReported(false);
+    void stopEmergencyAlert();
     triggerSafetyConfirmationHaptic();
     AsyncStorage.removeItem('@sogn_safe_cached_incident').catch(() => undefined);
   };

@@ -257,6 +257,16 @@ export const ChevronRightIcon: React.FC<IconProps> = ({
   </Svg>
 );
 
+export const ChevronLeftIcon: React.FC<IconProps> = ({
+  size = 16,
+  color = '#9CA3AF',
+  strokeWidth = 2,
+}) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Polyline points="15 18 9 12 15 6" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
 /**
  * Emergency Warning Triangle
  */

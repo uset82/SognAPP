@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
 import { Colors } from '../constants/theme';
+import { stopEmergencyAlert } from '../services/alertSound';
 import {
   AppChrome,
   CheckCircleSolidIcon,
@@ -43,7 +44,16 @@ export default function FindSafetyScreen() {
       <CivicAtmosphere>
       <ScreenEnter>
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-          <AppChrome title={t.brandTitle} subtitle={t.civilianApp} district={t.districtName} />
+          <AppChrome
+            title={t.brandTitle}
+            subtitle={t.civilianApp}
+            district={t.districtName}
+            onBack={() => {
+              void stopEmergencyAlert();
+              router.replace('/');
+            }}
+            backLabel={t.backToHome}
+          />
 
           <StatusHero
             variant="safe"

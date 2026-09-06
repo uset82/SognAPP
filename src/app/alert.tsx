@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
@@ -20,21 +20,54 @@ import {
 } from '../components/ui';
 import { AlertTriangleSolidIcon } from '../components/ui/CivicIcons';
 import { triggerEmergencyAlertHaptic } from '../services/haptics';
+import { stopEmergencyAlert } from '../services/alertSound';
+import { requestNotificationPermissions } from '../services/notificationService';
 
 export default function AlertScreen() {
   const router = useRouter();
-  const { incident, isDegradedConnection, language, t, lastSyncTimestamp } = useEmergency();
+  const {
+    incident,
+    isDegradedConnection,
+    language,
+    t,
+    lastSyncTimestamp,
+    notificationPermissionGranted,
+    refreshPermissions,
+  } = useEmergency();
 
   useEffect(() => {
     triggerEmergencyAlertHaptic();
   }, []);
+
+  const handleBackHome = () => {
+    void stopEmergencyAlert();
+    router.replace('/');
+  };
+
+  const handleGoToSafety = () => {
+    void stopEmergencyAlert();
+    router.push('/safety');
+  };
+
+  const handleNeedHelp = () => {
+    void stopEmergencyAlert();
+    router.push('/help');
+  };
+
+  const handleEnableSound = async () => {
+    const result = await requestNotificationPermissions();
+    await refreshPermissions();
+    if (!result.granted) {
+      router.push('/permissions');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <CivicAtmosphere mood="alert">
       <ScreenEnter>
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-          <AppChrome title={t.brandTitle} centered compact />
+          <AppChrome title={t.brandTitle} centered compact onBack={handleBackHome} backLabel={t.backToHome} />
 
           {isDegradedConnection ? (
             <GlassSurface tone="warning" glow="warning" style={styles.offline}>
@@ -54,10 +87,17 @@ export default function AlertScreen() {
                   <Text style={styles.statusText}>{t.vibrateOn}</Text>
                 </View>
                 <View style={styles.divider} />
-                <View style={styles.statusItem}>
+                <Pressable
+                  onPress={notificationPermissionGranted ? undefined : () => { void handleEnableSound(); }}
+                  accessibilityRole={notificationPermissionGranted ? 'text' : 'button'}
+                  accessibilityLabel={notificationPermissionGranted ? t.soundOn : t.soundOff}
+                  style={styles.statusItem}
+                >
                   <SpeakerSoundIcon size={16} color={Colors.textOnColor} />
-                  <Text style={styles.statusText}>{t.soundOn}</Text>
-                </View>
+                  <Text style={styles.statusText}>
+                    {notificationPermissionGranted ? t.soundOn : t.soundOff}
+                  </Text>
+                </Pressable>
               </View>
             }
           />
@@ -83,14 +123,14 @@ export default function AlertScreen() {
               variant="primary-safety"
               icon={<ShieldCheckIcon size={24} color={Colors.textOnColor} strokeWidth={2.5} />}
               showChevron
-              onPress={() => router.push('/safety')}
+              onPress={handleGoToSafety}
             />
             <CivicButton
               title={t.needHelp}
               variant="outline-emergency"
               icon={<MedicalCrossIcon size={22} color={Colors.emergencyRed} />}
               showChevron
-              onPress={() => router.push('/help')}
+              onPress={handleNeedHelp}
             />
           </View>
 
