@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BorderRadius, Colors, Elevation, Spacing, Touch, Typography } from '../../constants/theme';
@@ -73,11 +73,10 @@ export const CivicButton: React.FC<CivicButtonProps> = ({
             : ['rgba(255,255,255,0.5)', 'rgba(255,255,255,0.7)'];
 
   return (
-    <TouchableOpacity
-      style={[styles.lift, glow, disabled && styles.disabled, style]}
+    <Pressable
+      style={({ pressed }) => [styles.lift, glow, disabled && styles.disabled, pressed && styles.pressed, style]}
       onPress={handlePress}
       disabled={disabled}
-      activeOpacity={0.85}
       accessibilityRole="button"
       accessibilityLabel={`${title}${subtitle ? `, ${subtitle}` : ''}`}
     >
@@ -109,13 +108,17 @@ export const CivicButton: React.FC<CivicButtonProps> = ({
           {showChevron ? <ChevronRightIcon size={20} color={textColor} /> : null}
         </View>
       </LinearGradient>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   lift: {
     borderRadius: BorderRadius.lg,
+    minHeight: Touch.primaryCta,
+  },
+  pressed: {
+    opacity: 0.88,
   },
   base: {
     borderRadius: BorderRadius.lg,

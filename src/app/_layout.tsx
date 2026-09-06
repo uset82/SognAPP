@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { EmergencyProvider, useEmergency } from '../context/EmergencyContext';
@@ -8,7 +8,8 @@ import { registerNotificationListeners } from '../services/notificationService';
 
 function AppNavigation() {
   const router = useRouter();
-  const { triggerFlamScenario } = useEmergency();
+  const pathname = usePathname();
+  const { hasActiveIncident, triggerFlamScenario } = useEmergency();
 
   useEffect(() => {
     const unsubscribe = registerNotificationListeners(
@@ -17,7 +18,7 @@ function AppNavigation() {
       },
       () => {
         triggerFlamScenario();
-        router.push('/alert');
+        router.replace('/alert');
       }
     );
 
@@ -25,6 +26,12 @@ function AppNavigation() {
       unsubscribe();
     };
   }, [triggerFlamScenario, router]);
+
+  useEffect(() => {
+    if (hasActiveIncident && (pathname === '/' || pathname === '/index')) {
+      router.replace('/alert');
+    }
+  }, [hasActiveIncident, pathname, router]);
 
   return (
     <Stack

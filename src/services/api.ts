@@ -40,6 +40,17 @@ export async function registerDeviceWithSimulator(deviceId: string, pushToken?: 
   }
 }
 
+export async function startFlamScenarioOnSimulator(): Promise<boolean> {
+  try {
+    const response = await fetch(`${BASE_URL}/api/scenario/flam`, {
+      method: 'POST',
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Fetch live incident state from the simulator dispatcher
  */

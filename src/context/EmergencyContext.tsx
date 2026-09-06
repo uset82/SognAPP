@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { Incident, SafeZone, EvacuationRoute, HelpCondition, HelpRequest } from '../types/incident';
 import { Language, TranslationStrings, translations } from '../constants/translations';
 import {
@@ -10,10 +10,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   registerDeviceWithSimulator,
   fetchIncidentFromSimulator,
+  startFlamScenarioOnSimulator,
   transmitHelpRequestToSimulator,
   transmitSafeReportToSimulator,
 } from '../services/api';
-import { getCachedPushToken } from '../services/notificationService';
+import { getCachedPushToken, triggerLocalTestEmergencyNotification } from '../services/notificationService';
 import {
   Coordinates,
   FLAM_WATERFRONT_COORDINATES,
@@ -45,7 +46,7 @@ interface EmergencyContextType {
   selectedZoneId: string;
   enrichedZones: SafeZone[];
 
-  triggerFlamScenario: () => void;
+  triggerFlamScenario: () => Promise<void>;
   clearScenario: () => void;
   submitHelpRequest: (condition: HelpCondition) => Promise<void>;
   acknowledgeHelpRequest: () => void;
@@ -165,6 +166,8 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
   const [notificationPermissionGranted, setNotificationPermissionGranted] = useState(false);
   const [selectedZoneId, setSelectedZoneId] = useState(defaultSafeZone.id);
+  const localScenarioLock = useRef(false);
+  const followingRemoteIncident = useRef(false);
 
   const persistLanguage = (lang: Language) => {
     setLanguageState(lang);
@@ -229,11 +232,16 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             setIsDegradedConnection(remoteState.isDegradedConnection);
           }
           if (remoteState.hasActiveIncident && remoteState.incident) {
+            followingRemoteIncident.current = true;
+            localScenarioLock.current = false;
             setIncident(remoteState.incident);
             setHasActiveIncident(true);
-          } else if (!remoteState.hasActiveIncident && !isSafeReported) {
-            setHasActiveIncident(false);
-            setIncident(null);
+          } else if (!remoteState.hasActiveIncident && !localScenarioLock.current) {
+            if (followingRemoteIncident.current && !isSafeReported) {
+              followingRemoteIncident.current = false;
+              setHasActiveIncident(false);
+              setIncident(null);
+            }
           }
         }
       } catch {
@@ -252,17 +260,23 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const civicOffset = projectCoordsToSchematic(civicCoords);
   const enrichedZones = safeZones;
 
-  const triggerFlamScenario = () => {
+  const triggerFlamScenario = async () => {
+    localScenarioLock.current = true;
+    followingRemoteIncident.current = false;
     setIncident(flamIncidentMock);
     setHasActiveIncident(true);
     setIsSafeReported(false);
     setActiveHelpRequest(null);
-    triggerEmergencyAlertHaptic();
     setLastSyncTimestamp(new Date().toISOString());
     AsyncStorage.setItem('@sogn_safe_cached_incident', JSON.stringify(flamIncidentMock)).catch(() => undefined);
+    triggerEmergencyAlertHaptic();
+    await triggerLocalTestEmergencyNotification(flamIncidentMock);
+    await startFlamScenarioOnSimulator();
   };
 
   const clearScenario = () => {
+    localScenarioLock.current = false;
+    followingRemoteIncident.current = false;
     setHasActiveIncident(false);
     setIncident(null);
     setActiveHelpRequest(null);

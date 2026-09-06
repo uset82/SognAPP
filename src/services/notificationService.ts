@@ -133,23 +133,36 @@ export function openDeviceSettings(): void {
 /**
  * Dispatch an immediate test emergency notification (works on physical iPhone and Simulator)
  */
-export async function triggerLocalTestEmergencyNotification(incident: Incident): Promise<string> {
-  const notificationId = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: `EMERGENCY ALERT: ${incident.title.toUpperCase()}`,
-      body: incident.shortDescription,
-      data: {
-        incidentId: incident.id,
-        route: '/alert',
-        severity: incident.severity,
-      },
-      sound: true,
-      priority: 'high',
-    },
-    trigger: null, // deliver immediately
-  });
+export async function triggerLocalTestEmergencyNotification(incident: Incident): Promise<string | null> {
+  if (Platform.OS === 'web') {
+    return null;
+  }
 
-  return notificationId;
+  try {
+    const permission = await requestNotificationPermissions();
+    if (!permission.granted) {
+      return null;
+    }
+
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `EMERGENCY ALERT: ${incident.title.toUpperCase()}`,
+        body: incident.shortDescription,
+        data: {
+          incidentId: incident.id,
+          route: '/alert',
+          severity: incident.severity,
+        },
+        sound: 'default',
+        priority: 'high',
+      },
+      trigger: null,
+    });
+
+    return notificationId;
+  } catch {
+    return null;
+  }
 }
 
 /**

@@ -52,9 +52,9 @@ export default function ReadyScreen() {
   const [isOfflineInfoOpen, setIsOfflineInfoOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
 
-  const handleStartFlam = () => {
-    triggerFlamScenario();
-    router.push('/alert');
+  const handleStartFlam = async () => {
+    await triggerFlamScenario();
+    router.replace('/alert');
   };
 
   const permissionsMissing = !locationPermissionGranted || !notificationPermissionGranted;
@@ -181,7 +181,7 @@ export default function ReadyScreen() {
               <Text style={styles.trainingLabel}>{t.trainingControls}</Text>
               <CivicButton
                 title={t.simulateFlam}
-                variant="outline-emergency"
+                variant="primary-emergency"
                 onPress={handleStartFlam}
               />
               <Text style={styles.disclaimer}>{t.trainingDisclaimer}</Text>
