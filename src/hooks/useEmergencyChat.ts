@@ -376,10 +376,12 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
     if (!lastSpoken) {
       return;
     }
-    unlockSpeechPlayback();
     voiceOriginRef.current = true;
     setVoicePref(true);
-    void speakText(lastSpoken, language);
+    setVoiceState('SPEAKING');
+    void speakText(lastSpoken, language).finally(() => {
+      setVoiceState('IDLE');
+    });
   }, [language, lastSpoken]);
 
   const dismissError = useCallback(() => {
