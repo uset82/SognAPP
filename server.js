@@ -1,7 +1,12 @@
 // Production HTTP server for Canner / Cloud deployments
+const { loadSimulatorEnv } = require('./simulator/loadEnv');
+loadSimulatorEnv();
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { tryHandleAgentApi } = require('./simulator/agentHttp');
+const { describeModels } = require('./simulator/openRouterBridge');
 
 const PORT = parseInt(process.env.PORT, 10) || 3000;
 const DIST_DIR = path.join(__dirname, 'dist');
@@ -79,10 +84,24 @@ function ensureDistThenListen() {
   });
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   // Parse URL pathname safely
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = decodeURIComponent(url.pathname);
+
+  if (req.method === 'OPTIONS' && pathname.startsWith('/api/')) {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    });
+    res.end();
+    return;
+  }
+
+  if (await tryHandleAgentApi(req, res, pathname)) {
+    return;
+  }
 
   // Normalize path
   let safePath = path.normalize(path.join(DIST_DIR, pathname));
@@ -118,6 +137,13 @@ const server = http.createServer((req, res) => {
 function listen() {
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`[SOGN SAFE] Production Web Server listening on port ${PORT}`);
+    void describeModels().then((models) => {
+      if (process.env.OPENROUTER_API_KEY) {
+        console.log(`[OpenRouter] Agent SDK ready. Chat: ${models.chat.join(', ')}`);
+      } else {
+        console.log('[OpenRouter] No API key. Local verified-context assistant only.');
+      }
+    });
   });
 }
 

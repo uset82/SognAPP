@@ -4,8 +4,12 @@ import { AgentResponse, ConversationTurn, EmergencyAgentContext } from '../types
 import { ALLOWED_AGENT_ACTIONS } from '../types/chat';
 
 const getSimulatorServerUrl = (): string => {
-  if (Platform.OS === 'web') {
-    return 'http://localhost:4000';
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:4000';
+    }
+    return window.location.origin;
   }
   const hostUri = Constants.expoConfig?.hostUri;
   if (hostUri) {

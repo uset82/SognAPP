@@ -7,9 +7,8 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 4000;
-const chatHits = new Map();
-const { transcribeWithWhisper } = require('./whisper');
-const { askAgentWithSdk, speakWithSdk, describeModels } = require('./openRouterBridge');
+const { describeModels } = require('./openRouterBridge');
+const { tryHandleAgentApi } = require('./agentHttp');
 
 // State store
 let state = {
@@ -299,137 +298,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  const { answerQuestion, validateAgentResponse } = require('./localAgent');
-
-  const tooManyChatRequests = (ip) => {
-    const now = Date.now();
-    const recent = (chatHits.get(ip) || []).filter((stamp) => now - stamp < 60000);
-    recent.push(now);
-    chatHits.set(ip, recent);
-    return recent.length > 30;
-  };
-
-  if (req.method === 'POST' && pathname === '/api/agent/chat') {
-    const ip = req.socket.remoteAddress || 'local';
-    if (tooManyChatRequests(ip)) {
-      res.writeHead(429);
-      res.end(JSON.stringify({ type: 'error', message: 'Too many assistant requests.', action: null, speak: false }));
-      return;
-    }
-
-    const body = await parseBody(req);
-    const message = typeof body.message === 'string' ? body.message.slice(0, 500) : '';
-    if (!message) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ type: 'error', message: 'Missing message.', action: null, speak: false }));
-      return;
-    }
-
-    const rawSize = JSON.stringify(body).length;
-    if (rawSize > 20000) {
-      res.writeHead(413);
-      res.end(JSON.stringify({ type: 'error', message: 'Request too large.', action: null, speak: false }));
-      return;
-    }
-
-    const context = body.context || {};
-    const fallback = validateAgentResponse(answerQuestion(message, context));
-    const apiKey = process.env.OPENROUTER_API_KEY;
-
-    if (!apiKey) {
-      addAgentLog('ASSISTANT', 'Local verified-context answer (no OpenRouter key).');
-      res.writeHead(200);
-      res.end(JSON.stringify(fallback));
-      return;
-    }
-
-    try {
-      const modelResult = await askAgentWithSdk({
-        message,
-        context,
-        conversation: body.conversation || [],
-      });
-      const validated = validateAgentResponse(modelResult) || fallback;
-      addAgentLog('ASSISTANT', 'OpenRouter Agent SDK answer validated against allowed actions.');
-      res.writeHead(200);
-      res.end(JSON.stringify(validated));
-    } catch {
-      addAgentLog('ASSISTANT', 'OpenRouter unavailable. Local fallback used. No secret logged.');
-      res.writeHead(200);
-      res.end(JSON.stringify({ ...fallback, cached: true }));
-    }
-    return;
-  }
-
-  if (req.method === 'POST' && pathname === '/api/audio/speech') {
-    const body = await parseBody(req);
-    const text = typeof body.text === 'string' ? body.text.slice(0, 400) : '';
-    if (!text) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Missing text.' }));
-      return;
-    }
-    if (!process.env.OPENROUTER_API_KEY) {
-      res.writeHead(503);
-      res.end(JSON.stringify({ error: 'Speech unavailable.' }));
-      return;
-    }
-
-    try {
-      const audio = await speakWithSdk(text, body.language === 'no' ? 'no' : 'en');
-      if (!audio) {
-        res.writeHead(502);
-        res.end(JSON.stringify({ error: 'Speech provider unavailable.' }));
-        return;
-      }
-      addAgentLog('ASSISTANT', 'OpenRouter free TTS synthesized. No secret logged.');
-      res.writeHead(200);
-      res.end(
-        JSON.stringify({
-          audioBase64: audio.buffer.toString('base64'),
-          mimeType: audio.contentType || 'audio/mpeg',
-          model: audio.model,
-        })
-      );
-    } catch {
-      addAgentLog('ASSISTANT', 'OpenRouter TTS unavailable. No secret logged.');
-      res.writeHead(504);
-      res.end(JSON.stringify({ error: 'Speech timeout or provider error.' }));
-    }
-    return;
-  }
-
-  if (req.method === 'POST' && pathname === '/api/audio/transcribe') {
-    const body = await parseBody(req);
-    if (!body.audioBase64 || String(body.audioBase64).length > 2_000_000) {
-      res.writeHead(400);
-      res.end(JSON.stringify({ error: 'Invalid audio payload.' }));
-      return;
-    }
-
-    const whisperKey = process.env.WHISPER_API_KEY || process.env.OPENAI_API_KEY;
-    if (!whisperKey) {
-      addAgentLog('ASSISTANT', 'Whisper unavailable. No audio retained.');
-      res.writeHead(503);
-      res.end(JSON.stringify({ error: 'Transcription unavailable.' }));
-      return;
-    }
-
-    try {
-      const result = await transcribeWithWhisper(
-        body.audioBase64,
-        body.mimeType || 'audio/m4a',
-        body.language === 'no' ? 'no' : 'en',
-        whisperKey
-      );
-      addAgentLog('ASSISTANT', 'Audio transcribed. Recording discarded after processing.');
-      res.writeHead(200);
-      res.end(JSON.stringify({ transcript: result.text || '' }));
-    } catch {
-      addAgentLog('ASSISTANT', 'Whisper transcription failed. Recording discarded.');
-      res.writeHead(504);
-      res.end(JSON.stringify({ error: 'Transcription timeout or provider error.' }));
-    }
+  if (await tryHandleAgentApi(req, res, pathname)) {
     return;
   }
 
