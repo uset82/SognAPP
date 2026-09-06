@@ -12,6 +12,10 @@ let webPlayerUrl: string | null = null;
 const SILENT_WAV =
   'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 
+const SPEECH_RATE = 1.2;
+const SPEECH_VOLUME = 1;
+const SPEECH_PITCH = 1.05;
+
 const voiceLocale = (language: Language): string => (language === 'no' ? 'nb-NO' : 'en-US');
 
 const isWeb = (): boolean => Platform.OS === 'web' && typeof window !== 'undefined';
@@ -21,6 +25,39 @@ const getBrowserSynth = (): SpeechSynthesis | null => {
     return null;
   }
   return window.speechSynthesis;
+};
+
+const pickBrowserVoice = (synth: SpeechSynthesis, language: Language): SpeechSynthesisVoice | undefined => {
+  const voices = synth.getVoices();
+  if (voices.length === 0) {
+    return undefined;
+  }
+  const prefix = language === 'no' ? ['nb', 'no'] : ['en'];
+  const matches = voices.filter((voice) =>
+    prefix.some((item) => voice.lang.toLowerCase().startsWith(item))
+  );
+  const preferred =
+    language === 'no'
+      ? ['nora', 'henrik', 'norwegian']
+      : ['samantha', 'karen', 'moira', 'daniel', 'siri', 'google us english', 'enhanced'];
+  for (const name of preferred) {
+    const found = matches.find((voice) => voice.name.toLowerCase().includes(name));
+    if (found) {
+      return found;
+    }
+  }
+  return matches.find((voice) => voice.localService) ?? matches[0];
+};
+
+const applyUtteranceVoice = (utter: SpeechSynthesisUtterance, language: Language, synth: SpeechSynthesis): void => {
+  utter.lang = voiceLocale(language);
+  utter.rate = SPEECH_RATE;
+  utter.pitch = SPEECH_PITCH;
+  utter.volume = SPEECH_VOLUME;
+  const voice = pickBrowserVoice(synth, language);
+  if (voice) {
+    utter.voice = voice;
+  }
 };
 
 const getWebPlayer = (): HTMLAudioElement | null => {
@@ -109,13 +146,7 @@ export const speakImmediateCue = (language: Language): void => {
     return;
   }
   const utter = new SpeechSynthesisUtterance(language === 'no' ? 'OK.' : 'OK.');
-  utter.lang = voiceLocale(language);
-  utter.rate = 1;
-  const prefix = language === 'no' ? 'nb' : 'en';
-  const voice = synth.getVoices().find((item) => item.lang.toLowerCase().startsWith(prefix));
-  if (voice) {
-    utter.voice = voice;
-  }
+  applyUtteranceVoice(utter, language, synth);
   try {
     synth.speak(utter);
   } catch {
@@ -255,6 +286,7 @@ const playRemoteSpeech = async (text: string, language: Language): Promise<boole
   player.loop = false;
   player.muted = false;
   player.volume = 1;
+  player.playbackRate = 1.25;
   player.src = webPlayerUrl;
   const ended = waitForPlayer(player);
   try {
@@ -273,14 +305,7 @@ const speakWithBrowserNow = (text: string, language: Language): Promise<void> =>
     return Promise.resolve();
   }
   const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = voiceLocale(language);
-  utter.rate = 0.92;
-  utter.pitch = 1;
-  const prefix = language === 'no' ? 'nb' : 'en';
-  const voice = synth.getVoices().find((item) => item.lang.toLowerCase().startsWith(prefix));
-  if (voice) {
-    utter.voice = voice;
-  }
+  applyUtteranceVoice(utter, language, synth);
   const done = new Promise<void>((resolve) => {
     utter.onend = () => {
       browserUtterance = null;
@@ -311,25 +336,12 @@ export const speakText = async (
   state = 'speaking';
 
   if (isWeb()) {
-    if (options.fromUserGesture) {
-      const browserDone = speakWithBrowserNow(clean, language);
-      const remotePlayed = await playRemoteSpeech(clean, language);
-      if (remotePlayed) {
-        getBrowserSynth()?.cancel();
-        state = 'idle';
-        return;
-      }
-      await browserDone;
+    if (getBrowserSynth()) {
+      await speakWithBrowserNow(clean, language);
       state = 'idle';
       return;
     }
-
-    const remotePlayed = await playRemoteSpeech(clean, language);
-    if (remotePlayed) {
-      state = 'idle';
-      return;
-    }
-    await speakWithBrowserNow(clean, language);
+    await playRemoteSpeech(clean, language);
     state = 'idle';
     return;
   }
@@ -342,8 +354,9 @@ export const speakText = async (
   await new Promise<void>((resolve) => {
     Speech.speak(clean, {
       language: voiceLocale(language),
-      rate: 0.92,
-      pitch: 1,
+      rate: SPEECH_RATE,
+      pitch: SPEECH_PITCH,
+      volume: SPEECH_VOLUME,
       onDone: () => {
         state = 'idle';
         resolve();

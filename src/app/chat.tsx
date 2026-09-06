@@ -61,7 +61,9 @@ export default function ChatScreen() {
               contentContainerStyle={styles.threadInner}
               keyboardShouldPersistTaps="handled"
             >
-              <SuggestionChips chips={chat.chips} onSelect={(prompt) => void chat.askAssistant(prompt, 'typed')} />
+              {chat.messages.length === 0 ? (
+                <SuggestionChips chips={chat.chips} onSelect={(prompt) => void chat.askAssistant(prompt, 'typed')} />
+              ) : null}
               {chat.messages.map((message) => (
                 <ChatBubble key={message.id} message={message} />
               ))}
@@ -123,7 +125,7 @@ export default function ChatScreen() {
               ) : null}
             </ScrollView>
 
-            <Text style={styles.speakHint}>{chat.copy.speakHint}</Text>
+            {chat.messages.length === 0 ? <Text style={styles.speakHint}>{chat.copy.speakHint}</Text> : null}
             <View style={styles.composer}>
               <TextInput
                 value={chat.draft}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors, Touch, Typography } from '../../constants/theme';
 import { useEmergencyChat } from '../../hooks/useEmergencyChat';
@@ -13,7 +13,7 @@ import { HearAnswerBar } from './HearAnswerBar';
 export const HomeAssistantCard: React.FC = () => {
   const router = useRouter();
   const chat = useEmergencyChat({ maxChips: 2, includeHelpChip: false, homeChips: true });
-  const visible = chat.messages.slice(-4);
+  const visible = chat.messages.slice(-2);
 
   return (
     <GlassSurface tone="mint" glow="safe" style={styles.card}>
@@ -49,7 +49,12 @@ export const HomeAssistantCard: React.FC = () => {
         )}
       </View>
 
-      <View style={styles.thread} accessibilityRole="text">
+      <ScrollView
+        style={styles.thread}
+        contentContainerStyle={styles.threadInner}
+        nestedScrollEnabled
+        accessibilityRole="text"
+      >
         {visible.length === 0 ? (
           <ChatBubble
             message={{
@@ -73,11 +78,13 @@ export const HomeAssistantCard: React.FC = () => {
           cloudNotice={chat.usingCloudStt ? chat.copy.cloudSttNotice : undefined}
         />
         {chat.errorCode ? <Text style={styles.errorText}>{chat.errorCode}</Text> : null}
-      </View>
+      </ScrollView>
 
-      <SuggestionChips chips={chat.chips} onSelect={(prompt) => void chat.askAssistant(prompt, 'typed')} />
+      {chat.messages.length === 0 ? (
+        <SuggestionChips chips={chat.chips} onSelect={(prompt) => void chat.askAssistant(prompt, 'typed')} />
+      ) : null}
 
-      <Text style={styles.speakHint}>{chat.copy.speakHint}</Text>
+      {chat.messages.length === 0 ? <Text style={styles.speakHint}>{chat.copy.speakHint}</Text> : null}
       <View style={styles.composer}>
         <TextInput
           value={chat.draft}
@@ -155,8 +162,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   thread: {
-    maxHeight: 240,
+    maxHeight: 168,
+    overflow: 'hidden',
+  },
+  threadInner: {
     paddingTop: 8,
+    paddingBottom: 4,
   },
   errorText: {
     ...Typography.caption,
