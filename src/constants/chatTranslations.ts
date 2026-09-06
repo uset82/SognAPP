@@ -9,7 +9,9 @@ export interface ChatCopy {
   inputPlaceholder: string;
   send: string;
   microphone: string;
+  speakAction: string;
   stopListening: string;
+  speakHint: string;
   listening: string;
   transcribing: string;
   thinking: string;
@@ -48,8 +50,10 @@ export const chatCopy: Record<Language, ChatCopy> = {
     activeIncident: 'ACTIVE INCIDENT',
     inputPlaceholder: 'Ask a short question',
     send: 'Send',
-    microphone: 'Hold or tap to speak',
+    microphone: 'Tap to speak your question',
+    speakAction: 'SPEAK',
     stopListening: 'Stop listening',
+    speakHint: 'Tap SPEAK, say your question, then tap STOP. The assistant will answer out loud.',
     listening: 'LISTENING',
     transcribing: 'TRANSCRIBING',
     thinking: 'THINKING',
@@ -86,8 +90,10 @@ export const chatCopy: Record<Language, ChatCopy> = {
     activeIncident: 'AKTIV HENDELSE',
     inputPlaceholder: 'Still et kort spørsmål',
     send: 'Send',
-    microphone: 'Hold eller trykk for å snakke',
+    microphone: 'Trykk for å snakke spørsmålet',
+    speakAction: 'TALE',
     stopListening: 'Stopp lytting',
+    speakHint: 'Trykk TALE, si spørsmålet, deretter STOPP. Assistenten svarer høyt.',
     listening: 'LYTTER',
     transcribing: 'SKRIVER UT',
     thinking: 'TENKER',

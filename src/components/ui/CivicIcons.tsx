@@ -300,6 +300,22 @@ export const PhoneVibrateIcon: React.FC<IconProps> = ({
 );
 
 /**
+ * Microphone for push-to-talk
+ */
+export const MicrophoneIcon: React.FC<IconProps> = ({
+  size = 22,
+  color = '#FFFFFF',
+  strokeWidth = 2,
+}) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Rect x="9" y="3" width="6" height="11" rx="3" stroke={color} strokeWidth={strokeWidth} />
+    <Path d="M6 11C6 14.3137 8.68629 17 12 17C15.3137 17 18 14.3137 18 11" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M12 17V21" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    <Path d="M8 21H16" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+  </Svg>
+);
+
+/**
  * Speaker sound on Icon
  */
 export const SpeakerSoundIcon: React.FC<IconProps> = ({

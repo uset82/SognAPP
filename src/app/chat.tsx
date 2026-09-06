@@ -18,6 +18,7 @@ import { MedicalCrossIcon } from '../components/ui/CivicIcons';
 import { ChatBubble } from '../components/chat/ChatBubble';
 import { SuggestionChips } from '../components/chat/SuggestionChips';
 import { VoiceStatusBar } from '../components/chat/VoiceStatusBar';
+import { VoiceMicButton } from '../components/chat/VoiceMicButton';
 import { useEmergencyChat } from '../hooks/useEmergencyChat';
 
 export default function ChatScreen() {
@@ -121,6 +122,7 @@ export default function ChatScreen() {
               ) : null}
             </ScrollView>
 
+            <Text style={styles.speakHint}>{chat.copy.speakHint}</Text>
             <View style={styles.composer}>
               <TextInput
                 value={chat.draft}
@@ -140,29 +142,25 @@ export default function ChatScreen() {
               >
                 <Text style={styles.iconText}>{chat.copy.send}</Text>
               </Pressable>
-              <Pressable
-                onPress={() => void chat.handleMic()}
-                onLongPress={() => void chat.handleCancelVoice()}
-                style={[styles.micBtn, chat.voiceState === 'LISTENING' && styles.micLive]}
-                accessibilityRole="button"
+              <VoiceMicButton
+                voiceState={chat.voiceState}
+                speakLabel={chat.copy.speakAction}
+                stopLabel="STOP"
                 accessibilityLabel={
                   chat.voiceState === 'LISTENING' ? chat.copy.stopListening : chat.copy.microphone
                 }
-              >
-                <Text style={styles.micText}>{chat.voiceState === 'LISTENING' ? 'STOP' : 'MIC'}</Text>
-              </Pressable>
+                onPress={() => void chat.handleMic()}
+                onLongPress={() => void chat.handleCancelVoice()}
+              />
             </View>
 
             {chat.lastSpoken ? (
               <View style={styles.speechRow}>
-                <Pressable
+                <CivicButton
+                  title={chat.copy.replay}
+                  variant="outline-neutral"
                   onPress={chat.replayLast}
-                  style={styles.speechBtn}
-                  accessibilityRole="button"
-                  accessibilityLabel={chat.copy.replay}
-                >
-                  <Text style={styles.speechText}>{chat.copy.replay}</Text>
-                </Pressable>
+                />
                 <Pressable
                   onPress={() => void chat.stopSpeech()}
                   style={styles.speechBtn}
@@ -252,6 +250,12 @@ const styles = StyleSheet.create({
     ...Typography.subhead,
     color: Colors.safetyGreen,
   },
+  speakHint: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    paddingHorizontal: 16,
+    marginBottom: 6,
+  },
   composer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -288,27 +292,10 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: 12,
   },
-  micBtn: {
-    minHeight: Touch.minTarget,
-    minWidth: Touch.minTarget,
-    borderRadius: 24,
-    backgroundColor: Colors.textPrimary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  micLive: {
-    backgroundColor: Colors.emergencyRed,
-  },
-  micText: {
-    color: Colors.textOnColor,
-    fontWeight: '800',
-    fontSize: 11,
-  },
   speechRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     paddingHorizontal: 16,
     marginBottom: 8,
+    gap: 4,
   },
   speechBtn: {
     minHeight: Touch.minTarget,

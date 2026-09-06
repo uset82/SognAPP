@@ -93,6 +93,7 @@ const startNativeAppleSpeech = async (language: Language, native: NativeSpeechMo
         return;
       }
       session?.chunks.push(first.transcript);
+      listenCallbacks.onPartial?.(first.transcript);
       if (typeof first.confidence === 'number') {
         session!.confidence = first.confidence;
         lastConfidence = first.confidence;
@@ -104,7 +105,9 @@ const startNativeAppleSpeech = async (language: Language, native: NativeSpeechMo
   );
   session.subscriptions?.push(
     native.addListener('end', (() => {
-      session?.resolveStop?.(session.finalText || session.chunks.at(-1) || '');
+      const text = session?.finalText || session?.chunks.at(-1) || '';
+      session?.resolveStop?.(text);
+      listenCallbacks.onEnded?.(text);
     }) as (payload: never) => void)
   );
   session.subscriptions?.push(
@@ -122,8 +125,19 @@ const startNativeAppleSpeech = async (language: Language, native: NativeSpeechMo
   return 'apple-speech';
 };
 
-export const startListening = async (language: Language): Promise<SttProviderName> => {
+type ListenCallbacks = {
+  onPartial?: (text: string) => void;
+  onEnded?: (text: string) => void;
+};
+
+let listenCallbacks: ListenCallbacks = {};
+
+export const startListening = async (
+  language: Language,
+  callbacks: ListenCallbacks = {}
+): Promise<SttProviderName> => {
   lastConfidence = null;
+  listenCallbacks = callbacks;
   const native = getNativeSpeech();
   if (native?.isRecognitionAvailable()) {
     return startNativeAppleSpeech(language, native);
@@ -143,6 +157,7 @@ export const startListening = async (language: Language): Promise<SttProviderNam
       }
       const text = last[0].transcript;
       session?.chunks.push(text);
+      listenCallbacks.onPartial?.(text);
       if (typeof last[0].confidence === 'number') {
         session!.confidence = last[0].confidence;
         lastConfidence = last[0].confidence;
@@ -153,7 +168,9 @@ export const startListening = async (language: Language): Promise<SttProviderNam
     };
     recognition.onerror = () => undefined;
     recognition.onend = () => {
-      session?.resolveStop?.(session.finalText || session.chunks.at(-1) || '');
+      const text = session?.finalText || session?.chunks.at(-1) || '';
+      session?.resolveStop?.(text);
+      listenCallbacks.onEnded?.(text);
     };
     recognition.start();
     return 'apple-speech';
@@ -194,6 +211,7 @@ export const startListening = async (language: Language): Promise<SttProviderNam
 export const readPartialTranscript = (): string => session?.chunks.at(-1) || session?.finalText || '';
 
 export const cancelListening = async (): Promise<void> => {
+  listenCallbacks = {};
   session?.subscriptions?.forEach((sub) => sub.remove());
   if (session?.recognition) {
     session.recognition.abort();

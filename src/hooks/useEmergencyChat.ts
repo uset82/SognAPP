@@ -5,7 +5,7 @@ import { buildEmergencyAgentContext } from '../services/agentContext';
 import { runAgentPipeline } from '../services/agentPipeline';
 import { clearChatHistory, loadChatHistory, saveChatHistory } from '../services/chatHistory';
 import { cancelListening, readPartialTranscript, startListening, stopListening } from '../services/speechToText';
-import { speakText, stopSpeech } from '../services/textToSpeech';
+import { speakText, stopSpeech, unlockSpeechPlayback } from '../services/textToSpeech';
 import { triggerWarningHaptic } from '../services/haptics';
 import { AgentResponse, ChatMessage, ChatSource, VoiceSessionState } from '../types/chat';
 
@@ -43,7 +43,10 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
   const [usingCloudStt, setUsingCloudStt] = useState(false);
   const [historyReady, setHistoryReady] = useState(false);
   const voiceOriginRef = useRef(false);
+  const listeningRef = useRef(false);
+  const finishingRef = useRef(false);
   const partialTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const incidentId = incident?.id ?? null;
 
@@ -108,11 +111,20 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
     void saveChatHistory(incidentId, messages);
   }, [historyReady, incidentId, messages]);
 
+  const clearVoiceTimers = () => {
+    if (partialTimerRef.current) {
+      clearInterval(partialTimerRef.current);
+      partialTimerRef.current = null;
+    }
+    if (autoStopTimerRef.current) {
+      clearTimeout(autoStopTimerRef.current);
+      autoStopTimerRef.current = null;
+    }
+  };
+
   useEffect(() => {
     return () => {
-      if (partialTimerRef.current) {
-        clearInterval(partialTimerRef.current);
-      }
+      clearVoiceTimers();
     };
   }, []);
 
@@ -181,6 +193,7 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
 
   const askAssistant = useCallback(
     async (text: string, source: ChatSource) => {
+      unlockSpeechPlayback();
       const clean = text.trim();
       if (!clean) {
         setErrorCode(copy.notUnderstood);
@@ -234,9 +247,7 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
       setPendingAction(response.type === 'offer_help' || response.type === 'offer_safe' ? response : null);
       setLastSpoken(response.message);
 
-      const shouldSpeak =
-        response.speak && (voiceOriginRef.current || voicePref === false ? voiceOriginRef.current : false);
-      if (shouldSpeak) {
+      if (response.speak !== false && voicePref) {
         setVoiceState('SPEAKING');
         await speakText(response.message, language);
       }
@@ -246,30 +257,47 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
     [context, copy.notUnderstood, incidentId, language, messages, voicePref]
   );
 
+  const finishSpokenQuestion = useCallback(
+    async (text: string, provider: ChatSource) => {
+      if (finishingRef.current) {
+        return;
+      }
+      finishingRef.current = true;
+      listeningRef.current = false;
+      clearVoiceTimers();
+      setPartial('');
+      const clean = text.trim();
+      if (!clean) {
+        setErrorCode(copy.speechFailed);
+        setVoiceState('ERROR');
+        finishingRef.current = false;
+        return;
+      }
+      voiceOriginRef.current = true;
+      await askAssistant(clean, provider);
+      finishingRef.current = false;
+    },
+    [askAssistant, copy.speechFailed]
+  );
+
   const handleSend = useCallback(() => {
+    unlockSpeechPlayback();
     voiceOriginRef.current = false;
     void askAssistant(draft, 'typed');
   }, [askAssistant, draft]);
 
   const handleMic = useCallback(async () => {
-    if (voiceState === 'LISTENING') {
-      if (partialTimerRef.current) {
-        clearInterval(partialTimerRef.current);
-        partialTimerRef.current = null;
-      }
+    unlockSpeechPlayback();
+    if (listeningRef.current || voiceState === 'LISTENING') {
       setVoiceState('TRANSCRIBING');
       const result = await stopListening(language);
-      setPartial('');
       if (result.provider === 'whisper') {
         setUsingCloudStt(true);
       }
-      if (!result.text) {
-        setErrorCode(copy.speechFailed);
-        setVoiceState('ERROR');
-        return;
-      }
-      voiceOriginRef.current = true;
-      await askAssistant(result.text, result.provider === 'whisper' ? 'whisper' : 'apple-speech');
+      await finishSpokenQuestion(
+        result.text,
+        result.provider === 'whisper' ? 'whisper' : 'apple-speech'
+      );
       return;
     }
 
@@ -277,8 +305,18 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
     triggerWarningHaptic();
     setUsingCloudStt(false);
     setPartial('');
+    finishingRef.current = false;
     try {
-      const provider = await startListening(language);
+      const provider = await startListening(language, {
+        onPartial: setPartial,
+        onEnded: (text) => {
+          if (!listeningRef.current) {
+            return;
+          }
+          setVoiceState('TRANSCRIBING');
+          void finishSpokenQuestion(text, 'apple-speech');
+        },
+      });
       if (provider === 'none') {
         setErrorCode(copy.micUnavailable);
         setVoiceState('ERROR');
@@ -287,30 +325,38 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
       if (provider === 'whisper') {
         setUsingCloudStt(true);
       }
+      listeningRef.current = true;
       setVoiceState('LISTENING');
-      if (partialTimerRef.current) {
-        clearInterval(partialTimerRef.current);
-      }
+      clearVoiceTimers();
       partialTimerRef.current = setInterval(() => {
         setPartial(readPartialTranscript());
       }, 250);
-      setTimeout(() => {
-        if (partialTimerRef.current) {
-          clearInterval(partialTimerRef.current);
-          partialTimerRef.current = null;
+      autoStopTimerRef.current = setTimeout(() => {
+        if (!listeningRef.current) {
+          return;
         }
-      }, 12000);
+        setVoiceState('TRANSCRIBING');
+        void stopListening(language).then((result) => {
+          if (result.provider === 'whisper') {
+            setUsingCloudStt(true);
+          }
+          void finishSpokenQuestion(
+            result.text,
+            result.provider === 'whisper' ? 'whisper' : 'apple-speech'
+          );
+        });
+      }, 10000);
     } catch {
+      listeningRef.current = false;
       setErrorCode(copy.micUnavailable);
       setVoiceState('ERROR');
     }
-  }, [askAssistant, copy.micUnavailable, copy.speechFailed, language, voiceState]);
+  }, [copy.micUnavailable, finishSpokenQuestion, language, voiceState]);
 
   const handleCancelVoice = useCallback(async () => {
-    if (partialTimerRef.current) {
-      clearInterval(partialTimerRef.current);
-      partialTimerRef.current = null;
-    }
+    listeningRef.current = false;
+    finishingRef.current = false;
+    clearVoiceTimers();
     await cancelListening();
     await stopSpeech();
     setPartial('');
@@ -330,6 +376,7 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
     if (!lastSpoken) {
       return;
     }
+    unlockSpeechPlayback();
     voiceOriginRef.current = true;
     setVoicePref(true);
     void speakText(lastSpoken, language);
