@@ -1,11 +1,15 @@
+const { loadSimulatorEnv } = require('./loadEnv');
+loadSimulatorEnv();
+
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const path = require('path');
-const https = require('https');
 
 const PORT = process.env.PORT || 4000;
 const chatHits = new Map();
 const { transcribeWithWhisper } = require('./whisper');
+const { askAgentWithSdk, speakWithSdk, describeModels } = require('./openRouterBridge');
 
 // State store
 let state = {
@@ -331,7 +335,6 @@ const server = http.createServer(async (req, res) => {
     const context = body.context || {};
     const fallback = validateAgentResponse(answerQuestion(message, context));
     const apiKey = process.env.OPENROUTER_API_KEY;
-    const model = process.env.AGENT_MODEL || 'minimax/minimax-m3:free';
 
     if (!apiKey) {
       addAgentLog('ASSISTANT', 'Local verified-context answer (no OpenRouter key).');
@@ -341,71 +344,57 @@ const server = http.createServer(async (req, res) => {
     }
 
     try {
-      const { SOGN_SAFE_SYSTEM_PROMPT } = require('./agentPrompt');
-      const payload = JSON.stringify({
-        model,
-        messages: [
-          { role: 'system', content: SOGN_SAFE_SYSTEM_PROMPT },
-          { role: 'system', content: `Verified context JSON: ${JSON.stringify(context)}` },
-          ...((body.conversation || []).slice(-6).map((turn) => ({ role: turn.role, content: turn.text }))),
-          { role: 'user', content: message },
-        ],
+      const modelResult = await askAgentWithSdk({
+        message,
+        context,
+        conversation: body.conversation || [],
       });
-
-      const result = await new Promise((resolve, reject) => {
-        const request = https.request(
-          {
-            hostname: 'openrouter.ai',
-            path: '/api/v1/chat/completions',
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-              'Content-Type': 'application/json',
-              'Content-Length': Buffer.byteLength(payload),
-            },
-            timeout: 10000,
-          },
-          (upstream) => {
-            let data = '';
-            upstream.on('data', (chunk) => {
-              data += chunk;
-            });
-            upstream.on('end', () => resolve({ status: upstream.statusCode, data }));
-          }
-        );
-        request.on('error', reject);
-        request.on('timeout', () => {
-          request.destroy();
-          reject(new Error('timeout'));
-        });
-        request.write(payload);
-        request.end();
-      });
-
-      let parsed;
-      try {
-        parsed = JSON.parse(result.data);
-      } catch {
-        parsed = null;
-      }
-      const content = parsed?.choices?.[0]?.message?.content;
-      let modelJson = null;
-      if (typeof content === 'string') {
-        try {
-          modelJson = JSON.parse(content);
-        } catch {
-          const match = content.match(/\{[\s\S]*\}/);
-          modelJson = match ? JSON.parse(match[0]) : null;
-        }
-      }
-      const validated = validateAgentResponse(modelJson) || fallback;
-      addAgentLog('ASSISTANT', 'OpenRouter answer validated against allowed actions.');
+      const validated = validateAgentResponse(modelResult) || fallback;
+      addAgentLog('ASSISTANT', 'OpenRouter Agent SDK answer validated against allowed actions.');
       res.writeHead(200);
       res.end(JSON.stringify(validated));
     } catch {
       addAgentLog('ASSISTANT', 'OpenRouter unavailable. Local fallback used. No secret logged.');
       res.writeHead(200);
       res.end(JSON.stringify({ ...fallback, cached: true }));
+    }
+    return;
+  }
+
+  if (req.method === 'POST' && pathname === '/api/audio/speech') {
+    const body = await parseBody(req);
+    const text = typeof body.text === 'string' ? body.text.slice(0, 400) : '';
+    if (!text) {
+      res.writeHead(400);
+      res.end(JSON.stringify({ error: 'Missing text.' }));
+      return;
+    }
+    if (!process.env.OPENROUTER_API_KEY) {
+      res.writeHead(503);
+      res.end(JSON.stringify({ error: 'Speech unavailable.' }));
+      return;
+    }
+
+    try {
+      const audio = await speakWithSdk(text, body.language === 'no' ? 'no' : 'en');
+      if (!audio) {
+        res.writeHead(502);
+        res.end(JSON.stringify({ error: 'Speech provider unavailable.' }));
+        return;
+      }
+      addAgentLog('ASSISTANT', 'OpenRouter free TTS synthesized. No secret logged.');
+      res.writeHead(200);
+      res.end(
+        JSON.stringify({
+          audioBase64: audio.buffer.toString('base64'),
+          mimeType: audio.contentType || 'audio/mpeg',
+          model: audio.model,
+        })
+      );
+    } catch {
+      addAgentLog('ASSISTANT', 'OpenRouter TTS unavailable. No secret logged.');
+      res.writeHead(504);
+      res.end(JSON.stringify({ error: 'Speech timeout or provider error.' }));
     }
     return;
   }
@@ -459,4 +448,12 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`[SOGN SAFE Simulator API] Running at http://localhost:${PORT}`);
   console.log(`[SOGN SAFE Web Dashboard] Available at http://localhost:${PORT}/simulator`);
+  void describeModels().then((models) => {
+    if (process.env.OPENROUTER_API_KEY) {
+      console.log(`[OpenRouter] Agent SDK ready. Chat: ${models.chat.join(', ')}`);
+      console.log(`[OpenRouter] Free TTS: ${models.tts.join(', ')}`);
+    } else {
+      console.log('[OpenRouter] No API key. Local verified-context assistant only.');
+    }
+  });
 });

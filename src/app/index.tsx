@@ -40,6 +40,7 @@ export default function ReadyScreen() {
     incident,
     isDegradedConnection,
     triggerFlamScenario,
+    clearScenario,
     language,
     setLanguage,
     t,
@@ -208,11 +209,19 @@ export default function ReadyScreen() {
           <GlassSurface tone="neutral" style={styles.training}>
             <View style={styles.trainingInner}>
               <Text style={styles.trainingLabel}>{t.trainingControls}</Text>
-              <CivicButton
-                title={t.simulateFlam}
-                variant="primary-emergency"
-                onPress={handleStartFlam}
-              />
+              {hasActiveIncident ? (
+                <CivicButton
+                  title={language === 'no' ? 'AVSLUTT SIMULERING / ALT KLART' : 'END SIMULATION / ALL CLEAR'}
+                  variant="outline-emergency"
+                  onPress={clearScenario}
+                />
+              ) : (
+                <CivicButton
+                  title={t.simulateFlam}
+                  variant="primary-emergency"
+                  onPress={handleStartFlam}
+                />
+              )}
               <Text style={styles.disclaimer}>{t.trainingDisclaimer}</Text>
             </View>
           </GlassSurface>

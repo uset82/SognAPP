@@ -71,6 +71,37 @@ export const requestAgentChat = async (
   }
 };
 
+export const requestAgentSpeech = async (
+  text: string,
+  language: 'en' | 'no'
+): Promise<{ audioBase64: string; mimeType: string } | null> => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch(`${getSimulatorServerUrl()}/api/audio/speech`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.slice(0, 400), language }),
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      return null;
+    }
+    const data = (await response.json()) as { audioBase64?: string; mimeType?: string };
+    if (!data.audioBase64) {
+      return null;
+    }
+    return {
+      audioBase64: data.audioBase64,
+      mimeType: data.mimeType || 'audio/mpeg',
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
 export const transcribeAudioOnBackend = async (
   audioBase64: string,
   mimeType: string,

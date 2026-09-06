@@ -8,7 +8,7 @@ console.log('--- SOGN SAFE END-TO-END DEMO TEST SUITE ---');
 
 // Start server in background with TEST_PORT
 const serverProcess = spawn('node', ['simulator/server.js'], {
-  env: { ...process.env, PORT: String(TEST_PORT) },
+  env: { ...process.env, PORT: String(TEST_PORT), OPENROUTER_API_KEY: '' },
   stdio: 'pipe',
 });
 

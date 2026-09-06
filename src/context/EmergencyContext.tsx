@@ -203,12 +203,8 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (storedLang === 'en' || storedLang === 'no') {
           setLanguageState(storedLang);
         }
-        const storedIncident = await AsyncStorage.getItem('@sogn_safe_cached_incident');
-        if (storedIncident) {
-          const parsed = JSON.parse(storedIncident);
-          setIncident(parsed);
-          setHasActiveIncident(true);
-        }
+        // Start fresh in calm SAFE / READY mode by default (no active alert in the beginning).
+        await AsyncStorage.removeItem('@sogn_safe_cached_incident').catch(() => undefined);
         const storedZone = await AsyncStorage.getItem('@sogn_safe_selected_zone');
         if (storedZone) {
           setSelectedZoneId(storedZone);

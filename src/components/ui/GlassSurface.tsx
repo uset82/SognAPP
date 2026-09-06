@@ -71,10 +71,11 @@ export const GlassSurface: React.FC<GlassSurfaceProps> = ({
               {
                 backgroundColor: fill,
                 ...({
-                  backdropFilter: `saturate(140%) blur(${Math.min(blur, 14)}px)`,
-                  WebkitBackdropFilter: `saturate(140%) blur(${Math.min(blur, 14)}px)`,
+                  backdropFilter: `saturate(130%) blur(${Math.min(blur, 8)}px)`,
+                  WebkitBackdropFilter: `saturate(130%) blur(${Math.min(blur, 8)}px)`,
                   transform: 'translateZ(0)',
                   WebkitTransform: 'translateZ(0)',
+                  contain: 'paint',
                 } as ViewStyle),
               },
             ]}

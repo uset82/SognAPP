@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Platform, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Path, Circle, Rect, Line, Defs, LinearGradient, Stop, G } from 'react-native-svg';
 import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
 import { SafeZone } from '../../types/incident';
@@ -175,11 +175,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
+    ...(Platform.OS === 'web'
+      ? ({
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)',
+          contain: 'paint',
+        } as any)
+      : null),
   },
   mapCanvas: {
     height: 200,
     backgroundColor: '#F5F6F4',
     position: 'relative',
+    ...(Platform.OS === 'web'
+      ? ({
+          transform: 'translateZ(0)',
+          WebkitTransform: 'translateZ(0)',
+        } as any)
+      : null),
   },
   waterLabel: {
     position: 'absolute',
