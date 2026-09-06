@@ -5,7 +5,7 @@ import { buildEmergencyAgentContext } from '../services/agentContext';
 import { runAgentPipeline } from '../services/agentPipeline';
 import { clearChatHistory, loadChatHistory, saveChatHistory } from '../services/chatHistory';
 import { cancelListening, readPartialTranscript, startListening, stopListening } from '../services/speechToText';
-import { speakText, stopSpeech, unlockSpeechPlayback } from '../services/textToSpeech';
+import { hushOutput, speakImmediateCue, speakText, stopSpeech, unlockSpeechPlayback } from '../services/textToSpeech';
 import { triggerWarningHaptic } from '../services/haptics';
 import { AgentResponse, ChatMessage, ChatSource, VoiceSessionState } from '../types/chat';
 
@@ -194,6 +194,9 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
   const askAssistant = useCallback(
     async (text: string, source: ChatSource) => {
       unlockSpeechPlayback();
+      if (source === 'typed') {
+        speakImmediateCue(language);
+      }
       const clean = text.trim();
       if (!clean) {
         setErrorCode(copy.notUnderstood);
@@ -281,7 +284,6 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
   );
 
   const handleSend = useCallback(() => {
-    unlockSpeechPlayback();
     voiceOriginRef.current = false;
     void askAssistant(draft, 'typed');
   }, [askAssistant, draft]);
@@ -301,7 +303,7 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
       return;
     }
 
-    await stopSpeech();
+    hushOutput();
     triggerWarningHaptic();
     setUsingCloudStt(false);
     setPartial('');
@@ -376,10 +378,11 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
     if (!lastSpoken) {
       return;
     }
+    unlockSpeechPlayback();
     voiceOriginRef.current = true;
     setVoicePref(true);
     setVoiceState('SPEAKING');
-    void speakText(lastSpoken, language).finally(() => {
+    void speakText(lastSpoken, language, { fromUserGesture: true }).finally(() => {
       setVoiceState('IDLE');
     });
   }, [language, lastSpoken]);

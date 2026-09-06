@@ -6,6 +6,7 @@ import { useEmergencyChat } from '../../hooks/useEmergencyChat';
 import { GlassSurface } from '../ui/GlassSurface';
 import { VoiceStatusBar } from './VoiceStatusBar';
 import { VoiceMicButton } from './VoiceMicButton';
+import { HearAnswerBar } from './HearAnswerBar';
 
 interface AskDockProps {
   /** Called before navigating to full chat (e.g. stop alert sound). */
@@ -100,6 +101,13 @@ export const AskDock: React.FC<AskDockProps> = ({ onOpenChat }) => {
           onLongPress={() => void chat.handleCancelVoice()}
         />
       </View>
+      <HearAnswerBar
+        visible={Boolean(chat.lastSpoken)}
+        replayLabel={chat.copy.replay}
+        stopLabel={chat.copy.stopSpeech}
+        onReplay={chat.replayLast}
+        onStop={() => void chat.stopSpeech()}
+      />
     </GlassSurface>
   );
 };

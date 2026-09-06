@@ -8,6 +8,7 @@ import { ChatBubble } from './ChatBubble';
 import { SuggestionChips } from './SuggestionChips';
 import { VoiceStatusBar } from './VoiceStatusBar';
 import { VoiceMicButton } from './VoiceMicButton';
+import { HearAnswerBar } from './HearAnswerBar';
 
 export const HomeAssistantCard: React.FC = () => {
   const router = useRouter();
@@ -107,6 +108,13 @@ export const HomeAssistantCard: React.FC = () => {
           onLongPress={() => void chat.handleCancelVoice()}
         />
       </View>
+      <HearAnswerBar
+        visible={Boolean(chat.lastSpoken)}
+        replayLabel={chat.copy.replay}
+        stopLabel={chat.copy.stopSpeech}
+        onReplay={chat.replayLast}
+        onStop={() => void chat.stopSpeech()}
+      />
     </GlassSurface>
   );
 };

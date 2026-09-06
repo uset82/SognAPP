@@ -19,6 +19,7 @@ import { ChatBubble } from '../components/chat/ChatBubble';
 import { SuggestionChips } from '../components/chat/SuggestionChips';
 import { VoiceStatusBar } from '../components/chat/VoiceStatusBar';
 import { VoiceMicButton } from '../components/chat/VoiceMicButton';
+import { HearAnswerBar } from '../components/chat/HearAnswerBar';
 import { useEmergencyChat } from '../hooks/useEmergencyChat';
 
 export default function ChatScreen() {
@@ -154,23 +155,13 @@ export default function ChatScreen() {
               />
             </View>
 
-            {chat.lastSpoken ? (
-              <View style={styles.speechRow}>
-                <CivicButton
-                  title={chat.copy.replay}
-                  variant="outline-neutral"
-                  onPress={chat.replayLast}
-                />
-                <Pressable
-                  onPress={() => void chat.stopSpeech()}
-                  style={styles.speechBtn}
-                  accessibilityRole="button"
-                  accessibilityLabel={chat.copy.stopSpeech}
-                >
-                  <Text style={styles.speechText}>{chat.copy.stopSpeech}</Text>
-                </Pressable>
-              </View>
-            ) : null}
+            <HearAnswerBar
+              visible={Boolean(chat.lastSpoken)}
+              replayLabel={chat.copy.replay}
+              stopLabel={chat.copy.stopSpeech}
+              onReplay={chat.replayLast}
+              onStop={() => void chat.stopSpeech()}
+            />
 
             <View style={styles.help}>
               <CivicButton
@@ -291,19 +282,6 @@ const styles = StyleSheet.create({
     color: Colors.textOnColor,
     fontWeight: '800',
     fontSize: 12,
-  },
-  speechRow: {
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    gap: 4,
-  },
-  speechBtn: {
-    minHeight: Touch.minTarget,
-    justifyContent: 'center',
-  },
-  speechText: {
-    ...Typography.subhead,
-    color: Colors.safetyGreen,
   },
   help: {
     paddingHorizontal: 16,
