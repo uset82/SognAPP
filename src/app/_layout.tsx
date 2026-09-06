@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { EmergencyProvider, useEmergency } from '../context/EmergencyContext';
 import { Colors } from '../constants/theme';
 import { WELCOME_SEEN_KEY } from '../constants/storage';
+import { WebAppShell } from '../components/ui/WebAppShell';
 import { registerNotificationListeners } from '../services/notificationService';
 
 function AppNavigation() {
@@ -69,11 +70,13 @@ function AppNavigation() {
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider style={{ backgroundColor: Colors.canvas }}>
-      <EmergencyProvider>
-        <StatusBar style="dark" />
-        <AppNavigation />
-      </EmergencyProvider>
-    </SafeAreaProvider>
+    <WebAppShell>
+      <SafeAreaProvider style={{ flex: 1, height: '100%', backgroundColor: Colors.canvas }}>
+        <EmergencyProvider>
+          <StatusBar style="dark" />
+          <AppNavigation />
+        </EmergencyProvider>
+      </SafeAreaProvider>
+    </WebAppShell>
   );
 }

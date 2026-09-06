@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -14,6 +14,15 @@ interface ScreenEnterProps {
 
 export const ScreenEnter: React.FC<ScreenEnterProps> = ({ children }) => {
   const reduced = usePrefersReducedMotion();
+
+  if (Platform.OS === 'web') {
+    return <View style={styles.fill}>{children}</View>;
+  }
+
+  return <NativeEnter reduced={reduced}>{children}</NativeEnter>;
+};
+
+const NativeEnter: React.FC<ScreenEnterProps & { reduced: boolean }> = ({ children, reduced }) => {
   const opacity = useSharedValue(reduced ? 1 : 0);
   const translateY = useSharedValue(reduced ? 0 : Motion.translateY);
 
