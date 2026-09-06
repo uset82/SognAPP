@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Colors, Spacing, Typography, BorderRadius } from '../../constants/theme';
+import { BorderRadius, Colors, Spacing, Touch, Typography } from '../../constants/theme';
 import { useEmergency } from '../../context/EmergencyContext';
 import { AppModal } from '../ui/AppModal';
 
@@ -176,7 +176,7 @@ export const ReadinessModal: React.FC<ReadinessModalProps> = ({ visible, onClose
                     )}
                   </View>
                   <View style={styles.itemContent}>
-                    <Text style={[styles.itemTitle, isChecked && styles.itemTitleChecked]}>
+                    <Text style={styles.itemTitle}>
                       {isNorwegian ? item.titleNo : item.titleEn}
                     </Text>
                     <Text style={styles.itemDesc}>
@@ -250,10 +250,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalCategory: {
-    ...Typography.caption,
-    color: Colors.textMuted,
+    ...Typography.meta,
+    color: Colors.textSecondary,
     letterSpacing: 1,
-    fontSize: 10,
+    fontSize: 12,
+    fontWeight: '700',
   },
   modalTitle: {
     ...Typography.headline,
@@ -264,17 +265,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: BorderRadius.sm,
-    backgroundColor: Colors.surfaceRaised,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    minHeight: 44,
+    backgroundColor: Colors.surface,
+    borderWidth: 1.5,
+    borderColor: Colors.textPrimary,
+    minHeight: Touch.minTarget,
+    minWidth: Touch.minTarget,
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeBtnText: {
-    ...Typography.caption,
+    ...Typography.subhead,
     color: Colors.textPrimary,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   scrollContent: {
     padding: Spacing.md,
@@ -307,7 +309,7 @@ const styles = StyleSheet.create({
   progressBarTrack: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.surfaceRaised,
+    backgroundColor: Colors.border,
     overflow: 'hidden',
     marginBottom: Spacing.sm,
   },
@@ -316,18 +318,19 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.safetyGreen,
   },
   progressHint: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    lineHeight: 18,
+    ...Typography.body,
+    color: Colors.textSecondary,
+    lineHeight: 20,
   },
   listSection: {
     marginBottom: Spacing.xl,
   },
   sectionHeading: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    letterSpacing: 1,
+    ...Typography.subhead,
+    color: Colors.textPrimary,
+    letterSpacing: 0.8,
     marginBottom: Spacing.sm,
+    fontWeight: '800',
   },
   itemCard: {
     flexDirection: 'row',
@@ -341,15 +344,15 @@ const styles = StyleSheet.create({
     minHeight: 64,
   },
   itemCardChecked: {
-    borderColor: Colors.safetyGreenBorder,
-    backgroundColor: 'rgba(16, 36, 26, 0.4)',
+    borderColor: Colors.safetyGreen,
+    backgroundColor: Colors.safetyGreenBg,
   },
   checkboxBox: {
-    width: 24,
-    height: 24,
+    width: 28,
+    height: 28,
     borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: Colors.borderLight,
+    borderWidth: 2,
+    borderColor: Colors.textPrimary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: Spacing.md,
@@ -375,16 +378,15 @@ const styles = StyleSheet.create({
   itemTitle: {
     ...Typography.subhead,
     color: Colors.textPrimary,
-    fontSize: 14,
-  },
-  itemTitleChecked: {
-    color: Colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '700',
   },
   itemDesc: {
-    ...Typography.caption,
-    color: Colors.textMuted,
+    ...Typography.body,
+    color: Colors.textSecondary,
     marginTop: 4,
-    lineHeight: 18,
+    lineHeight: 21,
   },
   emergencyDisclaimerCard: {
     backgroundColor: Colors.surfaceRaised,
@@ -394,10 +396,10 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
   },
   disclaimerTitle: {
-    ...Typography.caption,
-    color: Colors.textSecondary,
-    fontWeight: '700',
-    letterSpacing: 0.8,
+    ...Typography.subhead,
+    color: Colors.textPrimary,
+    fontWeight: '800',
+    letterSpacing: 0.6,
     marginBottom: Spacing.sm,
   },
   numberRow: {
@@ -423,14 +425,14 @@ const styles = StyleSheet.create({
   },
   numberSub: {
     ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 10,
+    color: Colors.textPrimary,
+    fontSize: 12,
+    fontWeight: '600',
     marginTop: 2,
   },
   disclaimerNote: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    fontSize: 11,
-    lineHeight: 16,
+    ...Typography.body,
+    color: Colors.textSecondary,
+    lineHeight: 20,
   },
 });
