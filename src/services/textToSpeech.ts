@@ -12,7 +12,7 @@ let webPlayerUrl: string | null = null;
 const SILENT_WAV =
   'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 
-const SPEECH_RATE = 1.2;
+const SPEECH_RATE = 1;
 const SPEECH_VOLUME = 1;
 const SPEECH_PITCH = 1.05;
 
@@ -286,7 +286,7 @@ const playRemoteSpeech = async (text: string, language: Language): Promise<boole
   player.loop = false;
   player.muted = false;
   player.volume = 1;
-  player.playbackRate = 1.25;
+  player.playbackRate = 1;
   player.src = webPlayerUrl;
   const ended = waitForPlayer(player);
   try {
