@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
@@ -15,6 +15,7 @@ import {
   GlassSurface,
   MedicalCrossIcon,
   ScreenEnter,
+  ScreenScroll,
   ShelterGroupIcon,
   TimestampMeta,
   UpArrowNavIcon,
@@ -86,7 +87,7 @@ export default function EvacuateScreen() {
     <SafeAreaView style={styles.safeArea}>
       <CivicAtmosphere>
       <ScreenEnter>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScreenScroll contentContainerStyle={styles.container}>
           <AppChrome
             title={t.brandTitle}
             compact
@@ -180,7 +181,7 @@ export default function EvacuateScreen() {
             mode="official"
             style={styles.footer}
           />
-        </ScrollView>
+        </ScreenScroll>
       </ScreenEnter>
       </CivicAtmosphere>
     </SafeAreaView>

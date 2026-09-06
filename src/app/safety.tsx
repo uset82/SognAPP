@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
@@ -14,6 +14,7 @@ import {
   ClockIcon,
   MetricPill,
   ScreenEnter,
+  ScreenScroll,
   ShieldCheckBadge,
   ShieldCheckIcon,
   StatusHero,
@@ -43,7 +44,7 @@ export default function FindSafetyScreen() {
     <SafeAreaView style={styles.safeArea}>
       <CivicAtmosphere>
       <ScreenEnter>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScreenScroll contentContainerStyle={styles.container}>
           <AppChrome
             title={t.brandTitle}
             subtitle={t.civilianApp}
@@ -111,7 +112,7 @@ export default function FindSafetyScreen() {
             mode="official"
             style={styles.footer}
           />
-        </ScrollView>
+        </ScreenScroll>
       </ScreenEnter>
       </CivicAtmosphere>
     </SafeAreaView>

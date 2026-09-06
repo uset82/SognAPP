@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
@@ -13,6 +13,7 @@ import {
   MedicalCrossIcon,
   PhoneVibrateIcon,
   ScreenEnter,
+  ScreenScroll,
   ShieldCheckIcon,
   SpeakerSoundIcon,
   StatusHero,
@@ -66,7 +67,7 @@ export default function AlertScreen() {
     <SafeAreaView style={styles.safeArea}>
       <CivicAtmosphere mood="alert">
       <ScreenEnter>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScreenScroll contentContainerStyle={styles.container}>
           <AppChrome title={t.brandTitle} centered compact onBack={handleBackHome} backLabel={t.backToHome} />
 
           {isDegradedConnection ? (
@@ -144,7 +145,7 @@ export default function AlertScreen() {
             <Text style={styles.agency}>{t.coordinatingAgency}</Text>
             <Text style={styles.proto}>{t.fictionalPrototype}</Text>
           </View>
-        </ScrollView>
+        </ScreenScroll>
       </ScreenEnter>
       </CivicAtmosphere>
     </SafeAreaView>

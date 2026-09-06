@@ -22,6 +22,7 @@ const MIME_TYPES = {
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
+  '.wav': 'audio/wav',
 };
 
 function serveFile(res, filePath) {
@@ -52,6 +53,29 @@ function serveFile(res, filePath) {
 
     const stream = fs.createReadStream(filePath);
     stream.pipe(res);
+  });
+}
+
+function ensureDistThenListen() {
+  const indexPath = path.join(DIST_DIR, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    listen();
+    return;
+  }
+
+  const { spawn } = require('child_process');
+  console.log('[SOGN SAFE] dist/ missing — running expo export -p web');
+  const child = spawn('npx', ['expo', 'export', '-p', 'web'], {
+    stdio: 'inherit',
+    shell: true,
+    cwd: __dirname,
+  });
+  child.on('exit', (code) => {
+    if (code !== 0) {
+      console.error('[SOGN SAFE] expo export failed');
+      process.exit(code || 1);
+    }
+    listen();
   });
 }
 
@@ -91,6 +115,10 @@ const server = http.createServer((req, res) => {
   serveFile(res, path.join(DIST_DIR, 'index.html'));
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`[SOGN SAFE] Production Web Server listening on port ${PORT}`);
-});
+function listen() {
+  server.listen(PORT, '0.0.0.0', () => {
+    console.log(`[SOGN SAFE] Production Web Server listening on port ${PORT}`);
+  });
+}
+
+ensureDistThenListen();

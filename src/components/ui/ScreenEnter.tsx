@@ -47,5 +47,6 @@ const NativeEnter: React.FC<ScreenEnterProps & { reduced: boolean }> = ({ childr
 const styles = StyleSheet.create({
   fill: {
     flex: 1,
+    minHeight: 0,
   },
 });

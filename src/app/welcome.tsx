@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +14,7 @@ import {
   GlassSurface,
   LanguageSheet,
   ScreenEnter,
+  ScreenScroll,
 } from '../components/ui';
 import { CircularIconContainer, GlobeGridIcon, ShieldCheckIcon } from '../components/ui/CivicIcons';
 import { requestNotificationPermissions } from '../services/notificationService';
@@ -32,8 +33,10 @@ export default function WelcomeScreen() {
 
   const handleContinue = async () => {
     await AsyncStorage.setItem(WELCOME_SEEN_KEY, '1');
-    await requestNotificationPermissions();
-    await refreshPermissions();
+    if (Platform.OS !== 'web') {
+      await requestNotificationPermissions();
+      await refreshPermissions();
+    }
     router.replace('/');
   };
 
@@ -41,7 +44,7 @@ export default function WelcomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <CivicAtmosphere>
         <ScreenEnter>
-          <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+          <ScreenScroll contentContainerStyle={styles.container}>
             <AppChrome
               title={t.brandTitle}
               centered
@@ -100,7 +103,7 @@ export default function WelcomeScreen() {
                 }}
               />
             </View>
-          </ScrollView>
+          </ScreenScroll>
         </ScreenEnter>
       </CivicAtmosphere>
 
@@ -121,10 +124,11 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    minHeight: 0,
     backgroundColor: Colors.canvas,
   },
   container: {
-    paddingBottom: 40,
+    paddingBottom: 88,
   },
   hero: {
     alignItems: 'center',

@@ -46,6 +46,7 @@ export const CivicAtmosphere: React.FC<CivicAtmosphereProps> = ({
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    minHeight: 0,
     overflow: 'hidden',
   },
   orb: {

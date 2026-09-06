@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import { Colors, Spacing } from '../constants/theme';
-import { CivicButton, GlassSurface, ScreenEnter, StatusBanner } from '../components/ui';
+import { CivicButton, GlassSurface, ScreenEnter, ScreenScroll, StatusBanner } from '../components/ui';
 import {
   getCachedPushToken,
   openDeviceSettings,
@@ -68,7 +68,7 @@ export default function PermissionsScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScreenEnter>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScreenScroll contentContainerStyle={styles.container}>
           <Text style={styles.brand}>{t.brandTitle}</Text>
           <Text style={styles.heading}>{t.permissionsHeading}</Text>
           <Text style={styles.lead}>{t.permissionsLead}</Text>
@@ -130,7 +130,7 @@ export default function PermissionsScreen() {
               />
             ) : null}
           </View>
-        </ScrollView>
+        </ScreenScroll>
       </ScreenEnter>
     </SafeAreaView>
   );

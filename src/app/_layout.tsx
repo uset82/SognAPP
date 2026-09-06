@@ -52,7 +52,7 @@ function AppNavigation() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: Colors.canvasMint },
+        contentStyle: { flex: 1, minHeight: 0, backgroundColor: Colors.canvasMint },
         animation: 'fade',
       }}
     >
@@ -71,7 +71,7 @@ function AppNavigation() {
 export default function RootLayout() {
   return (
     <WebAppShell>
-      <SafeAreaProvider style={{ flex: 1, height: '100%', backgroundColor: Colors.canvas }}>
+      <SafeAreaProvider style={{ flex: 1, minHeight: 0, height: '100%', backgroundColor: Colors.canvas }}>
         <EmergencyProvider>
           <StatusBar style="dark" />
           <AppNavigation />

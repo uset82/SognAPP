@@ -33,10 +33,12 @@ export const WebAppShell: React.FC<WebAppShellProps> = ({ children }) => {
 const styles = StyleSheet.create({
   fill: {
     flex: 1,
+    minHeight: 0,
     height: '100%',
   },
   stage: {
     flex: 1,
+    minHeight: 0,
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',

@@ -11,8 +11,13 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <style
           dangerouslySetInnerHTML={{
             __html: `
-              html, body, #root { height: 100%; }
-              body { margin: 0; background: #1A2320; }
+              html, body, #root {
+                height: 100%;
+                height: 100dvh;
+                max-height: 100dvh;
+              }
+              html, body { margin: 0; overflow: hidden; background: #1A2320; }
+              #root { display: flex; flex-direction: column; min-height: 0; }
             `,
           }}
         />

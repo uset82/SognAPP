@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
@@ -13,6 +13,7 @@ import {
   GlassSurface,
   LanguageSheet,
   ScreenEnter,
+  ScreenScroll,
   StatusHero,
   TimestampMeta,
 } from '../components/ui';
@@ -36,6 +37,7 @@ export default function ReadyScreen() {
   const router = useRouter();
   const {
     hasActiveIncident,
+    incident,
     isDegradedConnection,
     triggerFlamScenario,
     language,
@@ -64,7 +66,7 @@ export default function ReadyScreen() {
     <SafeAreaView style={styles.safeArea}>
       <CivicAtmosphere>
       <ScreenEnter>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScreenScroll contentContainerStyle={styles.container}>
           <AppChrome title={t.brandTitle} subtitle={t.civilianApp} district={t.districtName} />
 
           {isDegradedConnection ? (
@@ -99,10 +101,16 @@ export default function ReadyScreen() {
           ) : null}
 
           <StatusHero
-            variant="safe"
-            title={t.safeTitle}
-            subtitle={t.safeSubtitle}
-            icon={<ShieldCheckBadge size={54} badgeColor={Colors.safetyGreen} checkColor={Colors.textOnColor} />}
+            variant={hasActiveIncident ? 'alert' : 'safe'}
+            title={hasActiveIncident ? t.alertTitle : t.safeTitle}
+            subtitle={hasActiveIncident ? (incident?.title || t.alertDefaultIncident) : t.safeSubtitle}
+            icon={
+              hasActiveIncident ? (
+                <AlertTriangleSolidIcon size={32} color={Colors.textOnColor} />
+              ) : (
+                <ShieldCheckBadge size={54} badgeColor={Colors.safetyGreen} checkColor={Colors.textOnColor} />
+              )
+            }
           />
 
           <View style={styles.mapWrap}>
@@ -198,7 +206,7 @@ export default function ReadyScreen() {
               <Text style={styles.disclaimer}>{t.trainingDisclaimer}</Text>
             </View>
           </GlassSurface>
-        </ScrollView>
+        </ScreenScroll>
       </ScreenEnter>
       </CivicAtmosphere>
 
@@ -222,10 +230,11 @@ export default function ReadyScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    minHeight: 0,
     backgroundColor: Colors.canvas,
   },
   container: {
-    paddingBottom: 40,
+    paddingBottom: 88,
   },
   banner: {
     marginHorizontal: 16,

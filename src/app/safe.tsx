@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
 import { Colors } from '../constants/theme';
-import { AppChrome, CivicAtmosphere, CivicButton, GlassSurface, ScreenEnter, ShieldCheckBadge } from '../components/ui';
+import { AppChrome, CivicAtmosphere, CivicButton, GlassSurface, ScreenEnter, ScreenScroll, ShieldCheckBadge } from '../components/ui';
 
 export default function SafeConfirmationScreen() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export default function SafeConfirmationScreen() {
     <SafeAreaView style={styles.safeArea}>
       <CivicAtmosphere>
       <ScreenEnter>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScreenScroll contentContainerStyle={styles.container}>
           <AppChrome title={t.brandTitle} centered compact />
           <View style={styles.content}>
             <ShieldCheckBadge size={72} badgeColor={Colors.safetyGreen} checkColor={Colors.textOnColor} />
@@ -52,7 +52,7 @@ export default function SafeConfirmationScreen() {
             onPress={handleReturnHome}
             style={styles.cta}
           />
-        </ScrollView>
+        </ScreenScroll>
       </ScreenEnter>
       </CivicAtmosphere>
     </SafeAreaView>

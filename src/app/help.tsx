@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEmergency } from '../context/EmergencyContext';
 import { HelpCondition } from '../types/incident';
 import { conditionLabel } from '../constants/translations';
 import { BorderRadius, Colors, Spacing, Touch, Typography } from '../constants/theme';
-import { CivicAtmosphere, CivicButton, GlassSurface, ScreenEnter } from '../components/ui';
+import { CivicAtmosphere, CivicButton, GlassSurface, ScreenEnter, ScreenScroll } from '../components/ui';
 
 const CONDITIONS: HelpCondition[] = [
   'I_AM_INJURED',
@@ -37,7 +37,7 @@ export default function HelpScreen() {
       <SafeAreaView style={styles.safeArea}>
         <CivicAtmosphere mood="alert">
         <ScreenEnter>
-          <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+          <ScreenScroll contentContainerStyle={styles.container}>
             <GlassSurface tone={isAcknowledged ? 'mint' : 'neutral'} glow={isAcknowledged ? 'safe' : 'none'}>
               <View style={styles.statusBox}>
                 <Text style={styles.statusHeadline}>
@@ -65,7 +65,7 @@ export default function HelpScreen() {
               onPress={() => router.back()}
               style={styles.topGap}
             />
-          </ScrollView>
+          </ScreenScroll>
         </ScreenEnter>
         </CivicAtmosphere>
       </SafeAreaView>
@@ -78,7 +78,7 @@ export default function HelpScreen() {
     <SafeAreaView style={styles.safeArea}>
       <CivicAtmosphere mood="alert">
       <ScreenEnter>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScreenScroll contentContainerStyle={styles.container}>
           <View style={styles.header}>
             <TouchableOpacity
               onPress={() => (step === 'confirm' ? setStep('select') : router.back())}
@@ -163,7 +163,7 @@ export default function HelpScreen() {
               />
             </>
           )}
-        </ScrollView>
+        </ScreenScroll>
       </ScreenEnter>
       </CivicAtmosphere>
     </SafeAreaView>

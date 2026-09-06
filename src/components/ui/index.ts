@@ -17,3 +17,4 @@ export * from './ScreenEnter';
 export * from './YouPulse';
 export * from './CivicAtmosphere';
 export * from './WebAppShell';
+export * from './ScreenScroll';
