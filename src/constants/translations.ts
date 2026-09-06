@@ -57,6 +57,15 @@ export interface TranslationStrings {
   howItWorksTitle: string;
   welcomeTagline: string;
   welcomeJob: string;
+  welcomeWhatTitle: string;
+  welcomeWhatBody: string;
+  welcomeHowTitle: string;
+  welcomeHowBody: string;
+  welcomeCanTitle: string;
+  welcomeCan1: string;
+  welcomeCan2: string;
+  welcomeCan3: string;
+  welcomeCan4: string;
   welcomeQuestionsTitle: string;
   welcomeQ1: string;
   welcomeQ2: string;
@@ -212,7 +221,18 @@ export const translations: Record<Language, TranslationStrings> = {
     backToHome: 'Back to home',
     howItWorksTitle: 'How the app works',
     welcomeTagline: 'Guidance when seconds matter',
-    welcomeJob: 'SOGN SAFE turns a complex incident into four civilian answers.',
+    welcomeJob: 'A civilian training app for Inner Sogn.',
+    welcomeWhatTitle: 'What this app is',
+    welcomeWhatBody:
+      'SOGN SAFE helps ordinary people during a simulated emergency. It turns complex official information into four simple answers: are you in danger, where to go, how to get there, and what to do if you cannot leave. This is a student prototype. It never calls real 112.',
+    welcomeHowTitle: 'How it works',
+    welcomeHowBody:
+      'You start on READY. If a training alert is sent, the app walks you through FIND SAFETY, EVACUATE, and SAFE. Ask the assistant by text or voice at any time. I NEED HELP sends your condition and location only after you confirm.',
+    welcomeCanTitle: 'What you can do',
+    welcomeCan1: 'See if you are inside the affected area',
+    welcomeCan2: 'Find a confirmed safe place and follow the walking route',
+    welcomeCan3: 'Ask the training assistant by text or voice',
+    welcomeCan4: 'Send I NEED HELP, or report I AM SAFE when you arrive',
     welcomeQuestionsTitle: 'Four civilian questions',
     welcomeQ1: 'Am I in danger?',
     welcomeQ2: 'Where should I go?',
@@ -358,7 +378,18 @@ export const translations: Record<Language, TranslationStrings> = {
     backToHome: 'Tilbake til start',
     howItWorksTitle: 'Slik fungerer appen',
     welcomeTagline: 'Veiledning når sekundene teller',
-    welcomeJob: 'SOGN SAFE gjør en kompleks hendelse om til fire sivile svar.',
+    welcomeJob: 'En sivil øvingsapp for Indre Sogn.',
+    welcomeWhatTitle: 'Hva denne appen er',
+    welcomeWhatBody:
+      'SOGN SAFE hjelper vanlige folk under en simulert hendelse. Den gjør kompleks offisiell informasjon om til fire enkle svar: er du i fare, hvor skal du gå, hvordan kommer du dit, og hva gjør du hvis du ikke kan evakuere. Dette er en studentprototype. Den ringer aldri ekte 112.',
+    welcomeHowTitle: 'Slik fungerer den',
+    welcomeHowBody:
+      'Du starter i KLAR. Hvis et øvingsvarsel sendes, tar appen deg gjennom FINN TRYGGHET, EVAKUER og TRYGG. Du kan spørre assistenten med tekst eller tale når som helst. JEG TRENGER HJELP sender tilstand og posisjon først etter at du bekrefter.',
+    welcomeCanTitle: 'Hva du kan gjøre',
+    welcomeCan1: 'Se om du er i det berørte området',
+    welcomeCan2: 'Finne et bekreftet trygt sted og følge gangruten',
+    welcomeCan3: 'Spørre øvingsassistenten med tekst eller tale',
+    welcomeCan4: 'Sende JEG TRENGER HJELP, eller melde JEG ER TRYGG når du er framme',
     welcomeQuestionsTitle: 'Fire sivile spørsmål',
     welcomeQ1: 'Er jeg i fare?',
     welcomeQ2: 'Hvor skal jeg gå?',

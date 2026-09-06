@@ -60,19 +60,36 @@ export default function WelcomeScreen() {
 
             <GlassSurface tone="mint" glow="safe" style={styles.card}>
               <View style={styles.cardInner}>
-                <Text style={styles.cardTitle}>{t.welcomeQuestionsTitle}</Text>
-                <Text style={styles.question}>{t.welcomeQ1}</Text>
-                <Text style={styles.question}>{t.welcomeQ2}</Text>
-                <Text style={styles.question}>{t.welcomeQ3}</Text>
-                <Text style={styles.question}>{t.welcomeQ4}</Text>
+                <Text style={styles.cardTitle}>{t.welcomeWhatTitle}</Text>
+                <Text style={styles.body}>{t.welcomeWhatBody}</Text>
               </View>
             </GlassSurface>
 
             <GlassSurface tone="neutral" style={styles.card}>
               <View style={styles.cardInner}>
-                <Text style={styles.cardTitle}>{t.welcomeJourneyTitle}</Text>
+                <Text style={styles.cardTitle}>{t.welcomeHowTitle}</Text>
                 <Text style={styles.journey}>{t.welcomeJourney}</Text>
-                <Text style={styles.helpNote}>{t.welcomeHelpNote}</Text>
+                <Text style={styles.body}>{t.welcomeHowBody}</Text>
+              </View>
+            </GlassSurface>
+
+            <GlassSurface tone="neutral" style={styles.card}>
+              <View style={styles.cardInner}>
+                <Text style={styles.cardTitle}>{t.welcomeCanTitle}</Text>
+                <Text style={styles.capability}>{t.welcomeCan1}</Text>
+                <Text style={styles.capability}>{t.welcomeCan2}</Text>
+                <Text style={styles.capability}>{t.welcomeCan3}</Text>
+                <Text style={styles.capability}>{t.welcomeCan4}</Text>
+              </View>
+            </GlassSurface>
+
+            <GlassSurface tone="mint" style={styles.card}>
+              <View style={styles.cardInner}>
+                <Text style={styles.cardTitle}>{t.welcomeQuestionsTitle}</Text>
+                <Text style={styles.question}>{t.welcomeQ1}</Text>
+                <Text style={styles.question}>{t.welcomeQ2}</Text>
+                <Text style={styles.question}>{t.welcomeQ3}</Text>
+                <Text style={styles.question}>{t.welcomeQ4}</Text>
               </View>
             </GlassSurface>
 
@@ -142,9 +159,9 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   job: {
-    ...Typography.body,
+    ...Typography.headline,
     textAlign: 'center',
-    color: Colors.textSecondary,
+    color: Colors.textPrimary,
     marginTop: 8,
   },
   card: {
@@ -157,11 +174,21 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cardTitle: {
-    ...Typography.caption,
-    fontWeight: '700',
-    letterSpacing: 1,
-    color: Colors.textMuted,
-    textTransform: 'uppercase',
+    ...Typography.subhead,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+    color: Colors.textPrimary,
+  },
+  body: {
+    ...Typography.body,
+    color: Colors.textSecondary,
+    lineHeight: 22,
+  },
+  capability: {
+    ...Typography.body,
+    color: Colors.textPrimary,
+    lineHeight: 22,
+    fontWeight: '600',
   },
   question: {
     ...Typography.headline,
@@ -170,21 +197,17 @@ const styles = StyleSheet.create({
   journey: {
     ...Typography.subhead,
     color: Colors.textPrimary,
+    fontWeight: '800',
     letterSpacing: 0.2,
-  },
-  helpNote: {
-    ...Typography.body,
-    color: Colors.textSecondary,
-    marginTop: 4,
   },
   list: {
     marginHorizontal: 16,
     marginTop: 4,
   },
   disclaimer: {
-    ...Typography.caption,
-    color: Colors.textMuted,
-    lineHeight: 16,
+    ...Typography.body,
+    color: Colors.textSecondary,
+    lineHeight: 20,
     marginHorizontal: 24,
     marginTop: 16,
     textAlign: 'center',
