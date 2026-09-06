@@ -9,6 +9,7 @@ const path = require('path');
 const PORT = process.env.PORT || 4000;
 const { describeModels } = require('./openRouterBridge');
 const { tryHandleAgentApi } = require('./agentHttp');
+const { createVesselRuntime } = require('./vesselBridge');
 
 // State store
 let state = {
@@ -18,7 +19,27 @@ let state = {
   safeReports: [],
   agentLogs: [],
   isDegradedConnection: false,
+  vesselEvents: [],
 };
+
+const activateFlamIncident = () => {
+  state.activeIncident = {
+    ...FLAM_INCIDENT,
+    lastVerifiedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  };
+  return state.activeIncident;
+};
+
+const vesselRuntime = createVesselRuntime({
+  getState: () => state,
+  setIncident: (incident) => {
+    state.activeIncident = incident;
+  },
+  addAgentLog,
+  resetIncident: () => {
+    state.activeIncident = null;
+  },
+});
 
 const FLAM_INCIDENT = {
   id: 'inc-flam-2026-09',
@@ -173,6 +194,62 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'GET' && pathname === '/api/state') {
     res.writeHead(200);
     res.end(JSON.stringify(state));
+    return;
+  }
+
+  if (req.method === 'POST' && pathname === '/api/vessel/events') {
+    const body = await parseBody(req);
+    const result = vesselRuntime.handleEvent(body, () => {
+      const incident = activateFlamIncident();
+      addAgentLog('SHIP AGENT', 'Loss of manoeuvrability reported from Vessel App (MS Fjord Star).');
+      setTimeout(() => addAgentLog('MAIN AGENT', 'Flåm Maritime Scenario activated from captain-confirmed vessel event.'), 300);
+      setTimeout(() => addAgentLog('RISK AGENT', 'Zone A (Kai 1-3) loaded as critical collision hazard area.'), 600);
+      setTimeout(() => addAgentLog('PUBLIC AGENT', 'Civilian emergency alert prepared: "Possible vessel collision near Flåm harbor".'), 900);
+      setTimeout(() => addAgentLog('CITIZEN AGENT', `${state.registeredDevices.length} test devices identified inside monitored zone. Dispatching push alert.`), 1200);
+      for (const dev of state.registeredDevices) {
+        if (dev.pushToken) {
+          sendExpoPush(
+            dev.pushToken,
+            'EMERGENCY ALERT: VESSEL COLLISION',
+            'Leave the harbor area now. Proceed to Flåm School.',
+            { incidentId: incident.id, route: '/alert' }
+          );
+        }
+      }
+      return incident;
+    });
+    state.vesselEvents = vesselRuntime.runtime.events;
+    res.writeHead(result.status);
+    res.end(JSON.stringify(result.body));
+    return;
+  }
+
+  if (req.method === 'POST' && (pathname === '/api/agents/vessel' || pathname === '/api/agent/vessel')) {
+    const body = await parseBody(req);
+    const result = await vesselRuntime.handleAgent(body);
+    res.writeHead(result.status);
+    res.end(JSON.stringify(result.body));
+    return;
+  }
+
+  if (req.method === 'POST' && pathname === '/api/vessel/reset') {
+    vesselRuntime.reset();
+    state.activeIncident = null;
+    state.vesselEvents = [];
+    addAgentLog('MAIN AGENT', 'Vessel training reset. No active maritime incident.');
+    res.writeHead(200);
+    res.end(JSON.stringify({ ok: true, incident: null }));
+    return;
+  }
+
+  if (req.method === 'GET' && pathname === '/api/vessel/status') {
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      connected: vesselRuntime.runtime.connected,
+      lastEmergencyId: vesselRuntime.runtime.lastEmergencyRequestId,
+      incident: state.activeIncident,
+      hasActiveIncident: !!state.activeIncident,
+    }));
     return;
   }
 
