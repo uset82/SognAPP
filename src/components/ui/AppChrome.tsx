@@ -1,9 +1,11 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { usePathname, useRouter } from 'expo-router';
 import { Colors, Touch, Typography } from '../../constants/theme';
 import { SognSafeLogo } from '../brand';
 import { GlassSurface } from './GlassSurface';
 import { ChevronLeftIcon, LocationPinIcon } from './CivicIcons';
+import { stopEmergencyAlert } from '../../services/alertSound';
 
 interface AppChromeProps {
   title?: string;
@@ -15,6 +17,8 @@ interface AppChromeProps {
   backLabel?: string;
 }
 
+const isHomePath = (pathname: string) => pathname === '/' || pathname === '/index';
+
 export const AppChrome: React.FC<AppChromeProps> = ({
   title = 'SOGN SAFE',
   subtitle,
@@ -24,20 +28,41 @@ export const AppChrome: React.FC<AppChromeProps> = ({
   onBack,
   backLabel = 'Back',
 }) => {
-  const brand = centered ? (
-    <View style={styles.centered}>
-      <SognSafeLogo size={compact ? 34 : 36} variant="master" />
-      <Text style={styles.title}>{title}</Text>
-    </View>
+  const router = useRouter();
+  const pathname = usePathname();
+  const isHome = isHomePath(pathname);
+
+  const handleGoHome = () => {
+    if (isHome) {
+      return;
+    }
+    void stopEmergencyAlert();
+    router.replace('/');
+  };
+
+  const brandMark = (
+    <Pressable
+      onPress={handleGoHome}
+      disabled={isHome}
+      accessibilityRole={isHome ? 'header' : 'button'}
+      accessibilityLabel={title}
+      accessibilityHint={isHome ? undefined : backLabel}
+      hitSlop={8}
+      style={({ pressed }) => [styles.brand, centered && styles.centeredBrand, pressed && !isHome && styles.pressed]}
+    >
+      <SognSafeLogo size={compact ? (centered ? 34 : 36) : 42} variant="master" />
+      <View>
+        <Text style={styles.title}>{title}</Text>
+        {subtitle && !centered ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      </View>
+    </Pressable>
+  );
+
+  const chrome = centered ? (
+    <View style={styles.centered}>{brandMark}</View>
   ) : (
     <View style={styles.row}>
-      <View style={styles.brand}>
-        <SognSafeLogo size={compact ? 36 : 42} variant="master" />
-        <View>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-        </View>
-      </View>
+      {brandMark}
       {district ? (
         <GlassSurface tone="neutral" intensity="soft" radius={16} style={styles.chip}>
           <View style={styles.chipInner}>
@@ -50,7 +75,7 @@ export const AppChrome: React.FC<AppChromeProps> = ({
   );
 
   if (!onBack) {
-    return brand;
+    return chrome;
   }
 
   return (
@@ -60,12 +85,12 @@ export const AppChrome: React.FC<AppChromeProps> = ({
         accessibilityRole="button"
         accessibilityLabel={backLabel}
         hitSlop={8}
-        style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
+        style={({ pressed }) => [styles.back, pressed && styles.pressed]}
       >
         <ChevronLeftIcon size={18} color={Colors.textPrimary} strokeWidth={2.4} />
         <Text style={styles.backLabel}>{backLabel}</Text>
       </Pressable>
-      {brand}
+      {chrome}
     </View>
   );
 };
@@ -84,6 +109,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     flex: 1,
+    minHeight: Touch.minTarget,
+  },
+  centeredBrand: {
+    flex: 0,
+    justifyContent: 'center',
   },
   centered: {
     flexDirection: 'row',
@@ -128,7 +158,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingRight: 20,
   },
-  backPressed: {
+  pressed: {
     opacity: 0.65,
   },
   backLabel: {
