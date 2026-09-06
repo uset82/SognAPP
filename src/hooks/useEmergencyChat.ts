@@ -3,7 +3,7 @@ import { useEmergency } from '../context/EmergencyContext';
 import { chatCopy } from '../constants/chatTranslations';
 import { buildEmergencyAgentContext } from '../services/agentContext';
 import { runAgentPipeline } from '../services/agentPipeline';
-import { clearChatHistory, loadChatHistory, saveChatHistory } from '../services/chatHistory';
+import { clearAllChatHistory, clearChatHistory, loadChatHistory, saveChatHistory } from '../services/chatHistory';
 import { cancelListening, readPartialTranscript, startListening, stopListening } from '../services/speechToText';
 import { hushOutput, speakImmediateCue, speakText, stopSpeech, unlockSpeechPlayback } from '../services/textToSpeech';
 import { triggerWarningHaptic } from '../services/haptics';
@@ -80,12 +80,27 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
   useEffect(() => {
     let cancelled = false;
     setHistoryReady(false);
+    setPendingAction(null);
+    setLastSpoken('');
+
+    if (!hasActiveIncident) {
+      void clearAllChatHistory();
+      setMessages([]);
+      setHistoryReady(true);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     loadChatHistory(incidentId)
       .then((loaded) => {
-        if (!cancelled) {
-          setMessages(loaded);
-          setHistoryReady(true);
+        if (cancelled) {
+          return;
         }
+        setMessages(loaded);
+        const lastAssistant = [...loaded].reverse().find((item) => item.role === 'assistant');
+        setLastSpoken(lastAssistant?.text ?? '');
+        setHistoryReady(true);
       })
       .catch(() => {
         if (!cancelled) {
@@ -96,20 +111,14 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
     return () => {
       cancelled = true;
     };
-  }, [incidentId]);
+  }, [hasActiveIncident, incidentId]);
 
   useEffect(() => {
-    if (!hasActiveIncident && messages.length > 0 && messages.some((item) => item.incidentId && item.incidentId !== incidentId)) {
-      void clearChatHistory(messages[0].incidentId);
-    }
-  }, [hasActiveIncident, incidentId, messages]);
-
-  useEffect(() => {
-    if (!historyReady) {
+    if (!historyReady || !hasActiveIncident) {
       return;
     }
     void saveChatHistory(incidentId, messages);
-  }, [historyReady, incidentId, messages]);
+  }, [hasActiveIncident, historyReady, incidentId, messages]);
 
   const clearVoiceTimers = () => {
     if (partialTimerRef.current) {
@@ -371,6 +380,7 @@ export const useEmergencyChat = (options: UseEmergencyChatOptions = {}) => {
     setPendingAction(null);
     setLastSpoken('');
     setErrorCode(null);
+    void clearAllChatHistory();
     void clearChatHistory(incidentId);
   }, [incidentId]);
 

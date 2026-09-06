@@ -34,3 +34,15 @@ export const clearChatHistory = async (incidentId: string | null): Promise<void>
     // Ignore.
   }
 };
+
+export const clearAllChatHistory = async (): Promise<void> => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const chatKeys = keys.filter((key) => key.startsWith('@sogn_safe_chat_'));
+    if (chatKeys.length > 0) {
+      await AsyncStorage.multiRemove(chatKeys);
+    }
+  } catch {
+    // Ignore.
+  }
+};
