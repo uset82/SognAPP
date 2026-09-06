@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Stack, usePathname, useRouter } from 'expo-router';
+import { Platform } from 'react-native';
+import { Slot, Stack, usePathname, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -48,6 +49,10 @@ function AppNavigation() {
     };
   }, [pathname, router]);
 
+  if (Platform.OS === 'web') {
+    return <Slot />;
+  }
+
   return (
     <Stack
       screenOptions={{
@@ -71,7 +76,7 @@ function AppNavigation() {
 export default function RootLayout() {
   return (
     <WebAppShell>
-      <SafeAreaProvider style={{ flex: 1, minHeight: 0, height: '100%', backgroundColor: Colors.canvas }}>
+      <SafeAreaProvider style={{ flex: 1, minHeight: '100%', backgroundColor: Colors.canvas }}>
         <EmergencyProvider>
           <StatusBar style="dark" />
           <AppNavigation />

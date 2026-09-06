@@ -8,11 +8,7 @@ interface ScreenScrollProps {
 
 export const ScreenScroll: React.FC<ScreenScrollProps> = ({ children, contentContainerStyle }) => {
   if (Platform.OS === 'web') {
-    return (
-      <View style={[styles.webScroll, contentContainerStyle]}>
-        {children}
-      </View>
-    );
+    return <View style={contentContainerStyle}>{children}</View>;
   }
 
   return (
@@ -30,17 +26,5 @@ export const ScreenScroll: React.FC<ScreenScrollProps> = ({ children, contentCon
 const styles = StyleSheet.create({
   fill: {
     flex: 1,
-  },
-  webScroll: {
-    flex: 1,
-    minHeight: 0,
-    height: '100%',
-    overflow: 'scroll',
-    // RN-web maps these to CSS so iPhone Safari can actually pan the page.
-    ...({
-      overflowY: 'auto',
-      WebkitOverflowScrolling: 'touch',
-      overscrollBehavior: 'contain',
-    } as ViewStyle),
   },
 });
