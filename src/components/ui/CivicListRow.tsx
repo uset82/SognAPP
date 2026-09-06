@@ -10,6 +10,7 @@ interface CivicListRowProps {
   onPress: () => void;
   accessibilityLabel?: string;
   last?: boolean;
+  href?: string;
 }
 
 export const CivicListRow: React.FC<CivicListRowProps> = ({
@@ -19,24 +20,46 @@ export const CivicListRow: React.FC<CivicListRowProps> = ({
   onPress,
   accessibilityLabel,
   last = false,
-}) => (
-  <TouchableOpacity
-    onPress={onPress}
-    activeOpacity={0.75}
-    accessibilityRole="button"
-    accessibilityLabel={accessibilityLabel ?? label}
-    style={[styles.inner, !last && styles.divider, Platform.OS === 'web' && styles.webPointer]}
-  >
-    <View style={styles.left}>
-      {icon}
-      <Text style={styles.label}>{label}</Text>
-    </View>
-    <View style={styles.right}>
-      {value ? <Text style={styles.value}>{value}</Text> : null}
-      <ChevronRightIcon size={18} color={Colors.textMuted} />
-    </View>
-  </TouchableOpacity>
-);
+  href,
+}) => {
+  const row = (
+    <>
+      <View style={styles.left}>
+        {icon}
+        <Text style={styles.label}>{label}</Text>
+      </View>
+      <View style={styles.right}>
+        {value ? <Text style={styles.value}>{value}</Text> : null}
+        <ChevronRightIcon size={18} color={Colors.textMuted} />
+      </View>
+    </>
+  );
+
+  if (Platform.OS === 'web' && href) {
+    return (
+      <a
+        href={href}
+        aria-label={accessibilityLabel ?? label}
+        onClick={() => onPress()}
+        style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+      >
+        <View style={[styles.inner, !last && styles.divider, styles.webPointer]}>{row}</View>
+      </a>
+    );
+  }
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.75}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      style={[styles.inner, !last && styles.divider, Platform.OS === 'web' && styles.webPointer]}
+    >
+      {row}
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   inner: {

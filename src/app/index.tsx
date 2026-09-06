@@ -17,6 +17,7 @@ import {
   StatusHero,
   TimestampMeta,
 } from '../components/ui';
+import { HomeAssistantCard } from '../components/chat/HomeAssistantCard';
 import { ReadinessModal } from '../components/modals/ReadinessModal';
 import { SafePlacesModal } from '../components/modals/SafePlacesModal';
 import { OfflineInfoModal } from '../components/modals/OfflineInfoModal';
@@ -114,6 +115,8 @@ export default function ReadyScreen() {
             }
           />
 
+          <HomeAssistantCard />
+
           <View style={styles.mapWrap}>
             <CalmLocalMapCard
               safeZones={safeZones}
@@ -160,6 +163,7 @@ export default function ReadyScreen() {
                 </CircularIconContainer>
               }
               label={language === 'no' ? 'Assistent' : 'Assistant'}
+              href="/chat"
               onPress={() => router.push('/chat')}
               accessibilityLabel={language === 'no' ? 'Assistent' : 'Assistant'}
             />

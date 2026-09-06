@@ -3,6 +3,8 @@ import { Language } from './translations';
 export interface ChatCopy {
   assistantTitle: string;
   assistantSubtitle: string;
+  homeIntro: string;
+  openFullAssistant: string;
   activeIncident: string;
   inputPlaceholder: string;
   send: string;
@@ -41,6 +43,8 @@ export const chatCopy: Record<Language, ChatCopy> = {
   en: {
     assistantTitle: 'Assistant',
     assistantSubtitle: 'Verified guidance only',
+    homeIntro: 'Ask a short question about the current verified situation.',
+    openFullAssistant: 'Open full assistant',
     activeIncident: 'ACTIVE INCIDENT',
     inputPlaceholder: 'Ask a short question',
     send: 'Send',
@@ -77,6 +81,8 @@ export const chatCopy: Record<Language, ChatCopy> = {
   no: {
     assistantTitle: 'Assistent',
     assistantSubtitle: 'Bare verifisert veiledning',
+    homeIntro: 'Still et kort spørsmål om den verifiserte situasjonen.',
+    openFullAssistant: 'Åpne full assistent',
     activeIncident: 'AKTIV HENDELSE',
     inputPlaceholder: 'Still et kort spørsmål',
     send: 'Send',

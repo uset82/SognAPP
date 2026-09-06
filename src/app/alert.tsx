@@ -137,6 +137,7 @@ export default function AlertScreen() {
               title={language === 'no' ? 'SPØR ASSISTENTEN' : 'ASK ASSISTANT'}
               variant="outline-neutral"
               showChevron
+              href="/chat"
               onPress={() => {
                 void stopEmergencyAlert();
                 router.push('/chat');
