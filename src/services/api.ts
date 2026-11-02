@@ -5,11 +5,18 @@ import Constants from 'expo-constants';
 import { HelpCondition, HelpRequest } from '../types/incident';
 
 /**
- * Determine the local server URL:
- * - On web: http://localhost:4000
+ * Determine the shared hub URL:
+ * - EXPO_PUBLIC_SIMULATOR_URL wins when set (production, e.g. the Railway hub)
+ * - On web localhost: http://localhost:4000
  * - On physical device or iOS simulator: use hostUri from Expo Constants or fallback to localhost
+ * - On a remote HTTPS deployment without the env var: null (no live hub)
  */
 function getSimulatorServerUrl(): string | null {
+  const configured = process.env.EXPO_PUBLIC_SIMULATOR_URL;
+  if (configured) {
+    return configured.replace(/\/$/, '');
+  }
+
   if (Platform.OS === 'web') {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;

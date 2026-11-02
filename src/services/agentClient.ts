@@ -4,6 +4,11 @@ import { AgentResponse, ConversationTurn, EmergencyAgentContext } from '../types
 import { ALLOWED_AGENT_ACTIONS } from '../types/chat';
 
 const getSimulatorServerUrl = (): string => {
+  const configured = process.env.EXPO_PUBLIC_SIMULATOR_URL;
+  if (configured) {
+    return configured.replace(/\/$/, '');
+  }
+
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     const hostname = window.location.hostname;
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
