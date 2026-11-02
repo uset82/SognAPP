@@ -350,11 +350,11 @@
 
         <div id="incidentStatusBox" class="incident-state-box state-normal">
           <div class="state-title" id="incidentStatusTitle">NORMAL / ALL CLEAR</div>
-          <div class="state-desc" id="incidentStatusDesc">No active emergencies in Flåm harbor area.</div>
+          <div class="state-desc" id="incidentStatusDesc">No active emergencies in the Fjordvik quay area.</div>
         </div>
 
-        <button class="btn btn-emergency" id="triggerFlamBtn" onclick="triggerFlamScenario()">
-          TRIGGER FLÅM PASSENGER SHIP COLLISION (DISPATCH ALERT)
+        <button class="btn btn-emergency" id="triggerEmergencyBtn" onclick="triggerVesselEmergencyScenario()">
+          TRIGGER VESSEL FIRE EMERGENCY (DISPATCH ALERT)
         </button>
 
         <div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -419,7 +419,7 @@
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-title">MULTI-AGENT SIMULATION PIPELINE (MOCKED SENSORS & RISK REASONING)</div>
       <div class="agent-log-container" id="agentLogContainer">
-        <div class="agent-entry"><span class="agent-tag agent-main">MAIN AGENT</span> Standby. Monitoring Aurlandsfjord AIS telemetry feed.</div>
+        <div class="agent-entry"><span class="agent-tag agent-main">MAIN AGENT</span> Standby. Monitoring Fjordvikfjord AIS telemetry feed.</div>
       </div>
     </div>
 
@@ -469,7 +469,7 @@
       } else {
         statusBox.className = 'incident-state-box state-normal';
         statusTitle.textContent = 'NORMAL / ALL CLEAR';
-        statusDesc.textContent = 'No active emergencies in Flåm harbor area.';
+        statusDesc.textContent = 'No active emergencies in the Fjordvik quay area.';
       }
 
       document.getElementById('safeCount').textContent = data.safeReports ? data.safeReports.length : 0;
@@ -533,8 +533,8 @@
       }
     }
 
-    async function triggerFlamScenario() {
-      await fetch('/api/scenario/flam', { method: 'POST' });
+    async function triggerVesselEmergencyScenario() {
+      await fetch('/api/scenario/vessel-emergency', { method: 'POST' });
       fetchState();
     }
 

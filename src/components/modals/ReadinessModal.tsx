@@ -108,7 +108,7 @@ export const ReadinessModal: React.FC<ReadinessModalProps> = ({ visible, onClose
           <View style={styles.titleRow}>
             <View>
               <Text style={styles.modalCategory}>
-                {isNorwegian ? 'EGENBEREDSKAP I FLÅM' : 'CIVILIAN PREPAREDNESS'}
+                {isNorwegian ? 'EGENBEREDSKAP I FJORDVIK' : 'CIVILIAN PREPAREDNESS IN FJORDVIK'}
               </Text>
               <Text style={styles.modalTitle}>
                 {isNorwegian ? '72-timers beredskap' : '72-Hour Readiness Guide'}

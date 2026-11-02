@@ -27,7 +27,7 @@ Configures and maintains file-based routing using Expo Router inside `src/app/`,
 
 ### Trigger Conditions
 - Adding new emergency screens or sub-flows (e.g., condition selection, safe confirmation).
-- Handling push notification deep-links (e.g., `sognsafe://incident/inc-flam-2026-09`).
+- Handling push notification deep-links (e.g., `sognsafe://incident/inc-fjordvik-2026-11`).
 
 ### Inputs
 - Target route path (e.g., `/alert`, `/safety`, `/evacuate`, `/help`, `/safe`).
@@ -150,7 +150,7 @@ Manages device location access using `expo-location`, providing transparent user
 ### Outputs
 - User coordinates (`latitude`, `longitude`).
 - Distance in meters and estimated walking duration in minutes.
-- Human-readable location description (e.g., "Near Flåm Waterfront Area").
+- Human-readable location description (e.g., "Near Fjordvik Waterfront Area").
 
 ### Quality & Safety Constraints
 - **Foreground Only**: No continuous background location tracking in V1.
@@ -213,10 +213,10 @@ Provides mock infrastructure and testing controls that imitate the future profes
 
 ### Trigger Conditions
 - Classroom demonstrations, stakeholder walkthroughs, and automated test passes.
-- Simulating the Flåm passenger vessel collision incident.
+- Simulating the Fjordvik passenger vessel collision incident.
 
 ### Inputs
-- Scenario selector (`START FLÅM SCENARIO`, `ACKNOWLEDGE HELP`, `END INCIDENT`).
+- Scenario selector (`START VESSEL EMERGENCY SCENARIO`, `ACKNOWLEDGE HELP`, `END INCIDENT`).
 - Registered test device ID.
 
 ### Outputs

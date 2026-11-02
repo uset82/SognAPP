@@ -23,10 +23,10 @@ export async function registerDeviceWithSimulator(deviceId: string, pushToken?: 
   }
 }
 
-export async function startFlamScenarioOnSimulator(): Promise<boolean> {
+export async function startScenarioOnSimulator(): Promise<boolean> {
   if (!BASE_URL) return false;
   try {
-    const response = await fetch(`${BASE_URL}/api/scenario/flam`, {
+    const response = await fetch(`${BASE_URL}/api/scenario/vessel-emergency`, {
       method: 'POST',
     });
     return response.ok;
@@ -59,7 +59,7 @@ export async function fetchIncidentFromSimulator(): Promise<{
 export async function transmitHelpRequestToSimulator(
   condition: HelpCondition,
   deviceId: string,
-  locationName: string = 'Flåm Waterfront'
+  locationName: string = 'Fjordvik quay'
 ): Promise<HelpRequest | null> {
   if (!BASE_URL) return null;
   try {
@@ -81,7 +81,7 @@ export async function transmitHelpRequestToSimulator(
  */
 export async function transmitSafeReportToSimulator(
   deviceId: string,
-  safeZoneName: string = 'Flåm Skule & Samfunnshus'
+  safeZoneName: string = 'Fjordvik Skule & Samfunnshus'
 ): Promise<boolean> {
   if (!BASE_URL) return false;
   try {

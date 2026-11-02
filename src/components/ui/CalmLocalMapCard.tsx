@@ -15,7 +15,7 @@ interface CalmLocalMapCardProps {
 }
 
 export const CalmLocalMapCard: React.FC<CalmLocalMapCardProps> = ({
-  userLocationName = 'Flåm Sentrum',
+  userLocationName = 'Fjordvik Sentrum',
   safeZones,
   onPressExplore,
   statusText,
@@ -117,9 +117,9 @@ export const CalmLocalMapCard: React.FC<CalmLocalMapCardProps> = ({
         </Svg>
 
         {/* Map Labels */}
-        <Text style={styles.waterLabel}>Aurlandsfjorden</Text>
-        <Text style={styles.townLabel}>Flåm Sentrum</Text>
-        <Text style={styles.quayLabel}>Flåm Kai</Text>
+        <Text style={styles.waterLabel}>Fjordvikfjorden</Text>
+        <Text style={styles.townLabel}>Fjordvik Sentrum</Text>
+        <Text style={styles.quayLabel}>Fjordvik Kai</Text>
 
         {/* Road 55 / E16 Shield Badge */}
         <View style={styles.roadBadge}>
@@ -132,14 +132,14 @@ export const CalmLocalMapCard: React.FC<CalmLocalMapCardProps> = ({
           <View style={styles.userCoreDot} />
         </View>
 
-        {/* Shelter Pin 1: Flåm Skule (Top Center) */}
+        {/* Shelter Pin 1: Fjordvik Skule (Top Center) */}
         <View style={styles.shelterPin1}>
           <View style={styles.shelterCircle}>
             <ShelterGroupIcon size={16} color="#FFFFFF" />
           </View>
         </View>
 
-        {/* Shelter Pin 2: Fretheim Høyde (Right) */}
+        {/* Shelter Pin 2: Fjordvik Heights (Right) */}
         <View style={styles.shelterPin2}>
           <View style={styles.shelterCircle}>
             <ShelterGroupIcon size={16} color="#FFFFFF" />

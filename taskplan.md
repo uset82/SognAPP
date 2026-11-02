@@ -292,14 +292,14 @@ A user can determine what to do within seconds.
 
 - App can use a real or test location.
 - No location is silently transmitted.
-- Test location can reproduce Flåm scenario.
+- Test location can reproduce Fjordvik scenario.
 
 ---
 
 # PHASE 10 — Safe-zone data
 
-- [x] Define fictional Flåm safe zones.
-- [x] Add Flåm School Safe Area.
+- [x] Define fictional Fjordvik safe zones.
+- [x] Add Fjordvik School Safe Area.
 - [x] Define OPEN/CLOSED/UNKNOWN status.
 - [x] Add confirmation timestamp.
 - [x] Add coordinates.
@@ -318,7 +318,7 @@ A user can determine what to do within seconds.
 Implement:
 
 - [x] nearest safe-area panel.
-- [x] Flåm School name.
+- [x] Fjordvik School name.
 - [x] distance.
 - [x] walking-time estimate.
 - [x] OPEN AND CONFIRMED status.
@@ -583,7 +583,7 @@ TRAINING / TEST ONLY
 Controls:
 
 - [x] Registered device selector.
-- [x] Flåm Vessel Scenario.
+- [x] Fjordvik Vessel Scenario.
 - [x] START SCENARIO.
 - [x] SEND ALERT.
 - [x] EVACUATE ZONE A.
@@ -668,7 +668,7 @@ SHIP AGENT
 Loss of manoeuvrability reported
 
 MAIN AGENT
-Flåm scenario activated
+Fjordvik scenario activated
 
 RISK AGENT
 Zone A loaded
@@ -787,13 +787,13 @@ Verified via automated test harness `npm test` (`tests/scenario.test.mjs`) & rea
 
 1. [x] Open Platform Simulator on laptop (`http://localhost:4000/simulator`).
 2. [x] Confirm Carlos test iPhone registered (`/api/devices`).
-3. [x] Start Flåm Vessel Scenario (`POST /api/scenario/flam`).
+3. [x] Start Fjordvik Vessel Scenario (`POST /api/scenario/vessel-emergency`).
 4. [x] Send 15-minute emergency alert with push broadcast (`sendExpoPush`).
 5. [x] Confirm iPhone receives push & deep-link route `/alert`.
 6. [x] Open notification & transition to incident state.
 7. [x] Confirm ALERT screen displays risk window and directions.
 8. [x] Tap GO TO SAFETY.
-9. [x] Confirm Flåm School selected as nearest verified safe shelter.
+9. [x] Confirm Fjordvik School selected as nearest verified safe shelter.
 10. [x] Start evacuation route.
 11. [x] Confirm turn-by-turn route screen (`src/app/evacuate.tsx`).
 12. [x] Trigger route change (`POST /api/scenario/reroute`).

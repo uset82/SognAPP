@@ -53,8 +53,8 @@ export const SafePlacesModal: React.FC<SafePlacesModalProps> = ({ visible, onClo
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <Text style={styles.leadText}>
             {isNorwegian
-              ? 'Ved hendelser i havne- eller fjordområdet i Flåm er følgende steder forhåndsdefinert som trygge samlingspunkter avhengig av type fare.'
-              : 'During incidents in the harbor or fjord area in Flåm, the following locations are designated safe assembly zones depending on hazard type.'}
+              ? 'Ved hendelser i havne- eller fjordområdet i Fjordvik er følgende steder forhåndsdefinert som trygge samlingspunkter avhengig av type fare.'
+              : 'During incidents in the harbor or fjord area in Fjordvik, the following locations are designated safe assembly zones depending on hazard type.'}
           </Text>
 
           {safeZones.map((zone: SafeZone, index: number) => {

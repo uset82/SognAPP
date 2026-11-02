@@ -12,7 +12,7 @@ import {
   requestNotificationPermissions,
   triggerLocalTestEmergencyNotification,
 } from '../services/notificationService';
-import { useEmergency, flamIncidentMock } from '../context/EmergencyContext';
+import { useEmergency, vesselIncidentMock } from '../context/EmergencyContext';
 
 export default function PermissionsScreen() {
   const router = useRouter();
@@ -58,7 +58,7 @@ export default function PermissionsScreen() {
   };
 
   const handleSendTestAlert = async () => {
-    await triggerLocalTestEmergencyNotification(incident || flamIncidentMock);
+    await triggerLocalTestEmergencyNotification(incident || vesselIncidentMock);
     setTestSent(true);
   };
 

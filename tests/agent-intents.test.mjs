@@ -6,13 +6,13 @@ const { answerQuestion, classifyIntent, validateAgentResponse } = require('../si
 
 const incidentContext = {
   hasActiveIncident: true,
-  incidentTitle: 'Possible vessel collision near Flåm harbor',
-  nearestSafeZone: 'Flåm Skule & Samfunnshus',
+  incidentTitle: 'Possible vessel collision near Fjordvik quay',
+  nearestSafeZone: 'Fjordvik Skule & Samfunnshus',
   safeZoneDistance: 650,
   walkingTime: 8,
   currentRoute: 'CONTINUE NORTH',
   nextNavigationInstruction: 'Turn left in 120 m away from the waterfront kai',
-  blockedAreas: ['Flåm Harbor Waterfront Kai 1-3'],
+  blockedAreas: ['Fjordvik Kai 1-3'],
   lastVerifiedUpdate: '14:47',
   connectionStatus: 'NORMAL',
   helpRequestStatus: 'RECEIVED',
@@ -20,7 +20,7 @@ const incidentContext = {
 };
 
 const cases = [
-  ['Where should I go?', 'DESTINATION', 'Flåm Skule'],
+  ['Where should I go?', 'DESTINATION', 'Fjordvik Skule'],
   ['Which way?', 'DIRECTION', 'CONTINUE NORTH'],
   ['How far is it?', 'DISTANCE', '650'],
   ['Can I go back to the harbor?', 'DANGER', 'waterfront'],

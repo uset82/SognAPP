@@ -147,7 +147,7 @@ Main message:
 
 EMERGENCY ALERT
 
-Possible vessel collision near Flåm harbor.
+Possible vessel collision near Fjordvik harbor.
 
 YOU ARE INSIDE THE AFFECTED AREA
 
@@ -165,7 +165,7 @@ The application determines which predefined safe location is relevant to the use
 
 Example:
 
-Flåm School
+Fjordvik School
 
 650 m
 
@@ -193,7 +193,7 @@ CONTINUE NORTH
 
 Turn left in 120 m
 
-Flåm School Safe Area
+Fjordvik School Safe Area
 
 520 m
 
@@ -373,7 +373,7 @@ It is not the professional product.
 
 The simulator may expose controls such as:
 
-START FLÅM SCENARIO
+START VESSEL EMERGENCY SCENARIO
 
 SEND EMERGENCY ALERT
 
@@ -492,7 +492,7 @@ A safe zone should contain:
 
 Initial fictional example:
 
-Flåm School Safe Area
+Fjordvik School Safe Area
 
 Status:
 
@@ -531,7 +531,7 @@ Example notification:
 
 EMERGENCY ALERT
 
-Possible vessel collision near Flåm harbor.
+Possible vessel collision near Fjordvik harbor.
 
 Open SOGN SAFE for instructions.
 
@@ -887,7 +887,7 @@ Platform Simulator
 
 Press:
 
-START FLÅM SCENARIO
+START VESSEL EMERGENCY SCENARIO
 
 ↓
 
@@ -911,7 +911,7 @@ GO TO SAFETY
 
 App displays:
 
-Flåm School
+Fjordvik School
 650 m
 8 min
 

@@ -41,7 +41,7 @@ export default function SafeConfirmationScreen() {
                     <Text style={styles.pillText}>{t.confirmed}</Text>
                   </View>
                 </View>
-                <Text style={styles.shelter}>{shelter?.name || 'Flåm School'}</Text>
+                <Text style={styles.shelter}>{shelter?.name || 'Fjordvik School'}</Text>
                 <Text style={styles.body}>{t.remainUntilCleared}</Text>
               </View>
             </GlassSurface>

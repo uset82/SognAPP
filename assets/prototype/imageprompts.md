@@ -79,7 +79,7 @@ Este probablemente será la imagen principal de la app.
 Create a high-fidelity emergency alert screen for the SOGN SAFE civilian mobile app.
 
 Scenario:
-A large passenger ship has lost maneuverability near Flåm harbor and authorities have activated a fictional evacuation alert.
+A large passenger ship has lost maneuverability near Fjordvik harbor and authorities have activated a fictional evacuation alert.
 
 The civilian user is currently inside the affected area.
 
@@ -89,7 +89,7 @@ At the very top, show a strong emergency-red alert area:
 
 EMERGENCY ALERT
 
-Possible vessel collision near Flåm harbor
+Possible vessel collision near Fjordvik harbor
 
 Below it, in very large clear text:
 
@@ -128,7 +128,7 @@ Show a clean mobile map occupying most of the screen.
 Map elements:
 
 current user location marked clearly as YOU
-red affected area near Flåm harbor
+red affected area near Fjordvik harbor
 one blocked waterfront area
 green Safe Zone B
 green Safe Zone C
@@ -138,7 +138,7 @@ Top information panel:
 
 NEAREST SAFE AREA
 
-Flåm School
+Fjordvik School
 
 650 m
 8 min walk
@@ -171,7 +171,7 @@ Esta muestra que la app no solo dice “evacua”, sino cómo.
 
 Create a realistic turn-by-turn evacuation guidance screen for the SOGN SAFE civilian emergency app.
 
-The civilian is walking away from Flåm harbor toward a designated safe area.
+The civilian is walking away from Fjordvik harbor toward a designated safe area.
 
 Show a simplified emergency navigation interface.
 
@@ -183,7 +183,7 @@ Next instruction:
 Turn left in 120 m
 
 Destination:
-Flåm School Safe Area
+Fjordvik School Safe Area
 
 Remaining:
 520 m
@@ -430,7 +430,7 @@ Large status:
 YOU ARE IN A SAFE AREA
 
 Safe Zone:
-Flåm School
+Fjordvik School
 
 Show:
 
@@ -512,7 +512,7 @@ Emergency content:
 
 ALERTA DE EMERGENCIA
 
-Posible colisión de un barco cerca del puerto de Flåm.
+Posible colisión de un barco cerca del puerto de Fjordvik.
 
 ESTÁS DENTRO DE LA ZONA AFECTADA
 
@@ -552,7 +552,7 @@ Show:
 EVACUATE NOW
 
 Safe destination:
-Flåm School
+Fjordvik School
 
 Walking time:
 10 min
@@ -641,7 +641,7 @@ EMERGENCY ALERT
 You are inside the affected area.
 
 Safe area:
-Flåm School
+Fjordvik School
 8 min
 
 [ GO TO SAFETY ]

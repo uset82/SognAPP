@@ -60,7 +60,7 @@ export default function FindSafetyScreen() {
           <StatusHero
             variant="safe"
             eyebrow={t.nearestSafeArea}
-            title={activeZone?.name || 'Flåm School'}
+            title={activeZone?.name || 'Fjordvik School'}
             icon={<ShieldCheckBadge size={48} badgeColor={Colors.safetyGreen} checkColor={Colors.textOnColor} />}
             footer={
               <View style={styles.pills}>
@@ -84,7 +84,7 @@ export default function FindSafetyScreen() {
           <View style={styles.map}>
             <CivicRouteMapCard
               mode="overview"
-              destinationName={activeZone?.name || 'Flåm School'}
+              destinationName={activeZone?.name || 'Fjordvik School'}
               youOffsetX={civicOffset.x}
               youOffsetY={civicOffset.y}
               youLabel={t.youLabel}

@@ -13,7 +13,7 @@ import { registerNotificationListeners } from '../services/notificationService';
 function AppNavigation() {
   const router = useRouter();
   const pathname = usePathname();
-  const { triggerFlamScenario } = useEmergency();
+  const { triggerVesselEmergencyScenario } = useEmergency();
 
   useEffect(() => {
     if (Platform.OS === 'web') {
@@ -22,10 +22,10 @@ function AppNavigation() {
 
     const unsubscribe = registerNotificationListeners(
       () => {
-        triggerFlamScenario();
+        triggerVesselEmergencyScenario();
       },
       () => {
-        triggerFlamScenario();
+        triggerVesselEmergencyScenario();
         router.replace('/alert');
       }
     );
@@ -33,7 +33,7 @@ function AppNavigation() {
     return () => {
       unsubscribe();
     };
-  }, [triggerFlamScenario, router]);
+  }, [triggerVesselEmergencyScenario, router]);
 
   useEffect(() => {
     let cancelled = false;

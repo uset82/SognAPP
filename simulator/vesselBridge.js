@@ -36,7 +36,7 @@ const createVesselRuntime = ({ getState, setIncident, addAgentLog, resetIncident
     ...extra,
   });
 
-  const handleEvent = (body, activateFlam) => {
+  const handleEvent = (body, activateIncident) => {
     const modules = loadVesselModules();
     const validated = modules
       ? modules.validateVesselEvent(body)
@@ -71,14 +71,18 @@ const createVesselRuntime = ({ getState, setIncident, addAgentLog, resetIncident
 
     if (event.type === 'VESSEL_EMERGENCY_TRIGGERED') {
       runtime.lastEmergencyRequestId = event.id;
-      const incident = activateFlam();
-      addAgentLog('MARITIME AGENT', 'VESSEL_EMERGENCY_TRIGGERED: maneuverability lost on MS Fjord Star.');
+      const incidentType = event.payload?.incidentType || 'MANEUVERABILITY_LOST';
+      const incident = activateIncident(incidentType);
+      addAgentLog(
+        'MARITIME AGENT',
+        `VESSEL_EMERGENCY_TRIGGERED: ${incidentType === 'FIRE_ONBOARD' ? 'fire onboard' : 'maneuverability lost'} on MS Fjord Star.`
+      );
       addAgentLog('COORDINATOR AGENT', 'Incident ACTIVE. Platform coordination started from captain confirmation.');
       addAgentLog('CIVILIAN AGENT', 'Public alert pipeline armed. Civilian notification follows Platform policy.');
       return {
         status: 200,
         body: acknowledge(event, {
-          incidentId: incident?.id || 'inc-flam-2026-09',
+          incidentId: incident?.id || 'inc-fjordvik-2026-11',
           platformStatus: 'ACTIVE',
         }),
       };

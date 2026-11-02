@@ -40,7 +40,7 @@ export default function ReadyScreen() {
     hasActiveIncident,
     incident,
     isDegradedConnection,
-    triggerFlamScenario,
+    triggerVesselEmergencyScenario,
     clearScenario,
     language,
     setLanguage,
@@ -57,8 +57,8 @@ export default function ReadyScreen() {
   const [isOfflineInfoOpen, setIsOfflineInfoOpen] = useState(false);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
 
-  const handleStartFlam = async () => {
-    await triggerFlamScenario();
+  const handleStartEmergency = async () => {
+    await triggerVesselEmergencyScenario();
     router.replace('/alert');
   };
 
@@ -210,9 +210,9 @@ export default function ReadyScreen() {
                 />
               ) : (
                 <CivicButton
-                  title={t.simulateFlam}
+                  title={t.simulateEmergency}
                   variant="primary-emergency"
-                  onPress={handleStartFlam}
+                  onPress={handleStartEmergency}
                 />
               )}
               <Text style={styles.disclaimer}>{t.trainingDisclaimer}</Text>

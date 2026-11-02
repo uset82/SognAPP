@@ -72,7 +72,7 @@ export const OfflineInfoModal: React.FC<OfflineInfoModalProps> = ({ visible, onC
 
           {/* Core Action Directives */}
           <Text style={styles.sectionHeading}>
-            {isNorwegian ? 'AKUTTE TILTAK VED SKIPSHENDELSE I FLÅM' : 'ACTION DIRECTIVES: FLÅM HARBOR INCIDENTS'}
+            {isNorwegian ? 'AKUTTE TILTAK VED SKIPSHENDELSE I FJORDVIK' : 'ACTION DIRECTIVES: FJORDVIK HARBOR INCIDENTS'}
           </Text>
 
           <View style={styles.guideCard}>
@@ -85,8 +85,8 @@ export const OfflineInfoModal: React.FC<OfflineInfoModalProps> = ({ visible, onC
               </Text>
               <Text style={styles.guideText}>
                 {isNorwegian
-                  ? 'Beveg deg umiddelbart vekk fra kaien og opp i terrenget (mot Flåm skule eller Fretheimsberget). Biler kan skape trafikkork som blokkerer redningsbiler.'
-                  : 'Immediately move away from the waterfront pier and head uphill towards Flåm School or Fretheim Heights. Do not use personal vehicles.'}
+                  ? 'Beveg deg umiddelbart vekk fra kaien og opp i terrenget (mot Fjordvik skule eller Fjordvik Heights). Biler kan skape trafikkork som blokkerer redningsbiler.'
+                  : 'Immediately move away from the waterfront pier and head uphill towards Fjordvik School or Fjordvik Heights. Do not use personal vehicles.'}
               </Text>
             </View>
           </View>
@@ -117,8 +117,8 @@ export const OfflineInfoModal: React.FC<OfflineInfoModalProps> = ({ visible, onC
               </Text>
               <Text style={styles.guideText}>
                 {isNorwegian
-                  ? 'Ved overbelastning i mobilnettet, unngå videosamtaler og sosiale medier. Bruk SMS for korte meldinger til pårørende: "Jeg er trygg i Flåm".'
-                  : 'During network congestion, avoid video streaming or social media. Use SMS for short check-ins: "I am safe in Flåm".'}
+                  ? 'Ved overbelastning i mobilnettet, unngå videosamtaler og sosiale medier. Bruk SMS for korte meldinger til pårørende: "Jeg er trygg i Fjordvik".'
+                  : 'During network congestion, avoid video streaming or social media. Use SMS for short check-ins: "I am safe in Fjordvik".'}
               </Text>
             </View>
           </View>
@@ -133,8 +133,8 @@ export const OfflineInfoModal: React.FC<OfflineInfoModalProps> = ({ visible, onC
               </Text>
               <Text style={styles.guideText}>
                 {isNorwegian
-                  ? 'Ved bortfall av telekommunikasjon vil Aurland kommune og Sivilforsvaret kringkaste viktige meldinger over NRK P1.'
-                  : 'If telecommunications fail, Aurland municipality and Civil Protection broadcast updates via NRK P1 (FM 96.0 MHz / DAB+).'}
+                  ? 'Ved bortfall av telekommunikasjon vil Nordvik kommune og Sivilforsvaret kringkaste viktige meldinger over NRK P1.'
+                  : 'If telecommunications fail, Nordvik municipality and Civil Protection broadcast updates via NRK P1 (FM 96.0 MHz / DAB+).'}
               </Text>
             </View>
           </View>

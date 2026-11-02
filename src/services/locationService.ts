@@ -8,8 +8,8 @@ export interface Coordinates {
   longitude: number;
 }
 
-// Default classroom simulation coordinate: Flåm Kai / Sentrum
-export const FLAM_WATERFRONT_COORDINATES: Coordinates = {
+// Default classroom simulation coordinate: Fjordvik Kai / Sentrum
+export const SCENARIO_QUAY_COORDINATES: Coordinates = {
   latitude: 60.8635,
   longitude: 7.1145,
 };
@@ -72,7 +72,7 @@ export async function getCurrentCivicLocation(): Promise<{
 
   if (Platform.OS === 'web') {
     return {
-      coords: FLAM_WATERFRONT_COORDINATES,
+      coords: SCENARIO_QUAY_COORDINATES,
       isSimulated: true,
       permissionGranted: true,
     };
@@ -82,7 +82,7 @@ export async function getCurrentCivicLocation(): Promise<{
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
       return {
-        coords: FLAM_WATERFRONT_COORDINATES,
+        coords: SCENARIO_QUAY_COORDINATES,
         isSimulated: true,
         permissionGranted: false,
       };
@@ -102,7 +102,7 @@ export async function getCurrentCivicLocation(): Promise<{
     };
   } catch {
     return {
-      coords: FLAM_WATERFRONT_COORDINATES,
+      coords: SCENARIO_QUAY_COORDINATES,
       isSimulated: true,
       permissionGranted: false,
     };
@@ -118,12 +118,12 @@ export interface SchematicOffset {
 }
 
 /**
- * Project civic GPS onto the Flåm schematic so the YOU marker can move
+ * Project civic GPS onto the Fjordvik schematic so the YOU marker can move
  * without a real map SDK. Waterfront is the origin; offsets are clamped.
  */
 export function projectCoordsToSchematic(
   coords: Coordinates,
-  origin: Coordinates = FLAM_WATERFRONT_COORDINATES
+  origin: Coordinates = SCENARIO_QUAY_COORDINATES
 ): SchematicOffset {
   const metersEast = calculateHaversineDistanceMeters(origin, {
     latitude: origin.latitude,

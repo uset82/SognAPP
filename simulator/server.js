@@ -22,9 +22,10 @@ let state = {
   vesselEvents: [],
 };
 
-const activateFlamIncident = () => {
+const activateVesselIncident = (incidentType = 'FIRE_ONBOARD') => {
+  const template = incidentType === 'FIRE_ONBOARD' ? VESSEL_FIRE_INCIDENT : VESSEL_MANEUVERABILITY_INCIDENT;
   state.activeIncident = {
-    ...FLAM_INCIDENT,
+    ...template,
     lastVerifiedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   };
   return state.activeIncident;
@@ -41,21 +42,21 @@ const vesselRuntime = createVesselRuntime({
   },
 });
 
-const FLAM_INCIDENT = {
-  id: 'inc-flam-2026-09',
-  title: 'Possible vessel collision near Flåm harbor',
-  shortDescription: 'Large passenger vessel experiencing maneuvering failure approaching Flåm waterfront kai.',
-  type: 'VESSEL_COLLISION',
+const VESSEL_FIRE_INCIDENT = {
+  id: 'inc-fjordvik-2026-11',
+  title: 'Engine-room fire aboard MS Nordic Horizon',
+  shortDescription: 'Engine-room fire with smoke on two decks. Vessel heading for Fjordvik quay with 3,200 passengers and 1,100 crew.',
+  type: 'VESSEL_FIRE',
   severity: 'CRITICAL',
   status: 'ACTIVE',
-  locationName: 'Flåm Harbor',
+  locationName: 'Fjordvik quay',
   affectedZoneName: 'Inner Kai Waterfront Zone A',
   createdTimestamp: '14:40',
   lastVerifiedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   isInsideAffectedZone: true,
   primarySafeZone: {
-    id: 'safe-flam-school',
-    name: 'Flåm Skule & Samfunnshus',
+    id: 'safe-fjordvik-school',
+    name: 'Fjordvik Skule & Samfunnshus',
     distanceMeters: 650,
     walkMinutes: 8,
     status: 'OPEN_AND_CONFIRMED',
@@ -64,13 +65,47 @@ const FLAM_INCIDENT = {
     capacity: 450,
   },
   defaultRoute: {
-    routeId: 'route-flam-01',
+    routeId: 'route-fjordvik-01',
     remainingDistanceMeters: 520,
     estimatedWalkingMinutes: 6,
     primaryInstruction: 'CONTINUE NORTH',
-    secondaryInstruction: 'Follow Nedre Brekkevegen away from harbor kai',
+    secondaryInstruction: 'Follow Kaivegen away from the quay',
     routeStatus: 'CLEAR',
-    blockedAreas: ['Flåm Harbor Waterfront Kai 1-3'],
+    blockedAreas: ['Fjordvik Kai 1-3'],
+    verifiedTimestamp: '14:47',
+  },
+};
+
+const VESSEL_MANEUVERABILITY_INCIDENT = {
+  id: 'inc-fjordvik-2026-11',
+  title: 'Vessel maneuverability failure near Fjordvik quay',
+  shortDescription: 'Large passenger vessel experiencing maneuvering failure approaching Fjordvik quay.',
+  type: 'VESSEL_COLLISION',
+  severity: 'CRITICAL',
+  status: 'ACTIVE',
+  locationName: 'Fjordvik quay',
+  affectedZoneName: 'Inner Kai Waterfront Zone A',
+  createdTimestamp: '14:40',
+  lastVerifiedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  isInsideAffectedZone: true,
+  primarySafeZone: {
+    id: 'safe-fjordvik-school',
+    name: 'Fjordvik Skule & Samfunnshus',
+    distanceMeters: 650,
+    walkMinutes: 8,
+    status: 'OPEN_AND_CONFIRMED',
+    shortDescription: 'Confirmed open shelter with designated medical first aid point.',
+    elevationMeters: 18,
+    capacity: 450,
+  },
+  defaultRoute: {
+    routeId: 'route-fjordvik-01',
+    remainingDistanceMeters: 520,
+    estimatedWalkingMinutes: 6,
+    primaryInstruction: 'CONTINUE NORTH',
+    secondaryInstruction: 'Follow Kaivegen away from the quay',
+    routeStatus: 'CLEAR',
+    blockedAreas: ['Fjordvik Kai 1-3'],
     verifiedTimestamp: '14:47',
   },
 };
@@ -199,19 +234,28 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && pathname === '/api/vessel/events') {
     const body = await parseBody(req);
-    const result = vesselRuntime.handleEvent(body, () => {
-      const incident = activateFlamIncident();
-      addAgentLog('SHIP AGENT', 'Loss of manoeuvrability reported from Vessel App (MS Fjord Star).');
-      setTimeout(() => addAgentLog('MAIN AGENT', 'Flåm Maritime Scenario activated from captain-confirmed vessel event.'), 300);
-      setTimeout(() => addAgentLog('RISK AGENT', 'Zone A (Kai 1-3) loaded as critical collision hazard area.'), 600);
-      setTimeout(() => addAgentLog('PUBLIC AGENT', 'Civilian emergency alert prepared: "Possible vessel collision near Flåm harbor".'), 900);
+    const result = vesselRuntime.handleEvent(body, (incidentType) => {
+      const isFire = incidentType === 'FIRE_ONBOARD';
+      const incident = activateVesselIncident(incidentType);
+      addAgentLog('SHIP AGENT', isFire
+        ? 'Engine-room fire reported from Vessel App (MS Fjord Star).'
+        : 'Loss of manoeuvrability reported from Vessel App (MS Fjord Star).');
+      setTimeout(() => addAgentLog('MAIN AGENT', isFire
+        ? 'Fjordvik fire scenario activated from captain-confirmed vessel event.'
+        : 'Fjordvik maneuverability scenario activated from captain-confirmed vessel event.'), 300);
+      setTimeout(() => addAgentLog('RISK AGENT', isFire
+        ? 'Zone A (Kai 1-3) loaded as critical fire and smoke hazard area.'
+        : 'Zone A (Kai 1-3) loaded as critical collision hazard area.'), 600);
+      setTimeout(() => addAgentLog('PUBLIC AGENT', isFire
+        ? 'Civilian emergency alert prepared: "Engine-room fire aboard MS Nordic Horizon".'
+        : 'Civilian emergency alert prepared: "Vessel maneuverability failure near Fjordvik quay".'), 900);
       setTimeout(() => addAgentLog('CITIZEN AGENT', `${state.registeredDevices.length} test devices identified inside monitored zone. Dispatching push alert.`), 1200);
       for (const dev of state.registeredDevices) {
         if (dev.pushToken) {
           sendExpoPush(
             dev.pushToken,
-            'EMERGENCY ALERT: VESSEL COLLISION',
-            'Leave the harbor area now. Proceed to Flåm School.',
+            isFire ? 'EMERGENCY ALERT: VESSEL FIRE' : 'EMERGENCY ALERT: VESSEL MANEUVERABILITY',
+            'Leave the quay area now. Proceed to Fjordvik School.',
             { incidentId: incident.id, route: '/alert' }
           );
         }
@@ -253,18 +297,19 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Phase 24 & 26: Trigger Scenario & Dispatch Real Push Alerts
-  if (req.method === 'POST' && pathname === '/api/scenario/flam') {
-    state.activeIncident = { 
-      ...FLAM_INCIDENT, 
-      lastVerifiedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+  // Trigger the vessel fire scenario and dispatch push alerts.
+  // The old /api/scenario/flam path stays as an alias for clients deployed before the rename.
+  if (req.method === 'POST' && (pathname === '/api/scenario/vessel-emergency' || pathname === '/api/scenario/flam')) {
+    state.activeIncident = {
+      ...VESSEL_FIRE_INCIDENT,
+      lastVerifiedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    // Trigger Mock Multi-Agent Progression (Phase 26)
-    addAgentLog('SHIP AGENT', 'Loss of manoeuvrability reported approaching Flåm kai (Bearing: 194°, Speed: 7.2 kts).');
-    setTimeout(() => addAgentLog('MAIN AGENT', 'Flåm Maritime Scenario activated. Initializing multi-agency incident perimeter.'), 300);
-    setTimeout(() => addAgentLog('RISK AGENT', 'Zone A (Kai 1-3) loaded as critical collision hazard area.'), 600);
-    setTimeout(() => addAgentLog('PUBLIC AGENT', 'Civilian emergency alert prepared: "Possible vessel collision near Flåm harbor".'), 900);
+    // Trigger the multi-agent progression for the fire scenario.
+    addAgentLog('SHIP AGENT', 'Engine-room fire reported approaching Fjordvik quay (Bearing: 194°, Speed: 7.2 kts).');
+    setTimeout(() => addAgentLog('MAIN AGENT', 'Fjordvik fire scenario activated. Initializing multi-agency incident perimeter.'), 300);
+    setTimeout(() => addAgentLog('RISK AGENT', 'Zone A (Kai 1-3) loaded as critical fire and smoke hazard area.'), 600);
+    setTimeout(() => addAgentLog('PUBLIC AGENT', 'Civilian emergency alert prepared: "Engine-room fire aboard MS Nordic Horizon".'), 900);
     setTimeout(() => addAgentLog('CITIZEN AGENT', `${state.registeredDevices.length} test devices identified inside monitored zone. Dispatching push alert.`), 1200);
 
     // Dispatch real push notifications to registered test devices
@@ -272,8 +317,8 @@ const server = http.createServer(async (req, res) => {
       if (dev.pushToken) {
         sendExpoPush(
           dev.pushToken,
-          'EMERGENCY ALERT: VESSEL COLLISION',
-          'Leave the harbor area now. Proceed to Flåm School.',
+          'EMERGENCY ALERT: VESSEL FIRE',
+          'Leave the quay area now. Proceed to Fjordvik School.',
           { incidentId: state.activeIncident.id, route: '/alert' }
         );
       }
@@ -287,13 +332,13 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'POST' && pathname === '/api/scenario/reroute') {
     if (state.activeIncident) {
       state.activeIncident.defaultRoute = {
-        routeId: 'route-flam-rerouted',
+        routeId: 'route-fjordvik-rerouted',
         remainingDistanceMeters: 620,
         estimatedWalkingMinutes: 8,
         primaryInstruction: 'AVOID WATERFRONT • HEAD INLAND',
-        secondaryInstruction: 'Smoke detected along pier. Divert uphill via Nedre Brekkevegen.',
+        secondaryInstruction: 'Smoke detected along the quay. Divert uphill via Kaivegen.',
         routeStatus: 'HAZARD_REROUTED',
-        blockedAreas: ['Flåm Harbor Waterfront Kai 1-3', 'Fjord Promenade Walkway'],
+        blockedAreas: ['Fjordvik Kai 1-3', 'Fjord Promenade Walkway'],
         verifiedTimestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       state.activeIncident.lastVerifiedTimestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -306,7 +351,7 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'POST' && pathname === '/api/scenario/end') {
     state.activeIncident = null;
-    addAgentLog('MAIN AGENT', 'Flåm harbor situation stabilized. Incident resolved. Transmitting ALL CLEAR.');
+    addAgentLog('MAIN AGENT', 'Fjordvik quay situation stabilized. Incident resolved. Transmitting ALL CLEAR.');
     res.writeHead(200);
     res.end(JSON.stringify({ success: true }));
     return;
@@ -336,7 +381,7 @@ const server = http.createServer(async (req, res) => {
       id: `help-${Date.now()}`,
       condition: body.condition || 'I_AM_INJURED',
       deviceId: body.deviceId || 'IPHONE-TEST-01',
-      approximateLocation: body.location || 'Near Flåm Waterfront',
+      approximateLocation: body.location || 'Near Fjordvik quay',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       state: 'RECEIVED',
     };
@@ -366,7 +411,7 @@ const server = http.createServer(async (req, res) => {
       id: `safe-${Date.now()}`,
       deviceId: body.deviceId || 'IPHONE-TEST-01',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      safeZoneName: body.safeZoneName || 'Flåm Skule & Samfunnshus',
+      safeZoneName: body.safeZoneName || 'Fjordvik Skule & Samfunnshus',
     };
     state.safeReports.unshift(report);
     addAgentLog('CITIZEN AGENT', `Civilian check-in: ${report.deviceId} accounted for at ${report.safeZoneName}`);

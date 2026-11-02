@@ -24,7 +24,7 @@ interface CivicRouteMapCardProps {
 
 export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
   mode = 'overview',
-  destinationName = 'Flåm School',
+  destinationName = 'Fjordvik School',
   userStep = 1,
   youOffsetX = 0,
   youOffsetY = 0,
@@ -54,7 +54,7 @@ export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
           fill="#DFEBDA"
         />
 
-        {/* Fjord Water (Aurlandsfjorden) */}
+        {/* Fjord Water (Fjordvikfjorden) */}
         <Path
           d="M0 200 L 140 180 Q 190 230, 210 280 L 360 280 L 360 380 L 0 380 Z"
           fill="#A4CDE8"
@@ -64,7 +64,7 @@ export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
           fill="#94BFDD"
         />
 
-        {/* Aurlandsfjorden Water Label */}
+        {/* Fjordvikfjorden Water Label */}
         <SvgText
           x="275"
           y="350"
@@ -74,10 +74,10 @@ export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
           fontWeight="500"
           textAnchor="middle"
         >
-          Aurlandsfjorden
+          Fjordvikfjorden
         </SvgText>
 
-        {/* Flåm River (Flåmselvi) */}
+        {/* Fjordvik River (Fjordvikselvi) */}
         <Path
           d="M135 0 C 130 50, 145 100, 140 160 C 138 180, 142 210, 145 250"
           stroke="#9AC4E2"
@@ -86,7 +86,7 @@ export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
           strokeLinecap="round"
         />
 
-        {/* Town Street Network (Flåm Sentrum) */}
+        {/* Town Street Network (Fjordvik Sentrum) */}
         {/* Main Road */}
         <Path
           d="M145 250 L 180 190 L 195 130 L 170 60 L 160 0"
@@ -126,7 +126,7 @@ export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
           fontWeight="700"
           textAnchor="middle"
         >
-          Flåm
+          Fjordvik
         </SvgText>
 
         {/* Red Affected / Danger Area (Waterfront Zone) */}
@@ -300,7 +300,7 @@ export const CivicRouteMapCard: React.FC<CivicRouteMapCardProps> = ({
           </G>
         )}
 
-        {/* Destination Pin: Flåm School */}
+        {/* Destination Pin: Fjordvik School */}
         {isTurnByTurn ? (
           <G transform="translate(162, 60)">
             <Rect x="-45" y="-14" width="90" height="26" rx="13" fill="#1B5E36" stroke="#FFFFFF" strokeWidth="1" />

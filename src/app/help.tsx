@@ -136,7 +136,7 @@ export default function HelpScreen() {
                     • {t.selectedCondition} {selectedLabels.title}
                   </Text>
                   <Text style={styles.disclosureItem}>
-                    • {t.approxLocation} Flåm Kai / Sentrum
+                    • {t.approxLocation} Fjordvik Kai / Sentrum
                   </Text>
                   <Text style={styles.disclosureItem}>
                     • {t.locationAccuracy}: ± 25–80 m

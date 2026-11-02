@@ -10,7 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   registerDeviceWithSimulator,
   fetchIncidentFromSimulator,
-  startFlamScenarioOnSimulator,
+  startScenarioOnSimulator,
   transmitHelpRequestToSimulator,
   transmitSafeReportToSimulator,
 } from '../services/api';
@@ -18,7 +18,7 @@ import { getCachedPushToken, triggerLocalTestEmergencyNotification } from '../se
 import { playEmergencyAlert, stopEmergencyAlert } from '../services/alertSound';
 import {
   Coordinates,
-  FLAM_WATERFRONT_COORDINATES,
+  SCENARIO_QUAY_COORDINATES,
   getCurrentCivicLocation,
   projectCoordsToSchematic,
   calculateHaversineDistanceMeters,
@@ -47,7 +47,7 @@ interface EmergencyContextType {
   selectedZoneId: string;
   enrichedZones: SafeZone[];
 
-  triggerFlamScenario: () => Promise<void>;
+  triggerVesselEmergencyScenario: () => Promise<void>;
   clearScenario: () => void;
   submitHelpRequest: (condition: HelpCondition) => Promise<void>;
   acknowledgeHelpRequest: () => void;
@@ -61,13 +61,13 @@ interface EmergencyContextType {
 
 export const verifiedSafeZones: SafeZone[] = [
   {
-    id: 'safe-flam-school',
-    name: 'Flåm Skule & Samfunnshus',
+    id: 'safe-fjordvik-school',
+    name: 'Fjordvik Skule & Samfunnshus',
     distanceMeters: 650,
     walkMinutes: 8,
     status: 'OPEN_AND_CONFIRMED',
     shortDescription: 'Primary heated civic assembly shelter with designated first aid point and emergency water supply.',
-    address: 'Nedre Brekkevegen 12, 5743 Flåm',
+    address: 'Kaivegen 12, 5743 Fjordvik',
     elevationMeters: 18,
     capacity: 450,
     facilities: ['Heated Assembly Hall', 'Paramedic First Aid', 'Backup Generator', 'Drinking Water'],
@@ -76,13 +76,13 @@ export const verifiedSafeZones: SafeZone[] = [
     confirmedTimestamp: '14:42',
   },
   {
-    id: 'safe-fretheim-heights',
-    name: 'Fretheim Høyde Assembly Ground',
+    id: 'safe-fjordvik-heights',
+    name: 'Fjordvik Heights Assembly Ground',
     distanceMeters: 850,
     walkMinutes: 11,
     status: 'OPEN_AND_CONFIRMED',
     shortDescription: 'Elevated outdoor assembly area 45 meters above sea level, completely clear of harbor surge or fuel smoke.',
-    address: 'Fretheimsberget, 5743 Flåm',
+    address: 'Fjordvik Heights, 5743 Fjordvik',
     elevationMeters: 45,
     capacity: 800,
     facilities: ['High Ground Elevation', 'Clear Line of Sight', 'Emergency Lighting', 'Helicopter Winch Zone'],
@@ -91,13 +91,13 @@ export const verifiedSafeZones: SafeZone[] = [
     confirmedTimestamp: '14:44',
   },
   {
-    id: 'safe-aurlandshallen',
-    name: 'Aurlandshallen Regional Shelter',
+    id: 'safe-nordvikhallen',
+    name: 'Nordvikhallen Regional Shelter',
     distanceMeters: 9400,
     walkMinutes: 115,
     status: 'STANDBY',
     shortDescription: 'Major municipal disaster reception sports complex with large sleeping quarters, kitchen, and triage.',
-    address: 'Skulevegen 6, 5745 Aurland',
+    address: 'Skulevegen 6, 5745 Nordvik',
     elevationMeters: 25,
     capacity: 1200,
     facilities: ['Regional Triage Station', 'Full Kitchen & Beds', 'Bus Evacuation Destination', 'Red Cross Unit'],
@@ -110,25 +110,25 @@ export const verifiedSafeZones: SafeZone[] = [
 const defaultSafeZone: SafeZone = verifiedSafeZones[0];
 
 const defaultRoute: EvacuationRoute = {
-  routeId: 'route-flam-01',
+  routeId: 'route-fjordvik-01',
   destinationSafeZone: defaultSafeZone,
   remainingDistanceMeters: 520,
   estimatedWalkingMinutes: 6,
   primaryInstruction: 'CONTINUE NORTH',
   secondaryInstruction: 'Turn left in 120 m away from the waterfront kai',
   routeStatus: 'CLEAR',
-  blockedAreas: ['Flåm Harbor Waterfront Kai 1-3'],
+  blockedAreas: ['Fjordvik Kai 1-3'],
   verifiedTimestamp: '14:47',
 };
 
-export const flamIncidentMock: Incident = {
-  id: 'inc-flam-2026-09',
-  title: 'Possible vessel collision near Flåm harbor',
-  shortDescription: 'Large passenger vessel experiencing maneuvering failure approaching Flåm kai.',
-  type: 'VESSEL_COLLISION',
+export const vesselIncidentMock: Incident = {
+  id: 'inc-fjordvik-2026-11',
+  title: 'Engine-room fire aboard MS Nordic Horizon',
+  shortDescription: 'Engine-room fire with smoke on two decks. Vessel heading for Fjordvik quay with 3,200 passengers and 1,100 crew.',
+  type: 'VESSEL_FIRE',
   severity: 'CRITICAL',
   status: 'ACTIVE',
-  locationName: 'Flåm Harbor',
+  locationName: 'Fjordvik quay',
   affectedZoneName: 'Inner Kai Waterfront Zone A',
   createdTimestamp: '14:40',
   lastVerifiedTimestamp: '14:47',
@@ -163,7 +163,7 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [safeZones, setSafeZones] = useState<SafeZone[]>(verifiedSafeZones);
   const [lastSyncTimestamp, setLastSyncTimestamp] = useState(new Date().toISOString());
   const [offlineCacheStatus] = useState('Up to date • Stored locally on device');
-  const [civicCoords, setCivicCoords] = useState<Coordinates>(FLAM_WATERFRONT_COORDINATES);
+  const [civicCoords, setCivicCoords] = useState<Coordinates>(SCENARIO_QUAY_COORDINATES);
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
   const [notificationPermissionGranted, setNotificationPermissionGranted] = useState(false);
   const [selectedZoneId, setSelectedZoneId] = useState(defaultSafeZone.id);
@@ -221,7 +221,7 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const pushToken = await getCachedPushToken();
         await registerDeviceWithSimulator('IPHONE-TEST-01', pushToken);
       } catch {
-        setSafeZones(enrichZones(FLAM_WATERFRONT_COORDINATES));
+        setSafeZones(enrichZones(SCENARIO_QUAY_COORDINATES));
       }
     }
     loadStoredState();
@@ -272,18 +272,18 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const civicOffset = projectCoordsToSchematic(civicCoords);
   const enrichedZones = safeZones;
 
-  const triggerFlamScenario = async () => {
+  const triggerVesselEmergencyScenario = async () => {
     localScenarioLock.current = true;
     followingRemoteIncident.current = false;
-    setIncident(flamIncidentMock);
+    setIncident(vesselIncidentMock);
     setHasActiveIncident(true);
     setIsSafeReported(false);
     setActiveHelpRequest(null);
     setLastSyncTimestamp(new Date().toISOString());
-    AsyncStorage.setItem('@sogn_safe_cached_incident', JSON.stringify(flamIncidentMock)).catch(() => undefined);
+    AsyncStorage.setItem('@sogn_safe_cached_incident', JSON.stringify(vesselIncidentMock)).catch(() => undefined);
     await playEmergencyAlert();
-    await triggerLocalTestEmergencyNotification(flamIncidentMock);
-    await startFlamScenarioOnSimulator();
+    await triggerLocalTestEmergencyNotification(vesselIncidentMock);
+    await startScenarioOnSimulator();
   };
 
   const clearScenario = () => {
@@ -299,7 +299,7 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const submitHelpRequest = async (condition: HelpCondition) => {
-    const locationName = 'Flåm Kai / Sentrum';
+    const locationName = 'Fjordvik Kai / Sentrum';
     const newRequest: HelpRequest = {
       id: `help-${Date.now().toString().slice(-4)}`,
       incidentId: incident?.id || 'inc-test',
@@ -343,7 +343,7 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const reportIAmSafe = async () => {
     setIsSafeReported(true);
     triggerSafetyConfirmationHaptic();
-    await transmitSafeReportToSimulator('IPHONE-TEST-01', 'Flåm Skule & Samfunnshus');
+    await transmitSafeReportToSimulator('IPHONE-TEST-01', 'Fjordvik Skule & Samfunnshus');
   };
 
   const toggleDegradedConnection = () => {
@@ -379,7 +379,7 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         notificationPermissionGranted,
         selectedZoneId,
         enrichedZones,
-        triggerFlamScenario,
+        triggerVesselEmergencyScenario,
         clearScenario,
         submitHelpRequest,
         acknowledgeHelpRequest,

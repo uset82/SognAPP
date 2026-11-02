@@ -8,7 +8,7 @@ A civilian emergency mobile application prototype for iPhone developed as part o
 
 > [!IMPORTANT]
 > **ACADEMIC DEMONSTRATION ONLY**:
-> SOGN SAFE is an experimental student prototype designed to model civilian evacuation guidance during a simulated large passenger-vessel collision near Flåm harbor (*Flåm kai*).
+> SOGN SAFE is an experimental student prototype designed to model civilian evacuation guidance during a simulated large passenger-vessel collision near Fjordvik harbor (*Fjordvik kai*).
 > - Strictly **NO** connection to live Norwegian emergency dispatch services (112, 113, 110, Hovedredningssentralen / HRS, Kystradio).
 > - All warnings and distress signals are simulated locally or routed to the temporary classroom Platform Simulator.
 > - In any real-world emergency, dial **112** (Police) or **113** (Ambulance) directly.
@@ -67,14 +67,14 @@ Open your browser at:
 1. **Start the Simulator**: Run `npm run simulator` and open `http://localhost:4000/simulator` on your laptop.
 2. **Open the iPhone App**: Launch SOGN SAFE on your iPhone or Expo Go / iOS Simulator.
 3. **Verify READY State**: Observe the calm, reassuring screen: `SAFE • No active emergency in your area`. Note the calm schematic map card, local cache timestamp, and 3 utility drawers (*Readiness*, *Safe Places*, *Offline Info*).
-4. **Trigger Flåm Vessel Scenario**: Click **"TRIGGER FLÅM PASSENGER SHIP COLLISION"** on the laptop simulator.
+4. **Trigger Vessel Emergency Scenario**: Click **"TRIGGER VESSEL EMERGENCY"** on the laptop simulator.
 5. **Receive Emergency Alert**:
    - The iPhone screen immediately transitions to **CRITICAL EMERGENCY ALERT** with urgent haptic feedback.
    - Prominently displays: `YOU ARE INSIDE THE AFFECTED AREA` and estimated risk window (~15 min).
 6. **Evacuation Decision**:
    - Tap **"GO TO SAFETY"** to open the **FIND SAFETY** shelter directory.
-   - Review nearest shelter: *Flåm Skule & Samfunnshus* (650m, 8 min walk, +18m elevation, open & confirmed).
-   - Tap *"Show another safe area"* to cycle through alternative high-ground points (e.g. *Fretheim Høyde*).
+   - Review nearest shelter: *Fjordvik Skule & Samfunnshus* (650m, 8 min walk, +18m elevation, open & confirmed).
+   - Tap *"Show another safe area"* to cycle through alternative high-ground points (e.g. *Fjordvik Heights*).
 7. **Turn-by-Turn Navigation**:
    - Tap **"START SAFE ROUTE"** to open **EVACUATION GUIDANCE**.
    - Review top directive: `CONTINUE NORTH` and secondary caution: `Do not return toward waterfront kai`.

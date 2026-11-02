@@ -35,21 +35,21 @@ const active = buildEmergencyAgentContext({
   isDegradedConnection: true,
   activeHelpRequest: { state: 'RECEIVED' },
   incident: {
-    id: 'inc-flam-2026-09',
+    id: 'inc-fjordvik-2026-09',
     status: 'ACTIVE',
-    title: 'Possible vessel collision near Flåm harbor',
+    title: 'Possible vessel collision near Fjordvik quay',
     affectedZoneName: 'Inner Kai Waterfront Zone A',
     isInsideAffectedZone: true,
     lastVerifiedTimestamp: '14:47',
-    primarySafeZone: { name: 'Flåm Skule & Samfunnshus', distanceMeters: 650 },
+    primarySafeZone: { name: 'Fjordvik Skule & Samfunnshus', distanceMeters: 650 },
     defaultRoute: { primaryInstruction: 'CONTINUE NORTH' },
   },
 });
 
-assert.equal(active.incidentId, 'inc-flam-2026-09');
+assert.equal(active.incidentId, 'inc-fjordvik-2026-09');
 assert.equal(active.connectionStatus, 'DEGRADED');
 assert.equal(active.helpRequestStatus, 'RECEIVED');
 assert.equal(active.lastVerifiedUpdate, '14:47');
-assert.equal(active.nearestSafeZone, 'Flåm Skule & Samfunnshus');
+assert.equal(active.nearestSafeZone, 'Fjordvik Skule & Samfunnshus');
 
 console.log('agent-context: 5/5 passed');

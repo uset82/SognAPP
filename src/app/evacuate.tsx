@@ -54,7 +54,7 @@ export default function EvacuateScreen() {
         minutes,
       },
       {
-        title: language === 'no' ? 'SVING VENSTRE INN TIL SKULEN' : 'TURN LEFT INTO FLÅM SCHOOL',
+        title: language === 'no' ? 'SVING VENSTRE INN TIL FJORDVIK SKULE' : 'TURN LEFT INTO FJORDVIK SCHOOL',
         subtitle: language === 'no' ? 'Hovedinngang til samlingssted' : 'Main entrance to assembly shelter',
         remaining: Math.max(120, Math.round(remaining * 0.27)),
         minutes: Math.max(2, Math.round(minutes * 0.33)),
@@ -121,7 +121,7 @@ export default function EvacuateScreen() {
                 <ShelterGroupIcon size={22} color={Colors.textOnColor} />
               </CircularIconContainer>
               <View style={styles.destText}>
-                <Text style={styles.destName}>{destination?.name || 'Flåm School'}</Text>
+                <Text style={styles.destName}>{destination?.name || 'Fjordvik School'}</Text>
                 <Text style={styles.destSub}>{t.nearestSafeArea}</Text>
               </View>
               <View>
@@ -139,7 +139,7 @@ export default function EvacuateScreen() {
           <View style={styles.map}>
             <CivicRouteMapCard
               mode="turn-by-turn"
-              destinationName={destination?.name || 'Flåm School'}
+              destinationName={destination?.name || 'Fjordvik School'}
               userStep={currentStepIndex + 1}
               youOffsetX={civicOffset.x}
               youOffsetY={civicOffset.y}

@@ -15,7 +15,7 @@ export const TacticalMapSurface: React.FC<TacticalMapSurfaceProps> = ({
   destinationName,
   distanceMeters,
   walkMinutes,
-  blockedZoneName = 'Flåm Waterfront Kai',
+  blockedZoneName = 'Fjordvik quay Kai',
   instructionText = 'Follow designated pedestrian corridor inland away from water risk.',
   style,
 }) => {

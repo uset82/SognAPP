@@ -52,7 +52,7 @@
   - Rescue branch: `I NEED HELP` → Condition selection → Location disclosure → Dispatcher acknowledgment
   - Data contracts: `Incident`, `SafeZone`, `EvacuationRoute`, `HelpRequest`
   - Offline caching strategy: Local persistence of last verified emergency instruction and timestamp
-- **Inputs**: Emergency scenarios (e.g., Flåm passenger vessel collision), mock event streams.
+- **Inputs**: Emergency scenarios (e.g., Fjordvik passenger vessel collision), mock event streams.
 - **Outputs**: Reactive contexts, typed event handlers, local storage caches.
 - **Constraints**: Never make false promises or display unverified ETAs (e.g., display "HELP REQUEST RECEIVED", never "AMBULANCE ARRIVING IN 3 MINUTES").
 
@@ -61,7 +61,7 @@
 ### 2.4 Platform Simulator & Integration Engineer (`agent-platform-simulator`)
 - **Primary Responsibility**: Builds and maintains the lightweight temporary Platform Simulator and mock APIs imitating the future professional emergency platform.
 - **Core Domain**:
-  - Simulated scenario controls (`START FLÅM SCENARIO`, `SEND ALERT`, `ACKNOWLEDGE HELP`)
+  - Simulated scenario controls (`START VESSEL EMERGENCY SCENARIO`, `SEND ALERT`, `ACKNOWLEDGE HELP`)
   - Device token registration and push notification dispatching
   - Simulating network degradation and connection recovery
   - Contract parity so the future multi-agent professional platform can cleanly replace the simulator

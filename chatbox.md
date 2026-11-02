@@ -319,7 +319,7 @@ Configurable model, default:
 
 ### Acceptance
 
-`Where should I go?` returns a context-grounded answer against the Flåm training incident.
+`Where should I go?` returns a context-grounded answer against the Fjordvik training incident.
 
 ---
 
@@ -351,7 +351,7 @@ Prefer a validated payload:
 ```json
 {
   "type": "answer",
-  "message": "Continue north toward Flåm School.",
+  "message": "Continue north toward Fjordvik School.",
   "action": null,
   "speak": true
 }
@@ -843,7 +843,7 @@ A complete voice conversation works on a real iPhone.
 - [ ] Phase 31 complete
   BLOCKED: simulator + unit path verified; full voice demo needs iPhone + running simulator.
 
-- [x] Start Flåm training scenario
+- [x] Start Fjordvik training scenario
 - [ ] iPhone shows the emergency alert
   BLOCKED: needs device.
 - [x] Open assistant
@@ -852,7 +852,7 @@ A complete voice conversation works on a real iPhone.
 - [ ] Apple Speech produces the transcript
   BLOCKED: needs device.
 - [x] MiniMax receives verified incident context
-- [x] Assistant shows the confirmed safe area (Flåm School)
+- [x] Assistant shows the confirmed safe area (Fjordvik School)
 - [ ] Apple TTS speaks the response
   BLOCKED: needs device speaker.
 - [x] Ask `How do I get there?` and get the current route

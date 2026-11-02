@@ -66,14 +66,23 @@ async function runTests() {
     assert.strictEqual(reg.body.success, true);
     console.log('  PASS: Test device registered with mock push token.');
 
-    // 4. Trigger Flåm Scenario
-    console.log('[Test 4] Triggering Flåm Vessel Collision Scenario...');
-    const scenario = await request('/api/scenario/flam', { method: 'POST' });
+    // 4. Trigger Fjordvik Scenario
+    console.log('[Test 4] Triggering Fjordvik Vessel Fire Scenario...');
+    const scenario = await request('/api/scenario/vessel-emergency', { method: 'POST' });
     assert.strictEqual(scenario.status, 200);
     assert.strictEqual(scenario.body.success, true);
-    assert.strictEqual(scenario.body.incident.id, 'inc-flam-2026-09');
-    assert.strictEqual(scenario.body.incident.type, 'VESSEL_COLLISION');
+    assert.strictEqual(scenario.body.incident.id, 'inc-fjordvik-2026-11');
+    assert.strictEqual(scenario.body.incident.type, 'VESSEL_FIRE');
     console.log('  PASS: Active incident generated and broadcasted.');
+
+    // 4b. Verify old route alias still works
+    console.log('[Test 4b] Verifying /api/scenario/flam alias still accepts request...');
+    await request('/api/scenario/end', { method: 'POST' }); // clear first
+    const aliasScenario = await request('/api/scenario/flam', { method: 'POST' });
+    assert.strictEqual(aliasScenario.status, 200);
+    assert.strictEqual(aliasScenario.body.success, true);
+    assert.strictEqual(aliasScenario.body.incident.id, 'inc-fjordvik-2026-11');
+    console.log('  PASS: Old /api/scenario/flam route alias works.');
 
     // 5. Verify multi-agent simulated progression
     await wait(1500);
@@ -103,7 +112,7 @@ async function runTests() {
       body: JSON.stringify({
         condition: 'I_AM_INJURED',
         deviceId: 'IPHONE-TEST-01',
-        location: 'Near Flåm Waterfront Dock 2',
+        location: 'Near Fjordvik quay Dock 2',
       }),
     });
     assert.strictEqual(help.status, 200);
@@ -130,7 +139,7 @@ async function runTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         deviceId: 'IPHONE-TEST-01',
-        safeZoneName: 'Flåm Skule & Samfunnshus',
+        safeZoneName: 'Fjordvik Skule & Samfunnshus',
       }),
     });
     assert.strictEqual(safe.status, 200);
@@ -152,7 +161,7 @@ async function runTests() {
         message: 'Where should I go?',
         context: {
           hasActiveIncident: true,
-          nearestSafeZone: 'Flåm Skule & Samfunnshus',
+          nearestSafeZone: 'Fjordvik Skule & Samfunnshus',
           lastVerifiedUpdate: '14:47',
           selectedLanguage: 'en',
         },
@@ -160,7 +169,7 @@ async function runTests() {
       }),
     });
     assert.strictEqual(chat.status, 200);
-    assert.match(chat.body.message, /Flåm Skule/i);
+    assert.match(chat.body.message, /Fjordvik Skule/i);
     console.log('  PASS: Assistant returned a context-grounded destination.');
 
     const transcribe = await request('/api/audio/transcribe', {
@@ -183,7 +192,7 @@ async function runTests() {
     console.log('  PASS: App returns to SAFE / ALL CLEAR state.');
 
     console.log('\n===========================================');
-    console.log('ALL 11 END-TO-END VERIFICATION TESTS PASSED');
+    console.log('ALL 12 END-TO-END VERIFICATION TESTS PASSED');
     console.log('===========================================\n');
   } finally {
     serverProcess.kill();
