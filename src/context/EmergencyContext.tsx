@@ -226,15 +226,8 @@ export const EmergencyProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
     loadStoredState();
 
-    const isLocalSimulatorAvailable =
-      Platform.OS !== 'web' ||
-      (typeof window !== 'undefined' &&
-        (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'));
-
-    if (!isLocalSimulatorAvailable) {
-      return;
-    }
-
+    // Poll the shared hub on web and native. The hub URL is always resolved
+    // (EXPO_PUBLIC_SIMULATOR_URL or the deployed Railway default).
     const interval = setInterval(async () => {
       try {
         const remoteState = await fetchIncidentFromSimulator();
