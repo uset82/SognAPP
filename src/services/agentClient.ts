@@ -1,27 +1,6 @@
-import { Platform } from 'react-native';
-import Constants from 'expo-constants';
 import { AgentResponse, ConversationTurn, EmergencyAgentContext } from '../types/chat';
 import { ALLOWED_AGENT_ACTIONS } from '../types/chat';
-
-const getSimulatorServerUrl = (): string => {
-  const configured = process.env.EXPO_PUBLIC_SIMULATOR_URL;
-  if (configured) {
-    return configured.replace(/\/$/, '');
-  }
-
-  if (Platform.OS === 'web' && typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      return 'http://localhost:4000';
-    }
-    return window.location.origin;
-  }
-  const hostUri = Constants.expoConfig?.hostUri;
-  if (hostUri) {
-    return `http://${hostUri.split(':')[0]}:4000`;
-  }
-  return 'http://localhost:4000';
-};
+import { getHubUrl } from './hubUrl';
 
 export const validateAgentResponse = (payload: unknown): AgentResponse | null => {
   if (!payload || typeof payload !== 'object') {
@@ -59,7 +38,7 @@ export const requestAgentChat = async (
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12000);
   try {
-    const response = await fetch(`${getSimulatorServerUrl()}/api/agent/chat`, {
+    const response = await fetch(`${getHubUrl()}/api/agent/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -87,7 +66,7 @@ export const requestAgentSpeech = async (
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 8000);
   try {
-    const response = await fetch(`${getSimulatorServerUrl()}/api/audio/speech`, {
+    const response = await fetch(`${getHubUrl()}/api/audio/speech`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text.slice(0, 400), language }),
@@ -119,7 +98,7 @@ export const transcribeAudioOnBackend = async (
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 20000);
   try {
-    const response = await fetch(`${getSimulatorServerUrl()}/api/audio/transcribe`, {
+    const response = await fetch(`${getHubUrl()}/api/audio/transcribe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ audioBase64, mimeType, language }),
